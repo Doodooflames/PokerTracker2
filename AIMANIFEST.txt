@@ -71,6 +71,53 @@ PokerTracker2 is a WPF (.NET 8) application for tracking poker sessions and play
 
 ## RECENT MAJOR IMPLEMENTATIONS
 
+### 2025-01-15: V1.0.7 RELEASE - SUCCESSFULLY COMPLETED ✅
+**Status: ✅ COMPLETED - Version Display Fix and Full Version Support**
+
+#### V1.0.7 Release Summary
+**Release Date**: January 15, 2025  
+**Version**: 1.0.7  
+**Build Status**: ✅ SUCCESSFUL  
+**Release Method**: Automated PowerShell Script  
+**Git Tag**: v1.0.7  
+**GitHub Release**: https://github.com/Doodooflames/PokerTracker2/releases/tag/v1.0.7  
+**Executable**: PublishSingle\PokerTracker2.exe (12MB)
+
+**Major Fix Released**:
+- **Version Display Fix**: Resolved issue where application was showing "v1.0" instead of correct version number
+- **Full Version Support**: Application now properly displays complete version (e.g., "v1.0.7.0") in login and title bars
+
+**Technical Improvements**:
+- **VersionService Enhancement**: Updated to read full assembly version instead of just Major.Minor
+- **Dynamic Version Binding**: Login screen and main window title now correctly show current project version
+- **Assembly Version Reading**: Fixed version reading from AssemblyVersion attribute in project file
+
+**Bug Fixes**:
+- **Version Display**: Fixed incorrect "v1.0" display in application title bars
+- **Login Screen**: Fixed version number display below "Status: Ready"
+- **Main Window**: Fixed title bar version display
+- **Version Consistency**: All UI elements now show the same, correct version number
+
+**Release Process**:
+1. ✅ **Version Updated**: Changed from 1.0.6 to 1.0.7 in PokerTracker2.csproj
+2. ✅ **VersionService Fixed**: Updated to read full version instead of just Major.Minor
+3. ✅ **Release Notes**: Created comprehensive release-notes-1.0.7.txt
+4. ✅ **Build Success**: Project compiled successfully with 206 warnings (no errors)
+5. ✅ **Publish Success**: Application published to PublishSingle directory
+6. ✅ **Git Operations**: Tag v1.0.7 created and committed
+7. ✅ **GitHub Release**: Successfully created at https://github.com/Doodooflames/PokerTracker2/releases/tag/v1.0.7
+8. ✅ **Executable Ready**: PokerTracker2.exe (12MB) uploaded to GitHub release
+
+**VersionService Fix Details**:
+- **Root Cause**: VersionService was only reading `Major.Minor` instead of full version
+- **Solution**: Changed from `$"{version.Major}.{version.Minor}"` to `version.ToString()`
+- **Result**: Application now shows "v1.0.7.0" instead of "v1.0" in all UI elements
+- **Fallback Values**: Updated all fallback version strings to 1.0.7.0
+
+**Next Release**: Ready for v1.0.8 when needed
+
+---
+
 ### 2025-01-15: V1.0.6 RELEASE - SUCCESSFULLY COMPLETED ✅
 **Status: ✅ COMPLETED - Enhanced Session Activity Panel, Permission System, and Admin Management**
 
