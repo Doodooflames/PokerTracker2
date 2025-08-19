@@ -72,13 +72,34 @@ git push origin $ReleaseTag
 
 # Step 5: Create GitHub release using GitHub CLI
 Write-Host "🌐 Creating GitHub release..." -ForegroundColor Yellow
+
+# Try to find GitHub CLI in common locations
+$GhPath = $null
 if (Get-Command "gh" -ErrorAction SilentlyContinue) {
+    $GhPath = "gh"
+} elseif (Test-Path "C:\Program Files\GitHub CLI\gh.exe") {
+    $GhPath = "C:\Program Files\GitHub CLI\gh.exe"
+} elseif (Test-Path "$env:LOCALAPPDATA\GitHub CLI\gh.exe") {
+    $GhPath = "$env:LOCALAPPDATA\GitHub CLI\gh.exe"
+}
+
+if ($GhPath) {
     $DraftFlag = if ($Draft) { "--draft" } else { "" }
     $NotesFlag = if ($ReleaseNotes) { "--notes '$ReleaseNotes'" } else { "" }
     
-    $GhCommand = "gh release create $ReleaseTag $ArchivePath $DraftFlag $NotesFlag --title 'Release $ReleaseTag' --repo $GitHubRepo"
+    $GhCommand = "& '$GhPath' release create $ReleaseTag $ArchivePath $DraftFlag $NotesFlag --title 'Release $ReleaseTag' --repo $GitHubRepo"
     Write-Host "Running: $GhCommand" -ForegroundColor Cyan
     Invoke-Expression $GhCommand
+    
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "✅ GitHub release created successfully!" -ForegroundColor Green
+    } else {
+        Write-Host "⚠️ GitHub release creation failed. Please create manually:" -ForegroundColor Yellow
+        Write-Host "   Go to: https://github.com/$GitHubRepo/releases/new" -ForegroundColor Cyan
+        Write-Host "   Tag: $ReleaseTag" -ForegroundColor Cyan
+        Write-Host "   Title: Release $ReleaseTag" -ForegroundColor Cyan
+        Write-Host "   Upload: $ArchivePath" -ForegroundColor Cyan
+    }
 } else {
     Write-Host "⚠️ GitHub CLI not found. Please install it or create the release manually:" -ForegroundColor Yellow
     Write-Host "   Go to: https://github.com/$GitHubRepo/releases/new" -ForegroundColor Cyan

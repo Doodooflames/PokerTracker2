@@ -69,7 +69,37 @@ git tag -a %RELEASE_TAG% -m "Release %RELEASE_TAG%"
 git push origin master
 git push origin %RELEASE_TAG%
 
-REM Step 5: Instructions for manual release creation
+REM Step 5: Try to create GitHub release automatically
+echo 🌐 Attempting to create GitHub release automatically...
+set GH_PATH=
+
+REM Try to find GitHub CLI
+where gh >nul 2>&1
+if %errorlevel% == 0 (
+    set GH_PATH=gh
+) else if exist "C:\Program Files\GitHub CLI\gh.exe" (
+    set GH_PATH="C:\Program Files\GitHub CLI\gh.exe"
+) else if exist "%LOCALAPPDATA%\GitHub CLI\gh.exe" (
+    set GH_PATH="%LOCALAPPDATA%\GitHub CLI\gh.exe"
+)
+
+if defined GH_PATH (
+    echo ✅ Found GitHub CLI at: %GH_PATH%
+    echo 🚀 Creating GitHub release...
+    %GH_PATH% release create %RELEASE_TAG% %ARCHIVE_PATH% --title "Release %RELEASE_TAG%" --repo %GITHUB_REPO% --notes "%RELEASE_NOTES%"
+    if %errorlevel% == 0 (
+        echo ✅ GitHub release created successfully!
+    ) else (
+        echo ⚠️ GitHub release creation failed. Please create manually:
+        goto :manual_release
+    )
+) else (
+    echo ⚠️ GitHub CLI not found. Please create the release manually:
+    goto :manual_release
+)
+goto :end
+
+:manual_release
 echo 🌐 Please create the GitHub release manually:
 echo   1. Go to: https://github.com/%GITHUB_REPO%/releases/new
 echo   2. Tag: %RELEASE_TAG%
@@ -77,6 +107,8 @@ echo   3. Title: Release %RELEASE_TAG%
 echo   4. Upload: %ARCHIVE_PATH%
 echo   5. Add release notes: %RELEASE_NOTES%
 echo   6. Click "Publish release"
+
+:end
 
 echo.
 echo 🎉 Release %RELEASE_TAG% prepared successfully!
