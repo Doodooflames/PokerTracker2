@@ -85,12 +85,16 @@ if %errorlevel% == 0 (
 
 if defined GH_PATH (
     echo ✅ Found GitHub CLI at: %GH_PATH%
+    echo 📝 Creating release notes file...
+    echo %RELEASE_NOTES% > temp_notes.txt
     echo 🚀 Creating GitHub release...
-    %GH_PATH% release create %RELEASE_TAG% %ARCHIVE_PATH% --title "Release %RELEASE_TAG%" --repo %GITHUB_REPO% --notes "%RELEASE_NOTES%"
+    %GH_PATH% release create %RELEASE_TAG% %ARCHIVE_PATH% --title "Release %RELEASE_TAG%" --repo %GITHUB_REPO% --notes-file temp_notes.txt
     if %errorlevel% == 0 (
         echo ✅ GitHub release created successfully!
+        del temp_notes.txt
     ) else (
         echo ⚠️ GitHub release creation failed. Please create manually:
+        del temp_notes.txt
         goto :manual_release
     )
 ) else (
