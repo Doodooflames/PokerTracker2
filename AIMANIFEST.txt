@@ -31,6 +31,7 @@ gh release create v1.0.6 PublishSingle\PokerTracker2.exe --title "Release v1.0.6
 - **Project Version**: `PokerTracker2/PokerTracker2.csproj` (lines 12-14)
 - **Release Scripts**: `scripts/create-release.ps1` (PowerShell) and `scripts/create-release.bat` (Batch)
 - **Release Notes**: Create `release-notes-{version}.txt` files for complex notes
+**Note**: Keep release notes concise and focused - avoid excessive verbosity and unnecessary sections
 
 ### GitHub CLI Path for Cursor's PowerShell:
 - **Location**: `C:\Program Files\GitHub CLI\gh.exe`
@@ -115,6 +116,16 @@ PokerTracker2 is a WPF (.NET 8) application for tracking poker sessions and play
 - **Fallback Values**: Updated all fallback version strings to 1.0.7.0
 
 **Next Release**: Ready for v1.0.8 when needed
+
+**IMPORTANT VERSION SERVICE NOTES**:
+- **Version Caching Issue**: VersionService caches version information and must be updated when version changes
+- **Fallback Values**: All fallback version strings in VersionService must be updated to match new project version
+- **Update Required**: When bumping version in .csproj, also update these lines in VersionService.cs:
+  - Line ~30: `_cachedVersion = "1.0.7.0";` → update to new version
+  - Line ~67: `_cachedFileVersion = version?.ToString() ?? "1.0.7.0";` → update to new version  
+  - Line ~85: `_cachedAssemblyVersion = version?.ToString() ?? "1.0.7.0";` → update to new version
+- **Why This Matters**: If fallback values aren't updated, old cached versions may display in UI
+- **Best Practice**: Always update both .csproj version AND VersionService fallback values together
 
 ---
 
