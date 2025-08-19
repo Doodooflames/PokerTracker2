@@ -32,6 +32,12 @@ gh release create v1.0.6 PublishSingle\PokerTracker2.exe --title "Release v1.0.6
 - **Release Scripts**: `scripts/create-release.ps1` (PowerShell) and `scripts/create-release.bat` (Batch)
 - **Release Notes**: Create `release-notes-{version}.txt` files for complex notes
 
+### GitHub CLI Path for Cursor's PowerShell:
+- **Location**: `C:\Program Files\GitHub CLI\gh.exe`
+- **Version**: 2.76.2 (2025-07-30)
+- **Authentication**: ✅ Authenticated as Doodooflames
+- **Note**: Use `& "C:\Program Files\GitHub CLI\gh.exe"` syntax in PowerShell
+
 ### Version Management:
 - **Dynamic Binding**: Version numbers automatically update in UI from project file
 - **VersionService**: `PokerTracker2/Services/VersionService.cs` handles runtime version reading
@@ -101,6 +107,10 @@ PokerTracker2 is a WPF (.NET 8) application for tracking poker sessions and play
 4. ✅ **Publish Success**: Application published to PublishSingle directory
 5. ✅ **Git Operations**: Tag v1.0.6 created and committed
 6. ✅ **Executable Ready**: PokerTracker2.exe (12MB) ready for distribution
+7. ✅ **GitHub CLI Found**: Located at `C:\Program Files\GitHub CLI\gh.exe` (version 2.76.2)
+8. ✅ **Authentication**: GitHub CLI authenticated as Doodooflames
+9. ✅ **GitHub Release Created**: Successfully created using `& "C:\Program Files\GitHub CLI\gh.exe"`
+10. ✅ **Release Complete**: v1.0.6 now available on GitHub with executable download
 
 **VersionService Verification**:
 - ✅ **No Hash Strings**: Confirmed VersionService uses AssemblyVersion (not AssemblyInformationalVersion)
