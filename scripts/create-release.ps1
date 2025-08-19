@@ -9,7 +9,10 @@ param(
     [string]$ReleaseNotes = "",
     
     [Parameter(Mandatory=$false)]
-    [switch]$Draft
+    [switch]$Draft,
+    
+    [Parameter(Mandatory=$false)]
+    [switch]$NoZip
 )
 
 # Configuration
@@ -43,24 +46,36 @@ if ($LASTEXITCODE -ne 0) {
     exit 1
 }
 
-# Step 3: Create release archive
-Write-Host "📁 Creating release archive..." -ForegroundColor Yellow
-$ArchiveName = "$ProjectName-$Version.zip"
-$ArchivePath = Join-Path $PublishDir $ArchiveName
-
-# Check if 7-Zip is available, otherwise use PowerShell compression
-if (Get-Command "7z" -ErrorAction SilentlyContinue) {
-    7z a -tzip $ArchivePath "$PublishDir\*" -r
+# Step 3: Create release archive (optional)
+if ($NoZip) {
+    Write-Host "🚫 Skipping zip creation - will upload EXE directly" -ForegroundColor Yellow
+    $ArchivePath = Join-Path $PublishDir "PokerTracker2.exe"
+    $UploadFile = $ArchivePath
 } else {
-    Compress-Archive -Path "$PublishDir\*" -DestinationPath $ArchivePath -Force
+    Write-Host "📁 Creating release archive..." -ForegroundColor Yellow
+    $ArchiveName = "$ProjectName-$Version.zip"
+    $ArchivePath = Join-Path $PublishDir $ArchiveName
+    
+    # Clean out old zip files before creating new archive
+    Write-Host "🧹 Cleaning old zip files..." -ForegroundColor Yellow
+    Get-ChildItem -Path $PublishDir -Filter "*.zip" | Remove-Item -Force
+    
+    # Create archive with only the executable
+    Write-Host "📦 Creating archive with executable only..." -ForegroundColor Yellow
+    if (Get-Command "7z" -ErrorAction SilentlyContinue) {
+        7z a -tzip $ArchivePath "$PublishDir\*.exe"
+    } else {
+        Compress-Archive -Path "$PublishDir\*.exe" -DestinationPath $ArchivePath -Force
+    }
+    
+    if (-not (Test-Path $ArchivePath)) {
+        Write-Host "❌ Failed to create archive!" -ForegroundColor Red
+        exit 1
+    }
+    
+    Write-Host "✅ Archive created: $ArchiveName" -ForegroundColor Green
+    $UploadFile = $ArchivePath
 }
-
-if (-not (Test-Path $ArchivePath)) {
-    Write-Host "❌ Failed to create archive!" -ForegroundColor Red
-    exit 1
-}
-
-Write-Host "✅ Archive created: $ArchiveName" -ForegroundColor Green
 
 # Step 4: Commit and tag the release
 Write-Host "🏷️ Creating Git tag..." -ForegroundColor Yellow
@@ -87,7 +102,7 @@ if ($GhPath) {
     $DraftFlag = if ($Draft) { "--draft" } else { "" }
     $NotesFlag = if ($ReleaseNotes) { "--notes '$ReleaseNotes'" } else { "" }
     
-    $GhCommand = "& '$GhPath' release create $ReleaseTag $ArchivePath $DraftFlag $NotesFlag --title 'Release $ReleaseTag' --repo $GitHubRepo"
+    $GhCommand = "& '$GhPath' release create $ReleaseTag $UploadFile $DraftFlag $NotesFlag --title 'Release $ReleaseTag' --repo $GitHubRepo"
     Write-Host "Running: $GhCommand" -ForegroundColor Cyan
     Invoke-Expression $GhCommand
     
@@ -109,5 +124,9 @@ if ($GhPath) {
 }
 
 Write-Host "🎉 Release $ReleaseTag created successfully!" -ForegroundColor Green
-Write-Host "📁 Archive: $ArchivePath" -ForegroundColor Cyan
+if ($NoZip) {
+    Write-Host "📁 Executable: $UploadFile" -ForegroundColor Cyan
+} else {
+    Write-Host "📁 Archive: $ArchivePath" -ForegroundColor Cyan
+}
 Write-Host "🌐 GitHub: https://github.com/$GitHubRepo/releases/tag/$ReleaseTag" -ForegroundColor Cyan

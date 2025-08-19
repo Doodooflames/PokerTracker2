@@ -6,8 +6,10 @@ REM Usage: create-release.bat [version] [release-notes]
 
 if "%1"=="" (
     echo ❌ Please provide a version number
-    echo Usage: create-release.bat [version] [release-notes]
-    echo Example: create-release.bat 1.0.0 "Initial release"
+    echo Usage: create-release.bat [version] [release-notes] [--no-zip]
+    echo Examples:
+    echo   create-release.bat 1.0.0 "Initial release"
+    echo   create-release.bat 1.0.0 "Initial release" --no-zip
     pause
     exit /b 1
 )
@@ -47,19 +49,34 @@ if errorlevel 1 (
     exit /b 1
 )
 
-REM Step 3: Create archive
-echo 📁 Creating release archive...
-set ARCHIVE_NAME=%PROJECT_NAME%-%VERSION%.zip
-set ARCHIVE_PATH=%PUBLISH_DIR%\%ARCHIVE_NAME%
-
-powershell -Command "Compress-Archive -Path '%PUBLISH_DIR%\*' -DestinationPath '%ARCHIVE_PATH%' -Force"
-if not exist "%ARCHIVE_PATH%" (
-    echo ❌ Failed to create archive!
-    pause
-    exit /b 1
+REM Step 3: Create archive (optional)
+set SKIP_ZIP=%3
+if "%SKIP_ZIP%"=="--no-zip" (
+    echo 🚫 Skipping zip creation - will upload EXE directly
+    set ARCHIVE_PATH=%PUBLISH_DIR%\PokerTracker2.exe
+    set UPLOAD_FILE=%ARCHIVE_PATH%
+    echo ✅ Will upload EXE directly: %UPLOAD_FILE%
+) else (
+    echo 📁 Creating release archive...
+    set ARCHIVE_NAME=%PROJECT_NAME%-%VERSION%.zip
+    set ARCHIVE_PATH=%PUBLISH_DIR%\%ARCHIVE_NAME%
+    
+    REM Clean out old zip files before creating new archive
+    echo 🧹 Cleaning old zip files...
+    del /Q "%PUBLISH_DIR%\*.zip" 2>nul
+    
+    REM Create archive with only the executable
+    echo 📦 Creating archive with executable only...
+    powershell -Command "Compress-Archive -Path '%PUBLISH_DIR%\*.exe' -DestinationPath '%ARCHIVE_PATH%' -Force"
+    if not exist "%ARCHIVE_PATH%" (
+        echo ❌ Failed to create archive!
+        pause
+        exit /b 1
+    )
+    
+    echo ✅ Archive created: %ARCHIVE_NAME%
+    set UPLOAD_FILE=%ARCHIVE_PATH%
 )
-
-echo ✅ Archive created: %ARCHIVE_NAME%
 
 REM Step 4: Git operations
 echo 🏷️ Creating Git tag...
@@ -88,7 +105,7 @@ if defined GH_PATH (
     echo 📝 Creating release notes file...
     powershell -Command "Set-Content -Path 'temp_notes.txt' -Value '%RELEASE_NOTES%'"
     echo 🚀 Creating GitHub release...
-    %GH_PATH% release create %RELEASE_TAG% %ARCHIVE_PATH% --title "Release %RELEASE_TAG%" --repo %GITHUB_REPO% --notes-file temp_notes.txt > temp_gh_output.txt 2>&1
+    %GH_PATH% release create %RELEASE_TAG% %UPLOAD_FILE% --title "Release %RELEASE_TAG%" --repo %GITHUB_REPO% --notes-file temp_notes.txt > temp_gh_output.txt 2>&1
     set GH_EXIT_CODE=%errorlevel%
     type temp_gh_output.txt
     if %GH_EXIT_CODE% == 0 (
@@ -113,7 +130,7 @@ echo 🌐 Please create the GitHub release manually:
 echo   1. Go to: https://github.com/%GITHUB_REPO%/releases/new
 echo   2. Tag: %RELEASE_TAG%
 echo   3. Title: Release %RELEASE_TAG%
-echo   4. Upload: %ARCHIVE_PATH%
+echo   4. Upload: %UPLOAD_FILE%
 echo   5. Add release notes: %RELEASE_NOTES%
 echo   6. Click "Publish release"
 
@@ -121,7 +138,11 @@ echo   6. Click "Publish release"
 
 echo.
 echo 🎉 Release %RELEASE_TAG% prepared successfully!
-echo 📁 Archive: %ARCHIVE_PATH%
+if "%SKIP_ZIP%"=="--no-zip" (
+    echo 📁 Executable: %UPLOAD_FILE%
+) else (
+    echo 📁 Archive: %ARCHIVE_PATH%
+)
 echo 🌐 GitHub: https://github.com/%GITHUB_REPO%/releases/tag/%RELEASE_TAG%
 
 pause
