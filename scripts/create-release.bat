@@ -107,10 +107,9 @@ if defined GH_PATH (
     echo %RELEASE_NOTES% > temp_notes.txt
     echo 🚀 Creating GitHub release...
     %GH_PATH% release create %RELEASE_TAG% %UPLOAD_FILE% --title "Release %RELEASE_TAG%" --repo %GITHUB_REPO% --notes-file temp_notes.txt > temp_gh_output.txt 2>&1
-    set GH_EXIT_CODE=%errorlevel%
     
-    REM Check if the release was actually created by looking for the URL in output
-    findstr /C:"https://github.com/%GITHUB_REPO%/releases/tag/%RELEASE_TAG%" temp_gh_output.txt >nul
+    REM Check if the release was actually created by querying GitHub CLI
+    %GH_PATH% release view %RELEASE_TAG% --repo %GITHUB_REPO% >nul 2>&1
     if %errorlevel% == 0 (
         echo ✅ GitHub release created successfully!
         del temp_notes.txt
