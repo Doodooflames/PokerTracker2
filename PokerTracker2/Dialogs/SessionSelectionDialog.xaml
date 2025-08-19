@@ -1,0 +1,266 @@
+<Window x:Class="PokerTracker2.Dialogs.SessionSelectionDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+        Title="Select Session" Height="600" Width="800"
+        WindowStartupLocation="CenterOwner"
+        Background="Transparent"
+        ResizeMode="NoResize"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        ShowInTaskbar="False">
+    
+    <Window.Resources>
+        <Style x:Key="SessionItemStyle" TargetType="Border">
+            <Setter Property="Background" Value="#60000000"/>
+            <Setter Property="BorderBrush" Value="#40FFFFFF"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="15"/>
+            <Setter Property="Margin" Value="0,5"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#80000000"/>
+                    <Setter Property="BorderBrush" Value="#60FFFFFF"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+    
+    <Border Background="#80000000" 
+            CornerRadius="8" 
+            BorderBrush="#40FFFFFF" 
+            BorderThickness="1">
+        <Border.Effect>
+            <DropShadowEffect Color="#000000" 
+                              Direction="270" 
+                              ShadowDepth="8" 
+                              Opacity="0.5" 
+                              BlurRadius="16"/>
+        </Border.Effect>
+        
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            
+            <!-- Title Bar -->
+            <Border x:Name="titleBar" Grid.Row="0" 
+                    Background="#C0000000" 
+                    BorderBrush="#60FFFFFF" 
+                    BorderThickness="0,0,0,1" 
+                    CornerRadius="8,8,0,0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <TextBlock Grid.Column="0" Text="Select Session to Load" 
+                               FontSize="18" FontWeight="Bold" Foreground="White" 
+                               VerticalAlignment="Center" Margin="20,15"/>
+                    
+                    <Button Grid.Column="1" Content="✕" Width="45" Height="32" 
+                            Background="Transparent" BorderThickness="0" 
+                            Foreground="White" Click="CloseButton_Click"
+                            FontSize="16" FontWeight="Bold"/>
+                </Grid>
+            </Border>
+            
+            <!-- Content -->
+            <Grid Grid.Row="1" Margin="20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                
+                <!-- Tabs -->
+                <TabControl Grid.Row="0" Background="Transparent" BorderThickness="0" Margin="0,0,0,20">
+                    <TabControl.Resources>
+                        <Style TargetType="TabItem">
+                            <Setter Property="Background" Value="#40000000"/>
+                            <Setter Property="Foreground" Value="#CCCCCC"/>
+                            <Setter Property="BorderThickness" Value="0"/>
+                            <Setter Property="Padding" Value="20,10"/>
+                            <Setter Property="FontWeight" Value="SemiBold"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="TabItem">
+                                        <Border Background="{TemplateBinding Background}"
+                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                BorderThickness="{TemplateBinding BorderThickness}"
+                                                Padding="{TemplateBinding Padding}">
+                                            <ContentPresenter ContentSource="Header"
+                                                            HorizontalAlignment="Center"
+                                                            VerticalAlignment="Center"/>
+                                        </Border>
+                                                                                 <ControlTemplate.Triggers>
+                                             <Trigger Property="IsSelected" Value="True">
+                                                 <Setter Property="Background" Value="#60000000"/>
+                                                 <Setter Property="Foreground" Value="White"/>
+                                                 <Setter Property="BorderBrush" Value="#4FC3F7"/>
+                                                 <Setter Property="BorderThickness" Value="0,0,0,2"/>
+                                             </Trigger>
+                                             <Trigger Property="IsMouseOver" Value="True">
+                                                 <Setter Property="Background" Value="#50000000"/>
+                                             </Trigger>
+                                         </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </TabControl.Resources>
+                    
+                    <TabItem Header="Active Sessions">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="400">
+                            <ItemsControl x:Name="ActiveSessionsList">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Style="{StaticResource SessionItemStyle}" 
+                                                MouseLeftButtonDown="SessionItem_MouseLeftButtonDown" 
+                                                Tag="{Binding}">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+                                                
+                                                <Grid Grid.Row="0">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    
+                                                    <TextBlock Grid.Column="0" Text="{Binding Name}" 
+                                                               FontSize="16" FontWeight="Bold" Foreground="White"/>
+                                                    <Border Grid.Column="1" Background="#4CAF50" CornerRadius="4" 
+                                                            Padding="8,4" Margin="10,0,0,0">
+                                                        <TextBlock Text="ACTIVE" FontSize="10" FontWeight="Bold" 
+                                                                   Foreground="White"/>
+                                                    </Border>
+                                                </Grid>
+                                                
+                                                <TextBlock Grid.Row="1" Text="{Binding StartTime, StringFormat='Started: {0:g}'}" 
+                                                           FontSize="12" Foreground="#CCCCCC" Margin="0,5,0,0"/>
+                                                
+                                                <Grid Grid.Row="2" Margin="0,5,0,0">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    
+                                                    <TextBlock Grid.Column="0" Text="{Binding DurationText}" 
+                                                               FontSize="11" Foreground="#4FC3F7"/>
+                                                    <TextBlock Grid.Column="1" Text="Buy-ins:" FontSize="11" 
+                                                               Foreground="#CCCCCC" Margin="10,0,0,0"/>
+                                                    <TextBlock Grid.Column="2" Text="{Binding TotalBuyIns, StringFormat='${0:F2}'}" 
+                                                               FontSize="11" Foreground="White" Margin="5,0,0,0"/>
+                                                </Grid>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </TabItem>
+                    
+                    <TabItem Header="Completed Sessions">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="400">
+                            <ItemsControl x:Name="CompletedSessionsList">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Style="{StaticResource SessionItemStyle}" 
+                                                MouseLeftButtonDown="SessionItem_MouseLeftButtonDown" 
+                                                Tag="{Binding}">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+                                                
+                                                <Grid Grid.Row="0">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    
+                                                    <TextBlock Grid.Column="0" Text="{Binding Name}" 
+                                                               FontSize="16" FontWeight="Bold" Foreground="White"/>
+                                                    <Border Grid.Column="1" Background="#FF9800" CornerRadius="4" 
+                                                            Padding="8,4" Margin="10,0,0,0">
+                                                        <TextBlock Text="COMPLETED" FontSize="10" FontWeight="Bold" 
+                                                                   Foreground="White"/>
+                                                    </Border>
+                                                </Grid>
+                                                
+                                                <TextBlock Grid.Row="1" Text="{Binding EndTime, StringFormat='Ended: {0:g}'}" 
+                                                           FontSize="12" Foreground="#CCCCCC" Margin="0,5,0,0"/>
+                                                
+                                                <Grid Grid.Row="2" Margin="0,5,0,0">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    
+                                                    <TextBlock Grid.Column="0" Text="{Binding DurationText}" 
+                                                               FontSize="11" Foreground="#4FC3F7"/>
+                                                    <TextBlock Grid.Column="1" Text="Profit:" FontSize="11" 
+                                                               Foreground="#CCCCCC" Margin="10,0,0,0"/>
+                                                    <TextBlock Grid.Column="2" Text="{Binding ProfitText}" 
+                                                               FontSize="11" FontWeight="Bold" Margin="5,0,0,0">
+                                                        <TextBlock.Foreground>
+                                                            <SolidColorBrush Color="{Binding NetProfit, Converter={StaticResource ProfitColorConverter}}"/>
+                                                        </TextBlock.Foreground>
+                                                    </TextBlock>
+                                                    <TextBlock Grid.Column="3" Text="{Binding TotalBuyIns, StringFormat='Buy-ins: ${0:F2}'}" 
+                                                               FontSize="11" Foreground="#CCCCCC" Margin="10,0,0,0"/>
+                                                </Grid>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </TabItem>
+                </TabControl>
+                
+                <!-- No Sessions Message -->
+                <TextBlock Grid.Row="1" x:Name="NoSessionsText" 
+                           Text="No sessions found. Create a new session first." 
+                           FontSize="16" Foreground="#CCCCCC" 
+                           HorizontalAlignment="Center" VerticalAlignment="Center"
+                           Visibility="Collapsed"/>
+            </Grid>
+            
+            <!-- Buttons -->
+            <Border Grid.Row="2" Background="#2A2A4E" BorderBrush="#0F3460" BorderThickness="0,1,0,0" Padding="20,15">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <TextBlock Grid.Column="0" x:Name="SelectedSessionInfo" 
+                               Text="No session selected" 
+                               FontSize="12" Foreground="#CCCCCC" 
+                               VerticalAlignment="Center"/>
+                    
+                    <ui:Button Grid.Column="1" x:Name="LoadButton" Content="Load Session" 
+                               Appearance="Primary" Margin="0,0,10,0" 
+                               Click="LoadButton_Click" IsEnabled="False"/>
+                    <ui:Button Grid.Column="2" Content="Cancel" 
+                               Appearance="Secondary" Click="CancelButton_Click"/>
+                </Grid>
+            </Border>
+        </Grid>
+    </Border>
+</Window>

@@ -1,0 +1,19 @@
+<Application
+    x:Class="PokerTracker2.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:local="clr-namespace:PokerTracker2">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ui:ThemesDictionary Theme="Dark" />
+                <ui:ControlsDictionary />
+            </ResourceDictionary.MergedDictionaries>
+            
+            <!-- Converters -->
+            <local:ProfitColorConverter x:Key="ProfitColorConverter"/>
+            <local:StatusColorConverter x:Key="StatusColorConverter"/>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application> 

@@ -1,0 +1,578 @@
+import { Button, VerticalBox, HorizontalBox, Text, TextInput, ListView, StandardButton, Dialog, LineEdit } from "std-widgets.slint";
+
+struct PlayerData {
+    id: int,
+    name: string,
+    initial_buy_in: float,
+}
+
+struct TransactionData {
+    id: int,
+    player_id: int,
+    player_name: string,
+    type: string,
+    amount: float,
+    notes: string,
+    timestamp: string,
+}
+
+struct SessionData {
+    id: int,
+    name: string,
+    notes: string,
+    total_buy_ins: float,
+    total_cash_outs: float,
+    session_profit: float,
+}
+
+struct TransferData {
+    from_player: string,
+    to_player: string,
+    amount: float,
+}
+
+export component AppWindow inherits Window {
+    title: "Poker Session Tracker";
+    width: 1200px;
+    height: 800px;
+    
+    // Data
+    current_session: SessionData;
+    players: [PlayerData];
+    transactions: [TransactionData];
+    optimal_transfers: [TransferData];
+    show_welcome: bool = true;
+    show_session: bool = false;
+    
+    // Callbacks
+    callback create-new-session();
+    callback load-session();
+    callback add-player(name: string, initial-buy-in: float);
+    callback add-buy-in(player-id: int, amount: float, notes: string);
+    callback add-cash-out(player-id: int, amount: float, notes: string);
+    callback calculate-optimal-transfers();
+    callback save-session();
+    
+    // Welcome Screen
+    WelcomeScreen {
+        visible: root.show_welcome;
+        on-create-new-session() => {
+            root.create-new-session();
+        }
+        on-load-session() => {
+            root.load-session();
+        }
+    }
+    
+    // Main Session Screen
+    SessionScreen {
+        visible: root.show_session;
+        current-session: root.current_session;
+        players: root.players;
+        transactions: root.transactions;
+        optimal-transfers: root.optimal_transfers;
+        on-add-player(name, initial-buy-in) => {
+            root.add-player(name, initial-buy-in);
+        }
+        on-add-buy-in(player-id, amount, notes) => {
+            root.add-buy-in(player-id, amount, notes);
+        }
+        on-add-cash-out(player-id, amount, notes) => {
+            root.add-cash-out(player-id, amount, notes);
+        }
+        on-calculate-optimal-transfers() => {
+            root.calculate-optimal-transfers();
+        }
+        on-save-session() => {
+            root.save-session();
+        }
+    }
+}
+
+component WelcomeScreen {
+    VerticalBox {
+        padding: 20px;
+        spacing: 20px;
+        
+        Text {
+            text: "Poker Session Tracker";
+            font-size: 32px;
+            font-weight: 700;
+            color: #FFD700;
+            horizontal-alignment: center;
+        }
+        
+        Text {
+            text: "Track your poker sessions with ease";
+            font-size: 16px;
+            color: #CCCCCC;
+            horizontal-alignment: center;
+        }
+        
+        VerticalBox {
+            spacing: 15px;
+            horizontal-alignment: center;
+            
+            Button {
+                text: "Create New Session";
+                width: 200px;
+                height: 50px;
+                background: #2a2a2a;
+                border-width: 2px;
+                border-color: #FFD700;
+                border-radius: 8px;
+                color: #FFD700;
+                font-size: 16px;
+                font-weight: 600;
+                
+                clicked => {
+                    root.create-new-session();
+                }
+                
+                hovered => {
+                    background: #3a3a3a;
+                    border-color: #FFED4E;
+                }
+            }
+            
+            Button {
+                text: "Load Existing Session";
+                width: 200px;
+                height: 50px;
+                background: #2a2a2a;
+                border-width: 2px;
+                border-color: #333333;
+                border-radius: 8px;
+                color: #FFFFFF;
+                font-size: 16px;
+                font-weight: 600;
+                
+                clicked => {
+                    root.load-session();
+                }
+                
+                hovered => {
+                    background: #3a3a3a;
+                    border-color: #FFD700;
+                }
+            }
+        }
+    }
+    
+    callback create-new-session();
+    callback load-session();
+}
+
+component SessionScreen {
+    current-session: SessionData;
+    players: [PlayerData];
+    transactions: [TransactionData];
+    optimal-transfers: [TransferData];
+    
+    callback add-player(name: string, initial-buy-in: float);
+    callback add-buy-in(player-id: int, amount: float, notes: string);
+    callback add-cash-out(player-id: int, amount: float, notes: string);
+    callback calculate-optimal-transfers();
+    callback save-session();
+    
+    VerticalBox {
+        padding: 20px;
+        spacing: 20px;
+        
+        // Header
+        HorizontalBox {
+            spacing: 20px;
+            vertical-alignment: center;
+            
+            Text {
+                text: root.current-session.name;
+                font-size: 24px;
+                font-weight: 700;
+                color: #FFD700;
+            }
+            
+            HorizontalBox {
+                spacing: 10px;
+                
+                Button {
+                    text: "Save Session";
+                    background: #2a2a2a;
+                    border-width: 2px;
+                    border-color: #FFD700;
+                    border-radius: 6px;
+                    color: #FFD700;
+                    font-weight: 600;
+                    
+                    clicked => {
+                        root.save-session();
+                    }
+                }
+            }
+        }
+        
+        // Main Content
+        HorizontalBox {
+            spacing: 20px;
+            
+            // Left Panel - Players and Buy-ins
+            VerticalBox {
+                width: 400px;
+                spacing: 15px;
+                
+                // Players Section
+                VerticalBox {
+                    spacing: 10px;
+                    
+                    Text {
+                        text: "PLAYERS";
+                        font-size: 14px;
+                        font-weight: 700;
+                        color: #FFD700;
+                        background: #2a2a2a;
+                        padding: 8px;
+                        border-radius: 4px;
+                    }
+                    
+                    ListView {
+                        for player in root.players: PlayerItem {
+                            player-data: player;
+                        }
+                    }
+                    
+                    Button {
+                        text: "Add Player";
+                        background: #2a2a2a;
+                        border-width: 2px;
+                        border-color: #FFD700;
+                        border-radius: 6px;
+                        color: #FFD700;
+                        font-weight: 600;
+                        
+                        clicked => {
+                            add-player-dialog.open();
+                        }
+                    }
+                }
+                
+                // Buy-ins Section
+                VerticalBox {
+                    spacing: 10px;
+                    
+                    Text {
+                        text: "BUY-INS";
+                        font-size: 14px;
+                        font-weight: 700;
+                        color: #FFD700;
+                        background: #2a2a2a;
+                        padding: 8px;
+                        border-radius: 4px;
+                    }
+                    
+                    ListView {
+                        for transaction in root.transactions: TransactionItem {
+                            transaction-data: transaction;
+                            visible: transaction.type == "Buy-In";
+                        }
+                    }
+                }
+            }
+            
+            // Center Panel - Cash-outs and Transactions
+            VerticalBox {
+                width: 400px;
+                spacing: 15px;
+                
+                // Cash-outs Section
+                VerticalBox {
+                    spacing: 10px;
+                    
+                    Text {
+                        text: "CASH-OUTS";
+                        font-size: 14px;
+                        font-weight: 700;
+                        color: #FFD700;
+                        background: #2a2a2a;
+                        padding: 8px;
+                        border-radius: 4px;
+                    }
+                    
+                    ListView {
+                        for transaction in root.transactions: TransactionItem {
+                            transaction-data: transaction;
+                            visible: transaction.type == "Cash-Out";
+                        }
+                    }
+                }
+                
+                // Transaction Log Section
+                VerticalBox {
+                    spacing: 10px;
+                    
+                    Text {
+                        text: "TRANSACTION LOG";
+                        font-size: 14px;
+                        font-weight: 700;
+                        color: #FFD700;
+                        background: #2a2a2a;
+                        padding: 8px;
+                        border-radius: 4px;
+                    }
+                    
+                    ListView {
+                        for transaction in root.transactions: TransactionItem {
+                            transaction-data: transaction;
+                        }
+                    }
+                }
+            }
+            
+            // Right Panel - Totals and Optimize
+            VerticalBox {
+                width: 300px;
+                spacing: 15px;
+                
+                // Totals Section
+                VerticalBox {
+                    spacing: 10px;
+                    
+                    Text {
+                        text: "TOTALS";
+                        font-size: 14px;
+                        font-weight: 700;
+                        color: #FFD700;
+                        background: #2a2a2a;
+                        padding: 8px;
+                        border-radius: 4px;
+                    }
+                    
+                    VerticalBox {
+                        spacing: 8px;
+                        
+                        HorizontalBox {
+                            Text { text: "Total Buy-ins:"; color: #CCCCCC; }
+                            Text { text: "$" + root.current-session.total-buy-ins; color: #FFFFFF; font-weight: 600; }
+                        }
+                        
+                        HorizontalBox {
+                            Text { text: "Total Cash-outs:"; color: #CCCCCC; }
+                            Text { text: "$" + root.current-session.total-cash-outs; color: #FFFFFF; font-weight: 600; }
+                        }
+                        
+                        HorizontalBox {
+                            Text { text: "Session Profit:"; color: #CCCCCC; }
+                            Text { 
+                                text: "$" + root.current-session.session-profit; 
+                                color: root.current-session.session-profit >= 0 ? #00FF00 : #FF0000; 
+                                font-weight: 600; 
+                            }
+                        }
+                    }
+                }
+                
+                // Optimize Section
+                VerticalBox {
+                    spacing: 10px;
+                    
+                    Text {
+                        text: "OPTIMIZE PAYOUTS";
+                        font-size: 14px;
+                        font-weight: 700;
+                        color: #FFD700;
+                        background: #2a2a2a;
+                        padding: 8px;
+                        border-radius: 4px;
+                    }
+                    
+                    Button {
+                        text: "Calculate Optimal Transfers";
+                        background: #2a2a2a;
+                        border-width: 2px;
+                        border-color: #FFD700;
+                        border-radius: 6px;
+                        color: #FFD700;
+                        font-weight: 600;
+                        
+                        clicked => {
+                            root.calculate-optimal-transfers();
+                        }
+                    }
+                    
+                    ListView {
+                        for transfer in root.optimal-transfers: TransferItem {
+                            transfer-data: transfer;
+                        }
+                    }
+                }
+                
+                // Notes Section
+                VerticalBox {
+                    spacing: 10px;
+                    
+                    Text {
+                        text: "NOTES";
+                        font-size: 14px;
+                        font-weight: 700;
+                        color: #FFD700;
+                        background: #2a2a2a;
+                        padding: 8px;
+                        border-radius: 4px;
+                    }
+                    
+                    TextInput {
+                        text: root.current-session.notes;
+                        placeholder-text: "Add session notes...";
+                        height: 100px;
+                        background: #3a3a3a;
+                        border-width: 1px;
+                        border-color: #4a4a4a;
+                        border-radius: 4px;
+                        color: #FFFFFF;
+                    }
+                }
+            }
+        }
+    }
+    
+    // Dialogs
+    AddPlayerDialog := Dialog {
+        title: "Add Player";
+        width: 300px;
+        height: 200px;
+        
+        VerticalBox {
+            spacing: 15px;
+            padding: 20px;
+            
+            Text { text: "Player Name:"; color: #FFFFFF; }
+            LineEdit {
+                id: player-name-input;
+                placeholder-text: "Enter player name";
+                background: #3a3a3a;
+                border-width: 1px;
+                border-color: #4a4a4a;
+                border-radius: 4px;
+                color: #FFFFFF;
+            }
+            
+            Text { text: "Initial Buy-in:"; color: #FFFFFF; }
+            LineEdit {
+                id: initial-buy-in-input;
+                placeholder-text: "0.00";
+                background: #3a3a3a;
+                border-width: 1px;
+                border-color: #4a4a4a;
+                border-radius: 4px;
+                color: #FFFFFF;
+            }
+            
+            HorizontalBox {
+                spacing: 10px;
+                
+                Button {
+                    text: "Cancel";
+                    background: #2a2a2a;
+                    border-width: 1px;
+                    border-color: #4a4a4a;
+                    border-radius: 4px;
+                    color: #FFFFFF;
+                    
+                    clicked => {
+                        add-player-dialog.close();
+                    }
+                }
+                
+                Button {
+                    text: "Add Player";
+                    background: #2a2a2a;
+                    border-width: 2px;
+                    border-color: #FFD700;
+                    border-radius: 4px;
+                    color: #FFD700;
+                    font-weight: 600;
+                    
+                    clicked => {
+                        root.add-player(player-name-input.text, initial-buy-in-input.text);
+                        add-player-dialog.close();
+                    }
+                }
+            }
+        }
+    }
+    
+    add-player-dialog := AddPlayerDialog;
+}
+
+component PlayerItem {
+    player-data: PlayerData;
+    
+    HorizontalBox {
+        spacing: 10px;
+        padding: 8px;
+        background: #3a3a3a;
+        border-radius: 4px;
+        
+        VerticalBox {
+            Text {
+                text: root.player-data.name;
+                color: #FFFFFF;
+                font-weight: 600;
+            }
+            Text {
+                text: "Initial: $" + root.player-data.initial-buy-in;
+                color: #CCCCCC;
+                font-size: 12px;
+            }
+        }
+    }
+}
+
+component TransactionItem {
+    transaction-data: TransactionData;
+    
+    HorizontalBox {
+        spacing: 10px;
+        padding: 8px;
+        background: #3a3a3a;
+        border-radius: 4px;
+        
+        VerticalBox {
+            Text {
+                text: root.transaction-data.player-name + " - " + root.transaction-data.type;
+                color: #FFFFFF;
+                font-weight: 600;
+            }
+            Text {
+                text: "$" + root.transaction-data.amount;
+                color: root.transaction-data.type == "Buy-In" ? #FF6B6B : #4ECDC4;
+                font-weight: 600;
+            }
+            if root.transaction-data.notes != "": Text {
+                text: root.transaction-data.notes;
+                color: #CCCCCC;
+                font-size: 12px;
+            }
+        }
+    }
+}
+
+component TransferItem {
+    transfer-data: TransferData;
+    
+    HorizontalBox {
+        spacing: 10px;
+        padding: 8px;
+        background: #3a3a3a;
+        border-radius: 4px;
+        
+        Text {
+            text: root.transfer-data.from-player + " → " + root.transfer-data.to-player;
+            color: #FFFFFF;
+            font-weight: 600;
+        }
+        Text {
+            text: "$" + root.transfer-data.amount;
+            color: #FFD700;
+            font-weight: 600;
+        }
+    }
+} 

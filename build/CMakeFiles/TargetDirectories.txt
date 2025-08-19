@@ -1,0 +1,4 @@
+C:/Users/domin/source/repos/PokerTracker2/build/CMakeFiles/PokerTracker2.dir
+C:/Users/domin/source/repos/PokerTracker2/build/CMakeFiles/INSTALL.dir
+C:/Users/domin/source/repos/PokerTracker2/build/CMakeFiles/ALL_BUILD.dir
+C:/Users/domin/source/repos/PokerTracker2/build/CMakeFiles/ZERO_CHECK.dir

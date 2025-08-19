@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\domin\source\repos\PokerTracker2\build\CMakeFiles\78b5ffce7453486a62107844d37adcab\INSTALL_force.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{5E8B94FE-1610-3D35-BE21-F3006DAB4E37}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

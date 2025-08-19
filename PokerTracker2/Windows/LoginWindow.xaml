@@ -1,0 +1,375 @@
+<Window x:Class="PokerTracker2.Windows.LoginWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="PokerTracker2 - Login" 
+        Height="600" 
+        Width="400"
+        WindowStartupLocation="CenterScreen"
+        Background="Transparent"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        AllowsTransparency="True">
+    
+    <Window.Resources>
+        <!-- Aero Button Style - Matching Main App -->
+        <Style x:Key="AeroButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#800F3460"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="#40FFFFFF"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="20,10"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#801A4A80"/>
+                                <Setter Property="BorderBrush" Value="#60FFFFFF"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#800A2A50"/>
+                                <Setter Property="BorderBrush" Value="#80FFFFFF"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+                            <!-- Aero TextBox Style - Matching Main App -->
+                    <Style x:Key="AeroTextBoxStyle" TargetType="TextBox">
+                        <Setter Property="Background" Value="#60000000"/>
+                        <Setter Property="Foreground" Value="White"/>
+                        <Setter Property="BorderBrush" Value="#40FFFFFF"/>
+                        <Setter Property="BorderThickness" Value="1"/>
+                        <Setter Property="Padding" Value="10,8"/>
+                        <Setter Property="FontSize" Value="14"/>
+                        <Setter Property="MinHeight" Value="35"/>
+                        <Setter Property="CaretBrush" Value="White"/>
+                        <Setter Property="VerticalContentAlignment" Value="Center"/>
+                        <Setter Property="TextWrapping" Value="NoWrap"/>
+                        <Setter Property="AcceptsReturn" Value="False"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="TextBox">
+                                    <Border Background="{TemplateBinding Background}"
+                                            BorderBrush="{TemplateBinding BorderBrush}"
+                                            BorderThickness="{TemplateBinding BorderThickness}"
+                                            CornerRadius="8">
+                                        <ScrollViewer x:Name="PART_ContentHost"
+                                                      Margin="{TemplateBinding Padding}"
+                                                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                      HorizontalAlignment="Left"
+                                                      VerticalScrollBarVisibility="Hidden"
+                                                      HorizontalScrollBarVisibility="Hidden"
+                                                      Focusable="False"
+                                                      CanContentScroll="True"/>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsFocused" Value="True">
+                                            <Setter Property="BorderBrush" Value="#80FFFFFF"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+        
+                                   <!-- Aero PasswordBox Style - Matching Main App -->
+          <Style x:Key="AeroPasswordBoxStyle" TargetType="PasswordBox">
+              <Setter Property="Background" Value="#60000000"/>
+              <Setter Property="Foreground" Value="White"/>
+              <Setter Property="BorderBrush" Value="#40FFFFFF"/>
+              <Setter Property="BorderThickness" Value="1"/>
+              <Setter Property="Padding" Value="10,4"/>
+              <Setter Property="FontSize" Value="14"/>
+              <Setter Property="Height" Value="35"/>
+              <Setter Property="CaretBrush" Value="White"/>
+              <Setter Property="VerticalContentAlignment" Value="Center"/>
+             <Setter Property="Template">
+                 <Setter.Value>
+                     <ControlTemplate TargetType="PasswordBox">
+                         <Border Background="{TemplateBinding Background}"
+                                 BorderBrush="{TemplateBinding BorderBrush}"
+                                 BorderThickness="{TemplateBinding BorderThickness}"
+                                 CornerRadius="8">
+                             <ScrollViewer x:Name="PART_ContentHost"
+                                           Margin="{TemplateBinding Padding}"
+                                           VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                           HorizontalAlignment="Left"
+                                           VerticalScrollBarVisibility="Hidden"
+                                           HorizontalScrollBarVisibility="Hidden"
+                                           Focusable="False"
+                                           CanContentScroll="True"/>
+                         </Border>
+                         <ControlTemplate.Triggers>
+                             <Trigger Property="IsFocused" Value="True">
+                                 <Setter Property="BorderBrush" Value="#80FFFFFF"/>
+                             </Trigger>
+                         </ControlTemplate.Triggers>
+                     </ControlTemplate>
+                 </Setter.Value>
+             </Setter>
+         </Style>
+         
+         <!-- Aero ComboBox Style - Matching Main App -->
+         <Style x:Key="AeroComboBoxStyle" TargetType="ComboBox">
+             <Setter Property="Background" Value="#60000000"/>
+             <Setter Property="Foreground" Value="White"/>
+             <Setter Property="BorderBrush" Value="#40FFFFFF"/>
+             <Setter Property="BorderThickness" Value="1"/>
+             <Setter Property="Padding" Value="10,4"/>
+             <Setter Property="FontSize" Value="14"/>
+             <Setter Property="Height" Value="35"/>
+             <Setter Property="VerticalContentAlignment" Value="Center"/>
+             <Setter Property="IsEditable" Value="True"/>
+             <Setter Property="IsTextSearchEnabled" Value="True"/>
+             <Setter Property="StaysOpenOnEdit" Value="True"/>
+             <Setter Property="Template">
+                 <Setter.Value>
+                     <ControlTemplate TargetType="ComboBox">
+                         <Border Background="{TemplateBinding Background}"
+                                 BorderBrush="{TemplateBinding BorderBrush}"
+                                 BorderThickness="{TemplateBinding BorderThickness}"
+                                 CornerRadius="8">
+                             <Grid>
+                                 <Grid.ColumnDefinitions>
+                                     <ColumnDefinition Width="*"/>
+                                     <ColumnDefinition Width="Auto"/>
+                                 </Grid.ColumnDefinitions>
+                                 <TextBox x:Name="PART_EditableTextBox"
+                                          Grid.Column="0"
+                                          Background="Transparent"
+                                          BorderThickness="0"
+                                          Padding="{TemplateBinding Padding}"
+                                          FontSize="{TemplateBinding FontSize}"
+                                          Foreground="{TemplateBinding Foreground}"
+                                          VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Text, UpdateSourceTrigger=PropertyChanged}"
+                                          IsReadOnly="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=IsReadOnly}"/>
+                                 <ToggleButton x:Name="ToggleButton"
+                                              Grid.Column="1"
+                                              Width="30"
+                                              HorizontalAlignment="Right"
+                                              Background="Transparent"
+                                              BorderThickness="0"
+                                              Focusable="False"
+                                              IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
+                                     <ToggleButton.Template>
+                                         <ControlTemplate TargetType="ToggleButton">
+                                             <Border Background="Transparent">
+                                                 <Path Data="M0,0 L4,4 L8,0 Z" 
+                                                       Stroke="White" 
+                                                       StrokeThickness="1.5" 
+                                                       HorizontalAlignment="Center" 
+                                                       VerticalAlignment="Center"/>
+                                             </Border>
+                                         </ControlTemplate>
+                                     </ToggleButton.Template>
+                                 </ToggleButton>
+                                 <Popup x:Name="PART_Popup"
+                                        AllowsTransparency="True"
+                                        Placement="Bottom"
+                                        IsOpen="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}}"
+                                        PopupAnimation="Slide">
+                                      <Border Background="#80000000"
+                                              BorderBrush="#40FFFFFF"
+                                              BorderThickness="1"
+                                              CornerRadius="8"
+                                              MaxHeight="200"
+                                              MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=ComboBox}}">
+                                          <ItemsPresenter/>
+                                      </Border>
+                                  </Popup>
+                             </Grid>
+                         </Border>
+                         <ControlTemplate.Triggers>
+                             <Trigger Property="IsFocused" Value="True">
+                                 <Setter Property="BorderBrush" Value="#80FFFFFF"/>
+                             </Trigger>
+                         </ControlTemplate.Triggers>
+                     </ControlTemplate>
+                 </Setter.Value>
+             </Setter>
+         </Style>
+         
+         <!-- ComboBox Item Style -->
+         <Style x:Key="ComboBoxItemStyle" TargetType="ComboBoxItem">
+             <Setter Property="Background" Value="Transparent"/>
+             <Setter Property="Foreground" Value="White"/>
+             <Setter Property="Padding" Value="10,2"/>
+             <Setter Property="FontSize" Value="14"/>
+             <Setter Property="Template">
+                 <Setter.Value>
+                     <ControlTemplate TargetType="ComboBoxItem">
+                         <Border Background="{TemplateBinding Background}"
+                                 Padding="{TemplateBinding Padding}">
+                             <ContentPresenter Content="{TemplateBinding Content}"
+                                             ContentTemplate="{TemplateBinding ContentTemplate}"
+                                             HorizontalAlignment="Left"
+                                             VerticalAlignment="Center"/>
+                         </Border>
+                         <ControlTemplate.Triggers>
+                             <Trigger Property="IsHighlighted" Value="True">
+                                 <Setter Property="Background" Value="#40FFFFFF"/>
+                             </Trigger>
+                             <Trigger Property="IsSelected" Value="True">
+                                 <Setter Property="Background" Value="#60FFFFFF"/>
+                             </Trigger>
+                         </ControlTemplate.Triggers>
+                     </ControlTemplate>
+                 </Setter.Value>
+             </Setter>
+         </Style>
+    </Window.Resources>
+    
+    <Grid>
+        <!-- Main Background with Aero Effect - Matching Main App -->
+        <Border Background="#80000000" 
+                CornerRadius="8" 
+                BorderBrush="#40FFFFFF" 
+                BorderThickness="1">
+            <Border.Effect>
+                <DropShadowEffect Color="#000000" Direction="270" ShadowDepth="8" Opacity="0.5" BlurRadius="16"/>
+            </Border.Effect>
+            
+            <Grid x:Name="MainContent" Margin="30">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                
+                <!-- Header with Aero Styling -->
+                <StackPanel Grid.Row="0" HorizontalAlignment="Center" Margin="0,0,0,25">
+                    <!-- App Icon with Aero Effects -->
+                    <Border CornerRadius="12" Padding="10" Margin="0,0,0,15" Width="60" Height="60">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                <GradientStop Color="#801A4A80" Offset="0"/>
+                                <GradientStop Color="#800F3460" Offset="0.7"/>
+                                <GradientStop Color="#800A2A50" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <Border.Effect>
+                            <DropShadowEffect Color="#000000" Direction="270" ShadowDepth="3" Opacity="0.4" BlurRadius="6"/>
+                        </Border.Effect>
+                        <Grid>
+                            <TextBlock Text="🎮" FontSize="28" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <!-- Inner highlight for shine effect -->
+                            <Border Background="Transparent" BorderBrush="#50FFFFFF" BorderThickness="1" CornerRadius="12" Opacity="0.4"/>
+                        </Grid>
+                    </Border>
+                    
+                    <TextBlock Text="PokerTracker2" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" Foreground="White"/>
+                    <TextBlock Text="Professional Poker Session Tracker" FontSize="12" HorizontalAlignment="Center" Margin="0,5,0,0" Foreground="#FFCCCCCC"/>
+                </StackPanel>
+                
+                <!-- Login Form -->
+                <StackPanel Grid.Row="1" VerticalAlignment="Center" Margin="0,10,0,10">
+                    <TextBlock Text="Login" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,25" Foreground="White"/>
+                    
+                    <!-- Loading Indicator -->
+                    <StackPanel x:Name="LoadingPanel" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,20" Visibility="Visible">
+                        <TextBlock Text="🔄" FontSize="16" Margin="0,0,8,0" Foreground="#FFCCCCCC"/>
+                        <TextBlock Text="Loading profiles..." FontSize="12" Foreground="#FFCCCCCC"/>
+                    </StackPanel>
+                    
+                    <!-- Username Field -->
+                     <TextBlock Text="Username:" Margin="0,0,0,8" Foreground="#FFCCCCCC" FontSize="14"/>
+                     <ComboBox x:Name="UsernameComboBox" 
+                               Style="{StaticResource AeroComboBoxStyle}"
+                               Margin="0,0,0,20" 
+                               DisplayMemberPath="Name"
+                               SelectedValuePath="Name"
+                               ItemContainerStyle="{StaticResource ComboBoxItemStyle}"
+                               IsEnabled="False"/>
+                    
+                    <!-- Password Field -->
+                    <TextBlock Text="Password:" Margin="0,0,0,8" Foreground="#FFCCCCCC" FontSize="14"/>
+                    <PasswordBox x:Name="PasswordBox" 
+                                 Style="{StaticResource AeroPasswordBoxStyle}"
+                                 Margin="0,0,0,25"
+                                 Width="{Binding ActualWidth, ElementName=UsernameComboBox}"/>
+                    
+                    <!-- Login Button -->
+                    <Button x:Name="LoginButton" 
+                            Content="Login" 
+                            Style="{StaticResource AeroButtonStyle}"
+                            Height="40" 
+                            Margin="0,0,0,15"
+                            Click="LoginButton_Click"/>
+                    
+                    <!-- Quick Start Button -->
+                    <Button x:Name="QuickStartButton" 
+                            Content="Quick Start (Admin)" 
+                            Style="{StaticResource AeroButtonStyle}"
+                            Height="40" 
+                            Margin="0,0,0,15"
+                            Click="QuickStartButton_Click"/>
+                    
+                    <!-- Test Firebase Button -->
+                    <Button x:Name="TestFirebaseButton" 
+                            Content="🔗 Test Firebase Connection" 
+                            Style="{StaticResource AeroButtonStyle}"
+                            Height="40" 
+                            Margin="0,0,0,15"
+                            Click="TestFirebase_Click"/>
+                </StackPanel>
+                
+                <!-- Status -->
+                <TextBlock Grid.Row="2" 
+                           x:Name="StatusText" 
+                           Text="Status: Ready" 
+                           HorizontalAlignment="Center" 
+                           Margin="0,15,0,0"
+                           Foreground="#FFCCCCCC"
+                           FontSize="11"/>
+            </Grid>
+        </Border>
+        
+        <!-- Close Button with Aero Styling -->
+        <Button x:Name="CloseButton"
+                Content="✕"
+                Width="30"
+                Height="30"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top"
+                Margin="0,15,15,0"
+                Background="#40FF0000"
+                Foreground="White"
+                BorderBrush="#80FF0000"
+                BorderThickness="1"
+                FontSize="16"
+                FontWeight="Bold"
+                Cursor="Hand"
+                Click="CloseButton_Click">
+            <Button.Template>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="15">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="#80FF0000"/>
+                            <Setter Property="BorderBrush" Value="#C0FF0000"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Button.Template>
+        </Button>
+    </Grid>
+</Window>
