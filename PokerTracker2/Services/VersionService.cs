@@ -25,12 +25,12 @@ namespace PokerTracker2.Services
                         var version = assembly.GetName().Version;
                         if (version != null)
                         {
-                            // Return only major.minor, ignore build and revision numbers
-                            _cachedVersion = $"{version.Major}.{version.Minor}";
+                            // Return the full version string (e.g., "1.0.7.0")
+                            _cachedVersion = version.ToString();
                         }
                         else
                         {
-                            _cachedVersion = "1.0.0";
+                            _cachedVersion = "1.0.7.0";
                         }
                     }
                     catch
@@ -64,12 +64,12 @@ namespace PokerTracker2.Services
                         {
                             // Fallback to assembly version
                             var version = assembly.GetName().Version;
-                            _cachedFileVersion = version?.ToString() ?? "1.0.0.0";
+                            _cachedFileVersion = version?.ToString() ?? "1.0.7.0";
                         }
                     }
                     catch
                     {
-                        _cachedFileVersion = "1.0.0.0";
+                        _cachedFileVersion = "1.0.7.0";
                     }
                 }
                 return _cachedFileVersion;
@@ -93,7 +93,7 @@ namespace PokerTracker2.Services
                     }
                     catch
                     {
-                        _cachedAssemblyVersion = "1.0.0.0";
+                        _cachedAssemblyVersion = "1.0.7.0";
                     }
                 }
                 return _cachedAssemblyVersion;
