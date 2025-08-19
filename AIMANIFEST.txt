@@ -1,5 +1,16 @@
 # PokerTracker2 AI Manifest
 
+## 🚨 IMPORTANT: NEW MANIFEST REQUIREMENT
+**AI-RELEASE-MANIFEST.txt**: A second manifest file is now required to track changes for each version release. This file should be created alongside AIMANIFEST.txt and contain:
+- **Version-specific changes** and modifications
+- **Release-specific notes** and implementation details  
+- **Per-release tracking** of features, fixes, and improvements
+- **Release-to-release continuity** for AI assistants
+
+**Purpose**: AIMANIFEST.txt tracks overall project knowledge, while AI-RELEASE-MANIFEST.txt tracks version-specific development history.
+
+---
+
 ## 🚀 QUICK REFERENCE - RELEASE WORKFLOW
 **For Future Chats - Build and Release Instructions**
 
