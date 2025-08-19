@@ -1,0 +1,35 @@
+🚀 PokerTracker2 v1.0.3 - Enhanced Auto-Update System with Smart Download & Replace
+
+## ✨ What's New
+- **Smart Auto-Update**: Completely redesigned update system with seamless installation
+- **Automatic App Restart**: App closes, updates, and restarts automatically
+- **Same Directory Updates**: Downloads and installs updates in the same location as current executable
+- **Rollback Protection**: Automatic backup and restore if update fails
+
+## 🔧 Technical Improvements
+- **Enhanced AutoUpdateService**: Complete rewrite with professional update workflow
+- **Batch Script Automation**: Self-deleting update scripts handle the entire process
+- **Process Verification**: Confirms new version is running before cleanup
+- **Error Handling**: Comprehensive error checking and user feedback
+- **Clean Installation**: Removes old version after successful update
+
+## 🎯 Update Process Flow
+1. **Detection**: App detects new version on startup/login
+2. **Download**: Downloads update to same directory as current executable
+3. **Confirmation**: User confirms update installation
+4. **Backup**: Creates backup of current version
+5. **Replacement**: Installs new version and starts it
+6. **Verification**: Confirms new version is running
+7. **Cleanup**: Removes old version and backup files
+
+## 🚀 Benefits
+- **Seamless Experience**: No manual file management required
+- **Professional Workflow**: Industry-standard update process
+- **Reliable Installation**: Automatic rollback if issues occur
+- **Clean System**: No leftover files or duplicate executables
+- **User Friendly**: Simple confirmation dialog, everything else is automatic
+
+## 🧪 Testing
+This version includes the complete enhanced auto-update system. Users can now test the full update workflow from any previous version.
+
+The future of professional software updates is here! 🎯
