@@ -227,6 +227,21 @@ namespace PokerTracker2
                 ShowPage(DashboardPage);
                 // UpdateDashboardStats(); // REMOVED - will be called after Firebase data loads
                 
+                // Check for updates automatically on startup
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        // Wait a bit to let the app fully load first
+                        await Task.Delay(3000);
+                        await CheckForUpdatesOnStartupAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        LoggingService.Instance.Error($"Error during startup update check: {ex.Message}", "MainWindow", ex);
+                    }
+                });
+                
                 LoggingService.Instance.Info("MainWindow constructor completed successfully", "MainWindow");
             }
             catch (Exception ex)
@@ -583,7 +598,7 @@ namespace PokerTracker2
                 CheckForUpdatesButton.IsEnabled = false;
                 CheckForUpdatesButton.Content = "🔍 Checking...";
                 
-                LoggingService.Instance.Info("Checking for updates...", "MainWindow");
+                LoggingService.Instance.Info("Manual update check initiated", "MainWindow");
                 
                 var updateInfo = await _autoUpdateService.CheckForUpdatesAsync();
                 
@@ -611,6 +626,50 @@ namespace PokerTracker2
             {
                 CheckForUpdatesButton.IsEnabled = true;
                 CheckForUpdatesButton.Content = "🔍 Check for Updates";
+            }
+        }
+
+        private async Task CheckForUpdatesOnStartupAsync()
+        {
+            try
+            {
+                LoggingService.Instance.Info("Automatic startup update check initiated", "MainWindow");
+                
+                var updateInfo = await _autoUpdateService.CheckForUpdatesAsync();
+                
+                if (updateInfo != null && updateInfo.IsUpdateAvailable)
+                {
+                    LoggingService.Instance.Info($"Startup update check: Update available - {updateInfo.LatestVersion}", "MainWindow");
+                    
+                    // Show update dialog on UI thread
+                    await Dispatcher.InvokeAsync(() =>
+                    {
+                        var result = MessageBox.Show(
+                            $"A new version of PokerTracker2 is available!\n\n" +
+                            $"Current Version: {updateInfo.CurrentVersion}\n" +
+                            $"Latest Version: {updateInfo.LatestVersion}\n\n" +
+                            "Would you like to download and install the update now?",
+                            "Update Available",
+                            MessageBoxButton.YesNo,
+                            MessageBoxImage.Information);
+                        
+                        if (result == MessageBoxResult.Yes)
+                        {
+                            var updateDialog = new Dialogs.UpdateDialog(updateInfo, _autoUpdateService);
+                            updateDialog.Owner = this;
+                            updateDialog.ShowDialog();
+                        }
+                    });
+                }
+                else
+                {
+                    LoggingService.Instance.Info("Startup update check: No updates available", "MainWindow");
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggingService.Instance.Error($"Error during startup update check: {ex.Message}", "MainWindow", ex);
+                // Don't show error dialogs on startup - just log it
             }
         }
 
