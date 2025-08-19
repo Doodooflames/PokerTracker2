@@ -6,10 +6,10 @@ REM Usage: create-release.bat [version] [release-notes]
 
 if "%1"=="" (
     echo ❌ Please provide a version number
-    echo Usage: create-release.bat [version] [release-notes] [--no-zip]
+    echo Usage: create-release.bat [version] [release-notes] [--zip]
     echo Examples:
-    echo   create-release.bat 1.0.0 "Initial release"
-    echo   create-release.bat 1.0.0 "Initial release" --no-zip
+    echo   create-release.bat 1.0.0 "Initial release" (default: no-zip)
+    echo   create-release.bat 1.0.0 "Initial release" --zip (legacy zip mode)
     pause
     exit /b 1
 )
@@ -51,17 +51,13 @@ if errorlevel 1 (
     exit /b 1
 )
 
-REM Step 3: Create archive (optional)
+REM Step 3: Create archive (optional) - NO-ZIP IS NOW DEFAULT
 set SKIP_ZIP=%3
 set ARCHIVE_NAME=%PROJECT_NAME%-%VERSION%.zip
 set ARCHIVE_PATH=%PUBLISH_DIR%\%ARCHIVE_NAME%
 
-if "%SKIP_ZIP%"=="--no-zip" (
-    echo 🚫 Skipping zip creation - will upload EXE directly
-    set UPLOAD_FILE=%PUBLISH_DIR%\PokerTracker2.exe
-    echo ✅ Will upload EXE directly: %UPLOAD_FILE%
-) else (
-    echo 📁 Creating release archive...
+if "%SKIP_ZIP%"=="--zip" (
+    echo 📁 Creating release archive (legacy zip mode)...
     REM Clean out old zip files before creating new archive
     echo 🧹 Cleaning old zip files...
     del /Q "%PUBLISH_DIR%\*.zip" 2>nul
@@ -77,6 +73,10 @@ if "%SKIP_ZIP%"=="--no-zip" (
     
     echo ✅ Archive created: %ARCHIVE_NAME%
     set UPLOAD_FILE=%ARCHIVE_PATH%
+) else (
+    echo 🚫 No-zip mode (default) - will upload EXE directly
+    set UPLOAD_FILE=%PUBLISH_DIR%\PokerTracker2.exe
+    echo ✅ Will upload EXE directly: %UPLOAD_FILE%
 )
 
 REM Step 4: Git operations
@@ -141,10 +141,10 @@ echo   6. Click "Publish release"
 
 echo.
 echo 🎉 Release %RELEASE_TAG% prepared successfully!
-if "%SKIP_ZIP%"=="--no-zip" (
-    echo 📁 Executable: %UPLOAD_FILE%
-) else (
+if "%SKIP_ZIP%"=="--zip" (
     echo 📁 Archive: %ARCHIVE_PATH%
+) else (
+    echo 📁 Executable: %UPLOAD_FILE%
 )
 echo 🌐 GitHub: https://github.com/%GITHUB_REPO%/releases/tag/%RELEASE_TAG%
 

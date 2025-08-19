@@ -25,6 +25,84 @@ PokerTracker2 is a WPF (.NET 8) application for tracking poker sessions and play
 
 ## RECENT MAJOR IMPLEMENTATIONS
 
+### 2025-01-15: AUTOMATED RELEASE SYSTEM - FULLY FUNCTIONAL
+**Status: ✅ COMPLETED - Professional Release Automation with No-Zip Default**
+
+#### Release Automation System Overview
+**Problem Solved**: Manual GitHub release creation was time-consuming and error-prone, requiring manual file uploads and release note entry.
+
+**Solution Implemented**: Created comprehensive automated release system using GitHub CLI that handles the entire release process automatically.
+
+**Key Features**:
+- **Fully Automatic**: Build → Publish → Git Tag → GitHub Release → File Upload
+- **No-Zip Default**: `--no-zip` is now the DEFAULT behavior for all releases
+- **Smart CLI Detection**: Automatically finds GitHub CLI installation in common locations
+- **Dual Scripts**: Both `.bat` and `.ps1` versions available
+- **Error Handling**: Comprehensive fallback to manual process if automation fails
+- **Release Verification**: Uses GitHub CLI to verify release was actually created
+
+**No-Zip as Default**:
+- **Standard Behavior**: All releases now upload the executable directly without zipping
+- **Benefits**: Faster downloads, no zip-in-zip recursion, cleaner releases
+- **Legacy Support**: `--zip` flag still available if zip archives are needed
+- **File Size**: Direct EXE uploads result in smaller, more professional releases
+
+**Usage Examples**:
+```bash
+# Standard release (no-zip by default)
+scripts\create-release.bat "1.0.0" "Initial release"
+
+# Explicit no-zip (same as default)
+scripts\create-release.bat "1.0.0" "Initial release" --no-zip
+
+# Legacy zip release (if needed)
+scripts\create-release.bat "1.0.0" "Initial release" --zip
+
+# PowerShell version
+scripts\create-release.ps1 -Version "1.0.0" -ReleaseNotes "Initial release"
+```
+
+**Technical Implementation**:
+- **GitHub CLI Integration**: Uses `gh release create` for automatic release creation
+- **Smart File Handling**: Automatically detects and uploads the correct file type
+- **Release Notes**: Creates temporary notes file for complex release descriptions
+- **Git Operations**: Automatic tagging, committing, and pushing
+- **Build Process**: Clean build → Release publish → Single file output
+- **Error Detection**: Verifies release success using `gh release view`
+
+**Files Created/Modified**:
+- **Created**: `scripts/create-release.bat` - Windows batch script for releases
+- **Created**: `scripts/create-release.ps1` - PowerShell script for releases
+- **Updated**: `.gitignore` - Excludes build outputs and credentials
+- **Updated**: `PokerTracker2.csproj` - Optimized for single-file publishing
+
+**Build Configuration**:
+- **Target**: `win-x64` platform
+- **Framework**: `.NET 8` (framework-dependent, not self-contained)
+- **Output**: Single executable file
+- **Size**: ~12.7MB (vs 206MB for self-contained)
+- **Dependencies**: Requires user to have .NET 8 runtime installed
+
+**Benefits Achieved**:
+- ✅ **Professional Workflow**: Industry-standard release automation
+- ✅ **Time Saving**: No more manual GitHub release creation
+- ✅ **Consistency**: Standardized release process every time
+- ✅ **Clean Releases**: No zip-in-zip recursion issues
+- ✅ **Faster Downloads**: Users get executable directly
+- ✅ **Error Prevention**: Automated process reduces human error
+- ✅ **Fallback Support**: Manual process available if automation fails
+
+**Release History**:
+- **v1.0.10**: Standard zip release (legacy)
+- **v1.0.11**: Standard zip release (legacy)  
+- **v1.0.12**: Standard zip release (legacy)
+- **v1.0.13**: Direct EXE upload (new default)
+
+**Next Steps**: 
+- Clean up test releases (v1.0.10 through v1.0.13)
+- Create official 1.0.0 release using no-zip default
+- Document release process for future development
+
 ### 2025-01-15: Project Structure Cleanup, Logging Centralization, Profile Creation Fix, and Authentication System Overhaul
 **Status: ✅ COMPLETED**
 

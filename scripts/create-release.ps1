@@ -12,7 +12,7 @@ param(
     [switch]$Draft,
     
     [Parameter(Mandatory=$false)]
-    [switch]$NoZip
+    [switch]$Zip
 )
 
 # Configuration
@@ -46,13 +46,9 @@ if ($LASTEXITCODE -ne 0) {
     exit 1
 }
 
-# Step 3: Create release archive (optional)
-if ($NoZip) {
-    Write-Host "🚫 Skipping zip creation - will upload EXE directly" -ForegroundColor Yellow
-    $ArchivePath = Join-Path $PublishDir "PokerTracker2.exe"
-    $UploadFile = $ArchivePath
-} else {
-    Write-Host "📁 Creating release archive..." -ForegroundColor Yellow
+# Step 3: Create release archive (optional) - NO-ZIP IS NOW DEFAULT
+if ($Zip) {
+    Write-Host "📁 Creating release archive (legacy zip mode)..." -ForegroundColor Yellow
     $ArchiveName = "$ProjectName-$Version.zip"
     $ArchivePath = Join-Path $PublishDir $ArchiveName
     
@@ -74,6 +70,10 @@ if ($NoZip) {
     }
     
     Write-Host "✅ Archive created: $ArchiveName" -ForegroundColor Green
+    $UploadFile = $ArchivePath
+} else {
+    Write-Host "🚫 No-zip mode (default) - will upload EXE directly" -ForegroundColor Yellow
+    $ArchivePath = Join-Path $PublishDir "PokerTracker2.exe"
     $UploadFile = $ArchivePath
 }
 
@@ -124,9 +124,9 @@ if ($GhPath) {
 }
 
 Write-Host "🎉 Release $ReleaseTag created successfully!" -ForegroundColor Green
-if ($NoZip) {
-    Write-Host "📁 Executable: $UploadFile" -ForegroundColor Cyan
-} else {
+if ($Zip) {
     Write-Host "📁 Archive: $ArchivePath" -ForegroundColor Cyan
+} else {
+    Write-Host "📁 Executable: $UploadFile" -ForegroundColor Cyan
 }
 Write-Host "🌐 GitHub: https://github.com/$GitHubRepo/releases/tag/$ReleaseTag" -ForegroundColor Cyan
