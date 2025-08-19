@@ -1,0 +1,75 @@
+# PokerTracker2 v1.0.6 Release Notes
+
+## 🚀 What's New in v1.0.6
+
+### ✨ Major Features
+- **Enhanced Session Activity Panel**: Complete transaction history display with visual indicators
+- **Permission System**: Comprehensive role-based access control for admin and player users
+- **Admin Status Management**: Toggle admin privileges for player profiles
+- **Session Creation UI Overhaul**: Streamlined player addition using familiar PlayerSelectionDialog
+
+### 🔧 Improvements
+- **Session Activity Tracking**: Enhanced transaction history with timestamps, notes, and visual indicators
+- **Player Management**: Improved player addition/removal during session creation
+- **UI Consistency**: Unified player selection experience across all session management features
+- **Transaction History**: Complete audit trail for all buy-ins and cash-outs
+
+### 🛡️ Security & Permissions
+- **Role-Based Access**: Admin and player role management
+- **Session Ownership**: Track who created and hosts each session
+- **Permission Validation**: Comprehensive permission checking for all operations
+- **Admin Controls**: Admin-only features for password management and system administration
+
+### 🎨 User Experience
+- **Modern Card Design**: Enhanced player display with rounded corners and shadows
+- **Visual Indicators**: Color-coded transaction types with intuitive emojis
+- **Streamlined Workflow**: Single "Add Player" button replaces complex checkbox lists
+- **Better Feedback**: Clear success/error messages and activity logging
+
+### 🔍 Technical Improvements
+- **Enhanced Player Model**: Profile linking and transaction history integration
+- **Session Manager**: Improved player management with proper transaction cleanup
+- **Firebase Integration**: Better session data persistence and loading
+- **Performance**: Optimized UI rendering and data binding
+
+## 🐛 Bug Fixes
+- **Buy-In Calculation**: Fixed double buy-in addition bug that caused incorrect totals
+- **Dashboard Layout**: Resolved layout jumping when selecting player profiles
+- **Profile Dropdown**: Fixed empty player profile dropdown in dashboard
+- **Session Loading**: Improved Firebase session loading and initialization
+- **Transaction History**: Fixed session completion status tracking
+
+## 📋 System Requirements
+- **Operating System**: Windows 10/11 (64-bit)
+- **Framework**: .NET 8.0 Runtime
+- **Memory**: 4GB RAM minimum, 8GB recommended
+- **Storage**: 100MB available disk space
+
+## 🔄 Migration Notes
+- **Existing Sessions**: All existing sessions will be automatically migrated to the enhanced transaction system
+- **Player Profiles**: Existing profiles maintain all data and settings
+- **Firebase Data**: No data migration required, all existing data preserved
+
+## 🚨 Known Issues
+- **Analytics Dashboard**: Currently shows placeholder content (planned for future releases)
+- **Settings Page**: Basic placeholder implementation (planned for future releases)
+- **Value Converters**: Some UI elements may show warnings in debug mode (non-critical)
+
+## 📈 Performance Notes
+- **Startup Time**: Improved with better async initialization
+- **Memory Usage**: Optimized for large session datasets
+- **Firebase Operations**: Enhanced query performance with targeted data loading
+
+## 🔮 Future Roadmap
+- **Analytics Dashboard**: Comprehensive charts and performance metrics
+- **Settings Configuration**: User-configurable application settings
+- **Advanced Reporting**: Export and analysis tools
+- **Mobile Support**: Cross-platform compatibility
+
+## 📞 Support
+For issues or questions, please refer to the project documentation or create an issue in the repository.
+
+---
+**Release Date**: January 15, 2025  
+**Version**: 1.0.6  
+**Build**: Release

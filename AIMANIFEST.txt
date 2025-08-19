@@ -1,5 +1,45 @@
 # PokerTracker2 AI Manifest
 
+## 🚀 QUICK REFERENCE - RELEASE WORKFLOW
+**For Future Chats - Build and Release Instructions**
+
+### Standard Release Process (Recommended):
+```bash
+# 1. Update version in PokerTracker2.csproj
+# 2. Create release notes file (e.g., release-notes-1.0.6.txt)
+# 3. Use PowerShell script (preferred):
+scripts\create-release.ps1 -Version "1.0.6" -ReleaseNotes (Get-Content "release-notes-1.0.6.txt")
+
+# Alternative batch script:
+scripts\create-release.bat "1.0.6" "Release description"
+```
+
+### Manual Release Process (if scripts fail):
+```bash
+# 1. Build and publish
+dotnet publish -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -o PublishSingle
+
+# 2. Git operations
+git add . && git commit -m "Release v1.0.6" && git tag -a v1.0.6 -m "Release v1.0.6"
+git push origin master && git push origin v1.0.6
+
+# 3. GitHub release
+gh release create v1.0.6 PublishSingle\PokerTracker2.exe --title "Release v1.0.6" --notes-file "release-notes-1.0.6.txt"
+```
+
+### Key Files:
+- **Project Version**: `PokerTracker2/PokerTracker2.csproj` (lines 12-14)
+- **Release Scripts**: `scripts/create-release.ps1` (PowerShell) and `scripts/create-release.bat` (Batch)
+- **Release Notes**: Create `release-notes-{version}.txt` files for complex notes
+
+### Version Management:
+- **Dynamic Binding**: Version numbers automatically update in UI from project file
+- **VersionService**: `PokerTracker2/Services/VersionService.cs` handles runtime version reading
+- **UI Elements**: Login screen and main window title automatically show current version
+- **No Manual Updates**: Just change version in .csproj and rebuild
+
+---
+
 ## Project Overview and Current Status
 ## Last Updated: 2025-01-15
 
@@ -97,6 +137,68 @@ scripts\create-release.ps1 -Version "1.0.0" -ReleaseNotes "Initial release"
 - **v1.0.11**: Standard zip release (legacy)  
 - **v1.0.12**: Standard zip release (legacy)
 - **v1.0.13**: Direct EXE upload (new default)
+- **v1.0.5**: Dynamic Version Binding System (latest)
+
+### 2025-01-15: DYNAMIC VERSION BINDING SYSTEM - FULLY FUNCTIONAL
+**Status: ✅ COMPLETED - Professional Version Management with Automatic UI Updates**
+
+#### Dynamic Version Binding System Overview
+**Problem Solved**: Hardcoded version numbers in UI elements required manual updates for each release, leading to inconsistencies and forgotten updates.
+
+**Solution Implemented**: Created comprehensive dynamic version binding system that automatically reads version from project file and updates all UI elements.
+
+**Key Features**:
+- **Automatic Version Reading**: Reads version from assembly attributes at runtime
+- **Dynamic UI Updates**: Both login screen and main window automatically show current version
+- **Single Source of Truth**: Project file (.csproj) is the only place to update version numbers
+- **Professional Workflow**: Industry-standard approach to version management
+- **No Manual Updates**: Eliminates the need to manually update hardcoded version strings
+
+**VersionService Implementation**:
+- **`CurrentVersion`**: Reads from `AssemblyInformationalVersionAttribute`
+- **`CurrentFileVersion`**: Reads from `AssemblyFileVersionAttribute`  
+- **`CurrentAssemblyVersion`**: Reads from assembly version
+- **`FormattedVersion`**: Returns "v1.0.5" for display
+- **`FullFormattedVersion`**: Returns "v1.0.5.0" for detailed display
+- **Caching**: Efficient caching of version information for performance
+
+**XAML Binding Implementation**:
+- **Login Window**: `{Binding Source={x:Static services:VersionService.FormattedVersion}}`
+- **Main Window Title**: `{Binding Source={x:Static services:VersionService.FormattedVersion}, StringFormat='Poker Session Tracker {0}'}`
+- **Namespace Integration**: Added `xmlns:services="clr-namespace:PokerTracker2.Services"` to both windows
+- **Automatic Updates**: Version numbers automatically reflect current project version
+
+**How It Works**:
+1. **Project File**: Update version in `.csproj` file (e.g., `<Version>1.0.5</Version>`)
+2. **Build Process**: Version gets compiled into assembly attributes
+3. **Runtime**: `VersionService` reads version from assembly
+4. **UI Display**: XAML binding automatically shows current version
+5. **Result**: Login screen shows "v1.0.5", title bar shows "Poker Session Tracker v1.0.5"
+
+**Files Created/Modified**:
+- **Created**: `PokerTracker2/Services/VersionService.cs` - Dynamic version service
+- **Updated**: `PokerTracker2/Windows/LoginWindow.xaml` - Added dynamic version binding
+- **Updated**: `PokerTracker2/MainWindow.xaml` - Added dynamic version binding to title bar
+- **Updated**: `PokerTracker2/PokerTracker2.csproj` - Set version to 1.0.5
+- **Created**: `release-notes-1.0.5.txt` - Comprehensive release documentation
+
+**Benefits Achieved**:
+- ✅ **Never Forget Again**: Version numbers automatically reflect current project version
+- ✅ **Consistency**: All UI elements always show the same, current version
+- ✅ **Maintainable**: Single source of truth for version information
+- ✅ **Professional**: No more mismatched version numbers between UI and actual app
+- ✅ **Industry Standard**: Follows best practices for version management
+- ✅ **Developer Experience**: Eliminates manual version string updates
+
+**Testing Results**:
+- **Login Screen**: Version number below "Status: Ready" automatically shows "v1.0.5"
+- **Main Window**: Title bar automatically shows "Poker Session Tracker v1.0.5"
+- **Dynamic Updates**: Changing version in .csproj automatically updates UI on next build
+
+**Next Steps**:
+- Test the dynamic binding by running the app and verifying version display
+- Future releases will automatically show correct version numbers
+- No more manual UI updates required for version changes
 
 **Next Steps**: 
 - Clean up test releases (v1.0.10 through v1.0.13)

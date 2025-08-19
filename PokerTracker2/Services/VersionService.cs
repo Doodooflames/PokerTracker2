@@ -21,17 +21,16 @@ namespace PokerTracker2.Services
                     try
                     {
                         var assembly = Assembly.GetExecutingAssembly();
-                        var versionAttribute = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
-                        
-                        if (versionAttribute != null && !string.IsNullOrEmpty(versionAttribute.InformationalVersion))
+                        // Use AssemblyVersion instead of AssemblyInformationalVersion to avoid Git commit hash
+                        var version = assembly.GetName().Version;
+                        if (version != null)
                         {
-                            _cachedVersion = versionAttribute.InformationalVersion;
+                            // Return only major.minor, ignore build and revision numbers
+                            _cachedVersion = $"{version.Major}.{version.Minor}";
                         }
                         else
                         {
-                            // Fallback to assembly version
-                            var version = assembly.GetName().Version;
-                            _cachedVersion = version?.ToString() ?? "1.0.0";
+                            _cachedVersion = "1.0.0";
                         }
                     }
                     catch
