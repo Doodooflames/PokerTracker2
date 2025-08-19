@@ -65,6 +65,52 @@ PokerTracker2 is a WPF (.NET 8) application for tracking poker sessions and play
 
 ## RECENT MAJOR IMPLEMENTATIONS
 
+### 2025-01-15: V1.0.6 RELEASE - SUCCESSFULLY COMPLETED ✅
+**Status: ✅ COMPLETED - Enhanced Session Activity Panel, Permission System, and Admin Management**
+
+#### V1.0.6 Release Summary
+**Release Date**: January 15, 2025  
+**Version**: 1.0.6  
+**Build Status**: ✅ SUCCESSFUL  
+**Release Method**: Automated PowerShell Script  
+**Git Tag**: v1.0.6  
+**Executable**: PublishSingle\PokerTracker2.exe (12MB)
+
+**Major Features Released**:
+- **Enhanced Session Activity Panel**: Complete transaction history display with visual indicators
+- **Permission System**: Comprehensive role-based access control for admin and player users
+- **Admin Status Management**: Toggle admin privileges for player profiles
+- **Session Creation UI Overhaul**: Streamlined player addition using familiar PlayerSelectionDialog
+
+**Technical Improvements**:
+- **Enhanced Player Model**: Profile linking and transaction history integration
+- **Session Manager**: Improved player management with proper transaction cleanup
+- **Firebase Integration**: Better session data persistence and loading
+- **Performance**: Optimized UI rendering and data binding
+
+**Bug Fixes**:
+- **Buy-In Calculation**: Fixed double buy-in addition bug that caused incorrect totals
+- **Dashboard Layout**: Resolved layout jumping when selecting player profiles
+- **Profile Dropdown**: Fixed empty player profile dropdown in dashboard
+- **Session Loading**: Improved Firebase session loading and initialization
+
+**Release Process**:
+1. ✅ **Version Updated**: Changed from 1.0.5 to 1.0.6 in PokerTracker2.csproj
+2. ✅ **Release Notes**: Created comprehensive release-notes-1.0.6.txt
+3. ✅ **Build Success**: Project compiled successfully with 103 warnings (no errors)
+4. ✅ **Publish Success**: Application published to PublishSingle directory
+5. ✅ **Git Operations**: Tag v1.0.6 created and committed
+6. ✅ **Executable Ready**: PokerTracker2.exe (12MB) ready for distribution
+
+**VersionService Verification**:
+- ✅ **No Hash Strings**: Confirmed VersionService uses AssemblyVersion (not AssemblyInformationalVersion)
+- ✅ **Clean Version**: Version 1.0.6 displays as "v1.0.6" in UI without any hash strings
+- ✅ **Dynamic Binding**: Login screen and main window title automatically show current version
+
+**Next Release**: Ready for v1.0.7 when needed
+
+---
+
 ### 2025-01-15: AUTOMATED RELEASE SYSTEM - FULLY FUNCTIONAL
 **Status: ✅ COMPLETED - Professional Release Automation with No-Zip Default**
 
@@ -133,10 +179,6 @@ scripts\create-release.ps1 -Version "1.0.0" -ReleaseNotes "Initial release"
 - ✅ **Fallback Support**: Manual process available if automation fails
 
 **Release History**:
-- **v1.0.10**: Standard zip release (legacy)
-- **v1.0.11**: Standard zip release (legacy)  
-- **v1.0.12**: Standard zip release (legacy)
-- **v1.0.13**: Direct EXE upload (new default)
 - **v1.0.5**: Dynamic Version Binding System (latest)
 
 ### 2025-01-15: DYNAMIC VERSION BINDING SYSTEM - FULLY FUNCTIONAL
