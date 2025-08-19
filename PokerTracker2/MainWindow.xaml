@@ -5,6 +5,7 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:local="clr-namespace:PokerTracker2"
     xmlns:controls="clr-namespace:PokerTracker2.Controls"
+    xmlns:services="clr-namespace:PokerTracker2.Services"
     Title="Poker Session Tracker"
     Width="1400"
     Height="1400"
@@ -110,7 +111,7 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="Poker Session Tracker v1.0.4" Foreground="White" VerticalAlignment="Center" Margin="10,0,0,0" FontSize="12"/>
+                        <TextBlock Grid.Column="0" Text="{Binding Source={x:Static services:VersionService.FormattedVersion}, StringFormat='Poker Session Tracker {0}'}" Foreground="White" VerticalAlignment="Center" Margin="10,0,0,0" FontSize="12"/>
                         <StackPanel Grid.Column="1" Orientation="Horizontal" Panel.ZIndex="10">
                             <Button Content="─" Width="45" Height="32" Background="Transparent" BorderThickness="0" Click="MinimizeButton_Click" Foreground="White" Cursor="Hand"/>
                             <Button Content="□" Width="45" Height="32" Background="Transparent" BorderThickness="0" Click="MaximizeButton_Click" Foreground="White" Cursor="Hand"/>

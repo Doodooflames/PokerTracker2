@@ -1,0 +1,28 @@
+🚀 PokerTracker2 v1.0.5 - Dynamic Version Binding System
+
+## ✨ What's New
+- **Dynamic Version Binding**: Version numbers now automatically update from project file
+- **Automatic UI Updates**: Login screen and title bar automatically show current version
+- **No More Manual Updates**: Eliminates the need to manually update hardcoded version strings
+
+## 🔧 Technical Improvements
+- **VersionService**: New service that reads version from assembly attributes
+- **XAML Binding**: Both login window and main window use dynamic version binding
+- **Single Source of Truth**: Project file (.csproj) is the only place to update version numbers
+- **Professional Workflow**: Industry-standard approach to version management
+
+## 🎯 Benefits
+- **Never Forget Again**: Version numbers automatically reflect current project version
+- **Consistency**: All UI elements always show the same, current version
+- **Maintainable**: Single source of truth for version information
+- **Professional**: No more mismatched version numbers between UI and actual app
+
+## 🔮 How It Works
+- **Login Screen**: Automatically shows "v1.0.5" from project file
+- **Main Window Title**: Automatically shows "Poker Session Tracker v1.0.5"
+- **Automatic Updates**: Change version in .csproj → UI updates automatically
+
+## 🚀 Getting Started
+The app will automatically display version 1.0.5 in both the login screen and main window title bar.
+
+This release demonstrates our commitment to professional software development practices! 🎯

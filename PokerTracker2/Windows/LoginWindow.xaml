@@ -1,6 +1,7 @@
 <Window x:Class="PokerTracker2.Windows.LoginWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:services="clr-namespace:PokerTracker2.Services"
         Title="PokerTracker2 - Login" 
         Height="600" 
         Width="400"
@@ -338,7 +339,7 @@
                 
                 <!-- Version Number -->
                 <TextBlock Grid.Row="2" 
-                           Text="v1.0.4" 
+                           Text="{Binding Source={x:Static services:VersionService.FormattedVersion}}" 
                            HorizontalAlignment="Center" 
                            Margin="0,35,0,0"
                            Foreground="#80CCCCCC"
