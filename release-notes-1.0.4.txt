@@ -1,0 +1,23 @@
+🚀 PokerTracker2 v1.0.4 - Version Number Display & UI Enhancements
+
+## ✨ What's New
+- **Version Number Display**: Added version numbers to both login screen and main app title bar
+- **Enhanced User Experience**: Users can now easily identify which version they're running
+- **Professional Appearance**: Consistent version information across all app windows
+
+## 🔧 Technical Improvements
+- **Login Window**: Added "v1.0.4" below status text for easy identification
+- **Main Window**: Updated title bar to show "Poker Session Tracker v1.0.4"
+- **Visual Consistency**: Version numbers styled to match existing UI elements
+- **Build Configuration**: Updated project file to version 1.0.4
+
+## 🎯 Benefits
+- **Version Awareness**: Users know exactly which version they're running
+- **Update Verification**: Easy to confirm if auto-updates are working correctly
+- **Support Clarity**: Users can report issues with specific version information
+- **Professional Polish**: Adds a professional touch to the application
+
+## 🚀 Getting Started
+The app will automatically display version 1.0.4 in both the login screen and main window title bar.
+
+This release focuses on improving user experience and version identification! 🎯

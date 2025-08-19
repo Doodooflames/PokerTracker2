@@ -335,6 +335,14 @@
                            Margin="0,15,0,0"
                            Foreground="#FFCCCCCC"
                            FontSize="11"/>
+                
+                <!-- Version Number -->
+                <TextBlock Grid.Row="2" 
+                           Text="v1.0.4" 
+                           HorizontalAlignment="Center" 
+                           Margin="0,35,0,0"
+                           Foreground="#80CCCCCC"
+                           FontSize="10"/>
             </Grid>
         </Border>
         
