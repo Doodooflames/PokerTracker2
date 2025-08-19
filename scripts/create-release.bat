@@ -86,7 +86,7 @@ if %errorlevel% == 0 (
 if defined GH_PATH (
     echo ✅ Found GitHub CLI at: %GH_PATH%
     echo 📝 Creating release notes file...
-    echo %RELEASE_NOTES% > temp_notes.txt
+    powershell -Command "Set-Content -Path 'temp_notes.txt' -Value '%RELEASE_NOTES%'"
     echo 🚀 Creating GitHub release...
     %GH_PATH% release create %RELEASE_TAG% %ARCHIVE_PATH% --title "Release %RELEASE_TAG%" --repo %GITHUB_REPO% --notes-file temp_notes.txt
     if %errorlevel% == 0 (
