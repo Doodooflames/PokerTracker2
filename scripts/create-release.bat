@@ -21,10 +21,7 @@ set GITHUB_REPO=Doodooflames/PokerTracker2
 set PUBLISH_DIR=PublishSingle
 set RELEASE_TAG=v%VERSION%
 
-echo 🔍 Debug: VERSION = %VERSION%
-echo 🔍 Debug: PROJECT_NAME = %PROJECT_NAME%
-echo 🔍 Debug: PUBLISH_DIR = %PUBLISH_DIR%
-echo 🔍 Debug: RELEASE_TAG = %RELEASE_TAG%
+
 
 echo 🚀 Creating release %RELEASE_TAG% for %PROJECT_NAME%
 echo ================================================
@@ -65,15 +62,12 @@ if "%SKIP_ZIP%"=="--no-zip" (
     echo ✅ Will upload EXE directly: %UPLOAD_FILE%
 ) else (
     echo 📁 Creating release archive...
-    echo 🔍 Debug: ARCHIVE_PATH = %ARCHIVE_PATH%
-    
     REM Clean out old zip files before creating new archive
     echo 🧹 Cleaning old zip files...
     del /Q "%PUBLISH_DIR%\*.zip" 2>nul
     
     REM Create archive with only the executable
     echo 📦 Creating archive with executable only...
-    echo 🔍 Debug: About to run: Compress-Archive -Path '%PUBLISH_DIR%\*.exe' -DestinationPath '%ARCHIVE_PATH%' -Force
     powershell -Command "Compress-Archive -Path '%PUBLISH_DIR%\*.exe' -DestinationPath '%ARCHIVE_PATH%' -Force"
     if not exist "%ARCHIVE_PATH%" (
         echo ❌ Failed to create archive!
@@ -112,14 +106,21 @@ if defined GH_PATH (
     echo 📝 Creating release notes file...
     echo %RELEASE_NOTES% > temp_notes.txt
     echo 🚀 Creating GitHub release...
-    %GH_PATH% release create %RELEASE_TAG% %UPLOAD_FILE% --title "Release %RELEASE_TAG%" --repo %GITHUB_REPO% --notes-file temp_notes.txt
+    %GH_PATH% release create %RELEASE_TAG% %UPLOAD_FILE% --title "Release %RELEASE_TAG%" --repo %GITHUB_REPO% --notes-file temp_notes.txt > temp_gh_output.txt 2>&1
+    set GH_EXIT_CODE=%errorlevel%
+    
+    REM Check if the release was actually created by looking for the URL in output
+    findstr /C:"https://github.com/%GITHUB_REPO%/releases/tag/%RELEASE_TAG%" temp_gh_output.txt >nul
     if %errorlevel% == 0 (
         echo ✅ GitHub release created successfully!
         del temp_notes.txt
+        del temp_gh_output.txt
         echo 🌐 Release URL: https://github.com/%GITHUB_REPO%/releases/tag/%RELEASE_TAG%
     ) else (
-        echo ⚠️ GitHub release creation failed. Please create manually:
+        echo ⚠️ GitHub release creation may have failed. Please check manually:
+        type temp_gh_output.txt
         del temp_notes.txt
+        del temp_gh_output.txt
         goto :manual_release
     )
 ) else (
