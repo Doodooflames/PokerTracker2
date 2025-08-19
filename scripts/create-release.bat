@@ -88,13 +88,18 @@ if defined GH_PATH (
     echo 📝 Creating release notes file...
     powershell -Command "Set-Content -Path 'temp_notes.txt' -Value '%RELEASE_NOTES%'"
     echo 🚀 Creating GitHub release...
-    %GH_PATH% release create %RELEASE_TAG% %ARCHIVE_PATH% --title "Release %RELEASE_TAG%" --repo %GITHUB_REPO% --notes-file temp_notes.txt
-    if %errorlevel% == 0 (
+    %GH_PATH% release create %RELEASE_TAG% %ARCHIVE_PATH% --title "Release %RELEASE_TAG%" --repo %GITHUB_REPO% --notes-file temp_notes.txt > temp_gh_output.txt 2>&1
+    set GH_EXIT_CODE=%errorlevel%
+    type temp_gh_output.txt
+    if %GH_EXIT_CODE% == 0 (
         echo ✅ GitHub release created successfully!
         del temp_notes.txt
+        del temp_gh_output.txt
+        echo 🌐 Release URL: https://github.com/%GITHUB_REPO%/releases/tag/%RELEASE_TAG%
     ) else (
         echo ⚠️ GitHub release creation failed. Please create manually:
         del temp_notes.txt
+        del temp_gh_output.txt
         goto :manual_release
     )
 ) else (
