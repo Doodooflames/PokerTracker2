@@ -37,7 +37,7 @@ if ($LASTEXITCODE -ne 0) {
 
 # Step 2: Publish the application
 Write-Host "📤 Publishing application..." -ForegroundColor Yellow
-dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:PublishTrimmed=false -o $PublishDir
+dotnet publish -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -p:PublishTrimmed=false -o $PublishDir
 if ($LASTEXITCODE -ne 0) {
     Write-Host "❌ Publish failed!" -ForegroundColor Red
     exit 1

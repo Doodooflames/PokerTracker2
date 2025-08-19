@@ -40,7 +40,7 @@ if errorlevel 1 (
 
 REM Step 2: Publish
 echo 📤 Publishing application...
-dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:PublishTrimmed=false -o %PUBLISH_DIR%
+dotnet publish -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -p:PublishTrimmed=false -o %PUBLISH_DIR%
 if errorlevel 1 (
     echo ❌ Publish failed!
     pause
