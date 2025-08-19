@@ -100,11 +100,36 @@ if (Get-Command "gh" -ErrorAction SilentlyContinue) {
 
 if ($GhPath) {
     $DraftFlag = if ($Draft) { "--draft" } else { "" }
-    $NotesFlag = if ($ReleaseNotes) { "--notes '$ReleaseNotes'" } else { "" }
     
-    $GhCommand = "& '$GhPath' release create $ReleaseTag $UploadFile $DraftFlag $NotesFlag --title 'Release $ReleaseTag' --repo $GitHubRepo"
-    Write-Host "Running: $GhCommand" -ForegroundColor Cyan
-    Invoke-Expression $GhCommand
+    # Create temporary notes file to avoid PowerShell parsing issues
+    $TempNotesFile = "temp_release_notes.txt"
+    if ($ReleaseNotes) {
+        Write-Host "📝 Creating release notes file..." -ForegroundColor Yellow
+        $ReleaseNotes | Out-File -FilePath $TempNotesFile -Encoding UTF8
+        $NotesFlag = "--notes-file $TempNotesFile"
+    } else {
+        $NotesFlag = ""
+    }
+    
+    # Build the GitHub CLI command
+    $GhArgs = @(
+        "release", "create", $ReleaseTag, $UploadFile,
+        "--title", "Release $ReleaseTag",
+        "--repo", $GitHubRepo
+    )
+    
+    if ($DraftFlag) { $GhArgs += $DraftFlag }
+    if ($NotesFlag) { $GhArgs += "--notes-file", $TempNotesFile }
+    
+    Write-Host "Running: gh $($GhArgs -join ' ')" -ForegroundColor Cyan
+    
+    # Execute the command
+    & $GhPath @GhArgs
+    
+    # Clean up temp file
+    if (Test-Path $TempNotesFile) {
+        Remove-Item $TempNotesFile -Force
+    }
     
     if ($LASTEXITCODE -eq 0) {
         Write-Host "✅ GitHub release created successfully!" -ForegroundColor Green
@@ -113,14 +138,14 @@ if ($GhPath) {
         Write-Host "   Go to: https://github.com/$GitHubRepo/releases/new" -ForegroundColor Cyan
         Write-Host "   Tag: $ReleaseTag" -ForegroundColor Cyan
         Write-Host "   Title: Release $ReleaseTag" -ForegroundColor Cyan
-        Write-Host "   Upload: $ArchivePath" -ForegroundColor Cyan
+        Write-Host "   Upload: $UploadFile" -ForegroundColor Cyan
     }
 } else {
     Write-Host "⚠️ GitHub CLI not found. Please install it or create the release manually:" -ForegroundColor Yellow
     Write-Host "   Go to: https://github.com/$GitHubRepo/releases/new" -ForegroundColor Cyan
     Write-Host "   Tag: $ReleaseTag" -ForegroundColor Cyan
     Write-Host "   Title: Release $ReleaseTag" -ForegroundColor Cyan
-    Write-Host "   Upload: $ArchivePath" -ForegroundColor Cyan
+    Write-Host "   Upload: $UploadFile" -ForegroundColor Cyan
 }
 
 Write-Host "🎉 Release $ReleaseTag created successfully!" -ForegroundColor Green

@@ -84,35 +84,126 @@ namespace PokerTracker2.Services
 
                 LoggingService.Instance.Info($"Starting update download: {updateInfo.LatestVersion}", "AutoUpdateService");
 
-                // Download the update
-                var updateBytes = await _httpClient.GetByteArrayAsync(updateInfo.DownloadUrl);
-                var updatePath = Path.Combine(Path.GetTempPath(), $"PokerTracker2-{updateInfo.LatestVersion}.exe");
-                
-                await File.WriteAllBytesAsync(updatePath, updateBytes);
-                LoggingService.Instance.Info($"Update downloaded to: {updatePath}", "AutoUpdateService");
-
-                // Show success message and instructions
-                var result = MessageBox.Show(
-                    $"Update downloaded successfully to:\n{updatePath}\n\n" +
-                    "To install the update:\n" +
-                    "1. Close this application\n" +
-                    "2. Run the downloaded file\n" +
-                    "3. Follow the installation instructions\n\n" +
-                    "Would you like to open the download folder now?",
-                    "Update Downloaded",
-                    MessageBoxButton.YesNo,
-                    MessageBoxImage.Information);
-
-                if (result == MessageBoxResult.Yes)
+                // Get current executable path and directory
+                var currentExePath = Process.GetCurrentProcess().MainModule?.FileName;
+                if (string.IsNullOrEmpty(currentExePath))
                 {
-                    Process.Start("explorer.exe", $"/select,\"{updatePath}\"");
+                    LoggingService.Instance.Error("Could not determine current executable path", "AutoUpdateService");
+                    return false;
                 }
+
+                var currentExeDir = Path.GetDirectoryName(currentExePath);
+                var currentExeName = Path.GetFileName(currentExePath);
+                var backupExePath = Path.Combine(currentExeDir, $"{Path.GetFileNameWithoutExtension(currentExeName)}_old.exe");
+                var newExePath = Path.Combine(currentExeDir, $"{Path.GetFileNameWithoutExtension(currentExeName)}_new.exe");
+
+                LoggingService.Instance.Info($"Current exe: {currentExePath}", "AutoUpdateService");
+                LoggingService.Instance.Info($"New exe will be: {newExePath}", "AutoUpdateService");
+
+                // Download the update to the same directory as current exe
+                var updateBytes = await _httpClient.GetByteArrayAsync(updateInfo.DownloadUrl);
+                await File.WriteAllBytesAsync(newExePath, updateBytes);
+                
+                LoggingService.Instance.Info($"Update downloaded to: {newExePath}", "AutoUpdateService");
+
+                // Confirm download was successful
+                if (!File.Exists(newExePath))
+                {
+                    LoggingService.Instance.Error("Downloaded file does not exist", "AutoUpdateService");
+                    return false;
+                }
+
+                // Show update ready message
+                var result = MessageBox.Show(
+                    $"Update {updateInfo.LatestVersion} downloaded successfully!\n\n" +
+                    "The application will now close and restart with the new version.\n" +
+                    "The old version will be automatically cleaned up.\n\n" +
+                    "Continue with update?",
+                    "Update Ready",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question);
+
+                if (result != MessageBoxResult.Yes)
+                {
+                    // Clean up downloaded file if user cancels
+                    File.Delete(newExePath);
+                    LoggingService.Instance.Info("Update cancelled by user", "AutoUpdateService");
+                    return false;
+                }
+
+                LoggingService.Instance.Info("Starting update process...", "AutoUpdateService");
+
+                // Create batch script to handle the update process
+                var batchScript = Path.Combine(Path.GetTempPath(), "PokerTracker2_Update.bat");
+                var batchContent = $@"@echo off
+echo Starting PokerTracker2 update process...
+
+REM Wait for current process to close
+timeout /t 2 /nobreak >nul
+
+REM Backup current executable
+if exist ""{currentExePath}"" (
+    echo Backing up current version...
+    move ""{currentExePath}"" ""{backupExePath}""
+)
+
+REM Move new executable to replace old one
+if exist ""{newExePath}"" (
+    echo Installing new version...
+    move ""{newExePath}"" ""{currentExePath}""
+)
+
+REM Start new version
+echo Starting new version...
+start """" ""{currentExePath}""
+
+REM Wait a moment for new process to start
+timeout /t 3 /nobreak >nul
+
+REM Check if new process is running, then clean up old version
+tasklist /FI ""IMAGENAME eq {currentExeName}"" 2>nul | find /I ""{currentExeName}"" >nul
+if %ERRORLEVEL% EQU 0 (
+    echo New version started successfully, cleaning up...
+    if exist ""{backupExePath}"" (
+        del ""{backupExePath}""
+    )
+    echo Update completed successfully!
+) else (
+    echo New version failed to start, restoring backup...
+    if exist ""{backupExePath}"" (
+        move ""{backupExePath}"" ""{currentExePath}""
+    )
+    echo Update failed, original version restored.
+)
+
+REM Clean up this script
+del ""%~f0""";
+
+                await File.WriteAllTextAsync(batchScript, batchContent);
+                LoggingService.Instance.Info($"Update script created: {batchScript}", "AutoUpdateService");
+
+                // Start the update batch script
+                var processInfo = new ProcessStartInfo
+                {
+                    FileName = batchScript,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+
+                Process.Start(processInfo);
+                LoggingService.Instance.Info("Update script started, closing application...", "AutoUpdateService");
+
+                // Close the current application
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    Application.Current.Shutdown();
+                });
 
                 return true;
             }
             catch (Exception ex)
             {
-                LoggingService.Instance.Error($"Error downloading update: {ex.Message}", "AutoUpdateService", ex);
+                LoggingService.Instance.Error($"Error downloading and installing update: {ex.Message}", "AutoUpdateService", ex);
                 return false;
             }
         }

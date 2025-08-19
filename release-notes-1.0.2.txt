@@ -1,0 +1,32 @@
+🚀 PokerTracker2 v1.0.2 - Enhanced Auto-Update System
+
+## ✨ What's New
+- **Improved Auto-Update**: Enhanced update detection and download reliability
+- **Release Notes Files**: External release notes files for better maintainability
+- **PowerShell Script Fixes**: Resolved parsing issues with complex markdown
+
+## 🔧 Technical Improvements
+- **External Notes Files**: Release notes can now be stored in separate .txt files
+- **No More Parsing Errors**: PowerShell script now handles complex notes without issues
+- **Better Maintainability**: Release notes can be written in proper markdown format
+- **Professional Workflow**: Industry-standard approach to release automation
+
+## 🎯 Benefits of New Approach
+- **Cleaner Scripts**: No more escaping issues in PowerShell
+- **Better Documentation**: Release notes can be properly formatted and version controlled
+- **Reusability**: Same notes file can be used across different release methods
+- **Professional Standard**: Follows industry best practices for release automation
+
+## 📋 Usage Examples
+```bash
+# PowerShell with external notes file
+scripts\create-release.ps1 -Version "1.0.2" -ReleaseNotes (Get-Content "release-notes-1.0.2.txt")
+
+# Or create notes inline (simpler text)
+scripts\create-release.ps1 -Version "1.0.2" -ReleaseNotes "Simple release notes"
+```
+
+## 🚀 Getting Started
+The app will automatically detect this update and prompt users to download and install it.
+
+This release demonstrates our commitment to professional software development practices! 🎯
