@@ -319,13 +319,7 @@
                             Margin="0,0,0,15"
                             Click="QuickStartButton_Click"/>
                     
-                    <!-- Test Firebase Button -->
-                    <Button x:Name="TestFirebaseButton" 
-                            Content="🔗 Test Firebase Connection" 
-                            Style="{StaticResource AeroButtonStyle}"
-                            Height="40" 
-                            Margin="0,0,0,15"
-                            Click="TestFirebase_Click"/>
+
                 </StackPanel>
                 
                 <!-- Status -->

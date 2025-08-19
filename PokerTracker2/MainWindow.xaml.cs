@@ -1679,8 +1679,32 @@ namespace PokerTracker2
                 PlayerSessionsText.Text = playerStats.TotalSessions.ToString();
                 PlayerBuyInsText.Text = playerStats.TotalBuyInsText;
                 PlayerCashOutsText.Text = playerStats.TotalCashOutsText;
-                // REMOVED: PlayerNetProfitText reference - poker sessions should always balance to 0
-                // PlayerNetProfitText.Text = playerStats.NetProfitText;
+                // Calculate player's cumulative profit for dashboard
+                var playerSessions = _sessionManager.GetPlayerSessions(_selectedPlayerProfile.Name);
+                var playerCumulativeProfit = 0.0;
+                
+                foreach (var session in playerSessions.OrderBy(s => s.StartTime))
+                {
+                    var playerInSession = session.Players?.FirstOrDefault(p => 
+                        string.Equals(p.Name, _selectedPlayerProfile.Name, StringComparison.OrdinalIgnoreCase));
+                    
+                    if (playerInSession != null)
+                    {
+                        var sessionProfit = (playerInSession.TotalCashOut + playerInSession.CurrentStack) - playerInSession.TotalBuyIn;
+                        playerCumulativeProfit += sessionProfit;
+                    }
+                }
+                
+                // Update player net profit on dashboard
+                PlayerNetProfitText.Text = playerCumulativeProfit.ToString("C");
+                
+                // Set profit color based on calculated value
+                if (playerCumulativeProfit > 0)
+                    PlayerNetProfitText.Foreground = System.Windows.Media.Brushes.Green;
+                else if (playerCumulativeProfit < 0)
+                    PlayerNetProfitText.Foreground = System.Windows.Media.Brushes.Red;
+                else
+                    PlayerNetProfitText.Foreground = System.Windows.Media.Brushes.Gray;
                 
                 // Update player info text
                 SelectedPlayerInfo.Text = $"{_selectedPlayerProfile.DisplayName} - {playerStats.CompletedSessions} completed sessions, Last played: {playerStats.LastPlayedText}";
@@ -2412,6 +2436,15 @@ namespace PokerTracker2
             }
         }
 
+        private void PlayerCard_Click(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is Border border && border.Tag is PlayerProfile player)
+            {
+                SelectedPlayerProfile = player;
+                UpdatePlayerDetailsUI();
+            }
+        }
+
         private void ViewPlayerDetails_Click(object sender, RoutedEventArgs e)
         {
             if (sender is Button button && button.Tag is PlayerProfile player)
@@ -2441,8 +2474,8 @@ namespace PokerTracker2
                 else
                     SelectedPlayerProfit.Foreground = System.Windows.Media.Brushes.Gray;
                 
-                // Recent activity (placeholder for now)
-                SelectedPlayerActivity.Text = $"Last played: {SelectedPlayerProfile.LastPlayedDate:MMM dd, yyyy HH:mm}";
+                // Populate activity data
+                PopulatePlayerActivityData();
             }
             else
             {
@@ -2453,8 +2486,183 @@ namespace PokerTracker2
                 SelectedPlayerBuyIns.Text = "$0";
                 SelectedPlayerProfit.Text = "$0";
                 SelectedPlayerNotes.Text = "No notes available";
-                SelectedPlayerActivity.Text = "No recent activity";
+                
+                // Clear activity data
+                ClearPlayerActivityData();
             }
+        }
+        
+        private void PopulatePlayerActivityData()
+        {
+            if (SelectedPlayerProfile == null) return;
+            
+            try
+            {
+                // Get player sessions from session manager
+                var playerSessions = _sessionManager.GetPlayerSessions(SelectedPlayerProfile.Name);
+                
+                // Build session breakdown
+                var sessionBreakdown = new List<SessionBreakdownItem>();
+                var transactionHistory = new List<TransactionHistoryItem>();
+                var profitTrendData = new List<ProfitPoint>();
+                
+                var cumulativeProfit = 0.0;
+                
+                // Add starting point at $0 for the line graph
+                if (playerSessions.Any())
+                {
+                    var firstSession = playerSessions.OrderBy(s => s.StartTime).First();
+                    profitTrendData.Add(new ProfitPoint
+                    {
+                        Profit = 0.0, // Starting at $0
+                        Timestamp = firstSession.StartTime,
+                        SessionId = "start"
+                    });
+                }
+                
+                foreach (var session in playerSessions.OrderBy(s => s.StartTime))
+                {
+                    var playerInSession = session.Players?.FirstOrDefault(p => 
+                        string.Equals(p.Name, SelectedPlayerProfile.Name, StringComparison.OrdinalIgnoreCase));
+                    
+                    if (playerInSession != null)
+                    {
+                        // Calculate session profit: (Cash Out + Final Stack) - Buy Ins
+                        var sessionProfit = (playerInSession.TotalCashOut + playerInSession.CurrentStack) - playerInSession.TotalBuyIn;
+                        
+                        // Debug logging for session profit calculation
+                        LoggingService.Instance.Debug($"Session '{session.Name}' profit calculation: CashOut={playerInSession.TotalCashOut:C}, FinalStack={playerInSession.CurrentStack:C}, BuyIns={playerInSession.TotalBuyIn:C}, Profit={sessionProfit:C}", "MainWindow");
+                        cumulativeProfit += sessionProfit;
+                        
+                        // Add to session breakdown
+                        sessionBreakdown.Add(new SessionBreakdownItem
+                        {
+                            SessionName = session.Name,
+                            SessionDate = session.StartTime,
+                            BuyIns = playerInSession.TotalBuyIn,
+                            CashOuts = playerInSession.TotalCashOut,
+                            FinalStack = playerInSession.CurrentStack,
+                            Profit = sessionProfit,
+                            SessionId = session.Id
+                        });
+                        
+                        // Add to profit trend data
+                        profitTrendData.Add(new ProfitPoint
+                        {
+                            Profit = cumulativeProfit,
+                            Timestamp = session.EndTime != DateTime.MinValue ? session.EndTime : session.StartTime,
+                            SessionId = session.Id
+                        });
+                        
+                        // Add transactions to history
+                        if (session.Transactions != null)
+                        {
+                            var playerTransactions = session.Transactions
+                                .Where(t => string.Equals(t.PlayerName, SelectedPlayerProfile.Name, StringComparison.OrdinalIgnoreCase))
+                                .OrderBy(t => t.Timestamp);
+                            
+                            foreach (var transaction in playerTransactions)
+                            {
+                                TransactionHistoryItem historyItem = transaction.Type switch
+                                {
+                                    TransactionType.BuyIn => TransactionHistoryItem.CreateBuyIn(
+                                        transaction.Amount, transaction.Notes, session.Name, transaction.Timestamp),
+                                    TransactionType.CashOut => TransactionHistoryItem.CreateCashOut(
+                                        transaction.Amount, transaction.Notes, session.Name, transaction.Timestamp),
+                                    TransactionType.Transfer => TransactionHistoryItem.CreateTransfer(
+                                        transaction.Amount, transaction.Notes, session.Name, transaction.Timestamp),
+                                    _ => TransactionHistoryItem.CreateBuyIn(
+                                        transaction.Amount, transaction.Notes, session.Name, transaction.Timestamp)
+                                };
+                                
+                                transactionHistory.Add(historyItem);
+                            }
+                            
+                            // Add final stack as a cash-out transaction if there's a remaining stack
+                            if (playerInSession.CurrentStack > 0)
+                            {
+                                var finalCashOut = TransactionHistoryItem.CreateCashOut(
+                                    playerInSession.CurrentStack,
+                                    "Final stack cash-out",
+                                    session.Name,
+                                    session.EndTime != DateTime.MinValue ? session.EndTime : session.StartTime.AddHours(4) // Use end time or estimate
+                                );
+                                transactionHistory.Add(finalCashOut);
+                            }
+                        }
+                    }
+                }
+                
+                // Update the UI collections
+                SelectedPlayerProfile.SessionBreakdown = sessionBreakdown;
+                SelectedPlayerProfile.TransactionHistory = transactionHistory;
+                SelectedPlayerProfile.ProfitTrendData = profitTrendData;
+                
+                // Update the main statistics display with calculated session data
+                var totalBuyIns = sessionBreakdown.Sum(s => s.BuyIns);
+                var totalCashOuts = sessionBreakdown.Sum(s => s.CashOuts);
+                
+                // Update the main UI elements
+                SelectedPlayerSessions.Text = sessionBreakdown.Count.ToString();
+                SelectedPlayerBuyIns.Text = totalBuyIns.ToString("C");
+                SelectedPlayerProfit.Text = cumulativeProfit.ToString("C");
+                
+                // Set profit color based on calculated value
+                if (cumulativeProfit > 0)
+                    SelectedPlayerProfit.Foreground = System.Windows.Media.Brushes.Green;
+                else if (cumulativeProfit < 0)
+                    SelectedPlayerProfit.Foreground = System.Windows.Media.Brushes.Red;
+                else
+                    SelectedPlayerProfit.Foreground = System.Windows.Media.Brushes.Gray;
+                
+                // Update the summary text controls
+                var sessionDetails = string.Join("\n", sessionBreakdown.Select(s => 
+                    $"📅 {s.SessionName} ({s.SessionDateDisplay}):\n" +
+                    $"   💰 Buy-ins: {s.BuyIns:C}\n" +
+                    $"   💵 Cash-outs: {s.CashOuts:C}\n" +
+                    $"   🎯 Final Stack: {s.FinalStack:C}\n" +
+                    $"   📊 Session P/L: {s.Profit:C}\n"));
+                
+                SessionSummaryText.Text = sessionDetails;
+                
+                // Sort transactions chronologically and display detailed history
+                var sortedTransactions = transactionHistory.OrderBy(t => t.Timestamp).ToList();
+                var transactionDetails = string.Join("\n", sortedTransactions.Select(t => 
+                    $"{t.TypeIcon} {t.Amount:C} - {t.Notes} ({t.Timestamp:HH:mm})")
+                );
+                
+                TransactionSummaryText.Text = string.IsNullOrEmpty(transactionDetails) ? 
+                    "No transaction data available" : transactionDetails;
+                
+                // Convert profit trend data to BuyInPoint format for the existing graph control
+                var buyInData = new ObservableCollection<BuyInPoint>(profitTrendData.Select(p => new BuyInPoint 
+                { 
+                    Amount = p.Profit, 
+                    Timestamp = p.Timestamp 
+                }).ToList());
+                
+                PlayerProfitGraph.BuyInData = buyInData;
+                
+                // Debug logging to help troubleshoot
+                LoggingService.Instance.Debug($"Updated player stats: Sessions={sessionBreakdown.Count}, BuyIns={totalBuyIns:C}, Profit={cumulativeProfit:C}", "MainWindow");
+                LoggingService.Instance.Debug($"Profit trend data points: {profitTrendData.Count}", "MainWindow");
+                foreach (var point in profitTrendData)
+                {
+                    LoggingService.Instance.Debug($"  Point: Profit={point.Profit:C}, Time={point.Timestamp:HH:mm}", "MainWindow");
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggingService.Instance.Error("Error populating player activity data", "MainWindow", ex);
+            }
+        }
+        
+        private void ClearPlayerActivityData()
+        {
+            // Clear all activity-related UI controls
+            SessionSummaryText.Text = "No session data available";
+            TransactionSummaryText.Text = "No transaction data available";
+            PlayerProfitGraph.BuyInData = null;
         }
 
         #endregion
@@ -2467,12 +2675,18 @@ namespace PokerTracker2
                 
                 var firebaseService = new FirebaseService();
                 
+                // Show current credentials path for debugging
+                var credentialsPath = firebaseService.GetCurrentCredentialsPath();
+                LoggingService.Instance.Info($"Current credentials path: {credentialsPath}", "MainWindow");
+                
                 // Test basic connection
                 var connectionTest = await firebaseService.TestConnectionAsync();
                 if (!connectionTest)
                 {
-                    MessageBox.Show("❌ Firebase connection test failed!\n\nCheck the debug output for details.", 
-                        "Firebase Test", MessageBoxButton.OK, MessageBoxImage.Error);
+                    var errorMessage = $"❌ Firebase connection test failed!\n\n" +
+                                     $"Credentials path: {credentialsPath}\n" +
+                                     $"Check the debug output for details.";
+                    MessageBox.Show(errorMessage, "Firebase Test", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
                 
@@ -2480,13 +2694,17 @@ namespace PokerTracker2
                 var writeTest = await firebaseService.TestWriteAsync();
                 if (!writeTest)
                 {
-                    MessageBox.Show("❌ Firebase write test failed!\n\nCheck the debug output for details.", 
-                        "Firebase Test", MessageBoxButton.OK, MessageBoxImage.Error);
+                    var errorMessage = $"❌ Firebase write test failed!\n\n" +
+                                     $"Credentials path: {credentialsPath}\n" +
+                                     $"Check the debug output for details.";
+                    MessageBox.Show(errorMessage, "Firebase Test", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
                 
-                MessageBox.Show("✅ Firebase connection successful!\n\nBoth read and write operations are working.", 
-                    "Firebase Test", MessageBoxButton.OK, MessageBoxImage.Information);
+                var successMessage = $"✅ Firebase connection successful!\n\n" +
+                                   $"Credentials path: {credentialsPath}\n" +
+                                   $"Both read and write operations are working.";
+                MessageBox.Show(successMessage, "Firebase Test", MessageBoxButton.OK, MessageBoxImage.Information);
                 
                 LoggingService.Instance.Info("Firebase connection test successful", "MainWindow");
             }

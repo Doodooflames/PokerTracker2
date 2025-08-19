@@ -18,7 +18,7 @@ namespace PokerTracker2.Services
     public class FirebaseService
     {
         private FirestoreDb? _firestoreDb;
-        private readonly string _credentialsPath;
+        private string? _credentialsPath; // Changed from readonly to allow modification
         private readonly string _projectId;
         private bool _isInitialized = false;
         
@@ -35,31 +35,74 @@ namespace PokerTracker2.Services
         {
             _projectId = projectId;
             
-            // If no credentials path provided, look for default Firebase credentials
+            DebugLog($"FirebaseService constructor called for project: {_projectId}");
+            DebugLog($"Starting credentials resolution...");
+            
+            // If no credentials path provided, use embedded credentials
             if (string.IsNullOrEmpty(credentialsPath))
             {
-                // Check for GOOGLE_APPLICATION_CREDENTIALS environment variable
-                var envCredentials = Environment.GetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS");
-                if (!string.IsNullOrEmpty(envCredentials) && File.Exists(envCredentials))
+                DebugLog("🔍 No external credentials path provided, using embedded credentials...");
+                
+                // Try to read embedded credentials first
+                var embeddedCredentials = GetEmbeddedCredentials();
+                if (!string.IsNullOrEmpty(embeddedCredentials))
                 {
-                    _credentialsPath = envCredentials;
+                    DebugLog("✅ Successfully loaded embedded Firebase credentials");
+                    _credentialsPath = null; // We'll use embedded credentials directly
                 }
                 else
                 {
-                    // Look for service account key in common locations - prioritize project root
-                    var commonPaths = new[]
+                    DebugLog("⚠️ Embedded credentials not found, falling back to file search...");
+                    
+                    // Fallback: Check for GOOGLE_APPLICATION_CREDENTIALS environment variable
+                    var envCredentials = Environment.GetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS");
+                    if (!string.IsNullOrEmpty(envCredentials) && File.Exists(envCredentials))
                     {
-                        Path.Combine(Directory.GetCurrentDirectory(), "firebase-credentials.json"),
-                        Path.Combine(Directory.GetCurrentDirectory(), "..", "firebase-credentials.json"),
-                        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "PokerTracker2", "firebase-credentials.json")
-                    };
-
-                    foreach (var path in commonPaths)
+                        _credentialsPath = envCredentials;
+                        DebugLog($"✅ Using environment variable credentials: {_credentialsPath}");
+                    }
+                    else
                     {
-                        if (File.Exists(path))
+                        DebugLog($"No environment variable credentials found, searching common locations...");
+                        
+                        // Look for service account key in common locations - prioritize project root
+                        var commonPaths = new[]
                         {
-                            _credentialsPath = path;
-                            break;
+                            // Current working directory (where app is running from)
+                            Path.Combine(Directory.GetCurrentDirectory(), "firebase-credentials.json"),
+                            // Executable directory (where .exe is located) - use AppContext.BaseDirectory for single-file apps
+                            Path.Combine(AppContext.BaseDirectory, "firebase-credentials.json"),
+                            // Project root (one level up from executable if in bin/Debug or bin/Release)
+                            Path.Combine(Directory.GetCurrentDirectory(), "..", "firebase-credentials.json"),
+                            Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "firebase-credentials.json"),
+                            Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", "firebase-credentials.json"),
+                            // Absolute project root path (hardcoded fallback)
+                            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "source", "repos", "PokerTracker2", "firebase-credentials.json"),
+                            // AppData location
+                            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "PokerTracker2", "firebase-credentials.json")
+                        };
+
+                        DebugLog($"🔍 Searching for credentials in {commonPaths.Length} locations:");
+                        foreach (var path in commonPaths)
+                        {
+                            DebugLog($"  📁 Checking: {path}");
+                            if (File.Exists(path))
+                            {
+                                _credentialsPath = path;
+                                DebugLog($"  ✅ Found credentials at: {_credentialsPath}");
+                                break;
+                            }
+                            else
+                            {
+                                DebugLog($"  ❌ Not found: {path}");
+                            }
+                        }
+
+                        if (string.IsNullOrEmpty(_credentialsPath))
+                        {
+                            DebugLog("❌ No credentials file found in any of the searched locations!");
+                            DebugLog($"Current working directory: {Directory.GetCurrentDirectory()}");
+                            DebugLog($"Executable location: {AppContext.BaseDirectory}");
                         }
                     }
                 }
@@ -67,7 +110,10 @@ namespace PokerTracker2.Services
             else
             {
                 _credentialsPath = credentialsPath;
+                DebugLog($"✅ Using provided credentials path: {_credentialsPath}");
             }
+            
+            DebugLog($"FirebaseService constructor completed. Final credentials path: {_credentialsPath ?? "NOT SET"}");
         }
 
         /// <summary>
@@ -89,11 +135,46 @@ namespace PokerTracker2.Services
                     // Set environment variable for credentials
                     Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", _credentialsPath);
                 }
+                else if (_credentialsPath == null)
+                {
+                    // Using embedded credentials - create temporary file
+                    DebugLog("Using embedded credentials, creating temporary credentials file...");
+                    
+                    var embeddedCredentials = GetEmbeddedCredentials();
+                    if (!string.IsNullOrEmpty(embeddedCredentials))
+                    {
+                        var tempPath = Path.Combine(Path.GetTempPath(), $"firebase-credentials-{Guid.NewGuid()}.json");
+                        File.WriteAllText(tempPath, embeddedCredentials);
+                        
+                        DebugLog($"✅ Created temporary credentials file: {tempPath}");
+                        _credentialsPath = tempPath;
+                        Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", tempPath);
+                    }
+                    else
+                    {
+                        DebugLog("❌ Failed to read embedded credentials");
+                        return false;
+                    }
+                }
                 else
                 {
                     DebugLog($"WARNING - No valid credentials path found!");
                     DebugLog($"_credentialsPath = '{_credentialsPath}'");
                     DebugLog($"File exists = {File.Exists(_credentialsPath ?? "")}");
+                    
+                    // Try to copy credentials from project root to executable directory as fallback
+                    var fallbackPath = await TryCopyCredentialsToExecutableDirectoryAsync();
+                    if (!string.IsNullOrEmpty(fallbackPath))
+                    {
+                        _credentialsPath = fallbackPath;
+                        DebugLog($"✅ Using fallback credentials path: {_credentialsPath}");
+                        Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", _credentialsPath);
+                    }
+                    else
+                    {
+                        DebugLog("❌ Failed to find or copy credentials file!");
+                        return false;
+                    }
                 }
 
                 // Create Firestore database instance
@@ -110,6 +191,129 @@ namespace PokerTracker2.Services
                 DebugLog($"Stack trace: {ex.StackTrace}");
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Get Firebase credentials from embedded resource
+        /// </summary>
+        private string? GetEmbeddedCredentials()
+        {
+            try
+            {
+                var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+                var resourceName = "PokerTracker2.firebase-credentials.json";
+                
+                DebugLog($"🔍 Looking for embedded resource: {resourceName}");
+                
+                // Get all embedded resource names for debugging
+                var allResources = assembly.GetManifestResourceNames();
+                DebugLog($"📦 Available embedded resources: {string.Join(", ", allResources)}");
+                
+                using var stream = assembly.GetManifestResourceStream(resourceName);
+                if (stream == null)
+                {
+                    DebugLog($"❌ Embedded resource '{resourceName}' not found");
+                    return null;
+                }
+                
+                using var reader = new StreamReader(stream);
+                var credentials = reader.ReadToEnd();
+                
+                DebugLog($"✅ Successfully read embedded credentials ({credentials.Length} characters)");
+                return credentials;
+            }
+            catch (Exception ex)
+            {
+                DebugLog($"❌ Error reading embedded credentials: {ex.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Try to copy credentials file to executable directory as fallback
+        /// </summary>
+        private async Task<string?> TryCopyCredentialsToExecutableDirectoryAsync()
+        {
+            try
+            {
+                // Look for credentials in common development locations
+                var possibleSourcePaths = new[]
+                {
+                    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "source", "repos", "PokerTracker2", "firebase-credentials.json"),
+                    Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", "firebase-credentials.json"),
+                    Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "firebase-credentials.json"),
+                    Path.Combine(Directory.GetCurrentDirectory(), "..", "firebase-credentials.json")
+                };
+
+                string? sourcePath = null;
+                foreach (var path in possibleSourcePaths)
+                {
+                    if (File.Exists(path))
+                    {
+                        sourcePath = path;
+                        DebugLog($"Found source credentials at: {sourcePath}");
+                        break;
+                    }
+                }
+
+                if (sourcePath == null)
+                {
+                    DebugLog("No source credentials found to copy");
+                    return null;
+                }
+
+                // Copy to executable directory - use AppContext.BaseDirectory for single-file apps
+                var executableDir = AppContext.BaseDirectory;
+                if (string.IsNullOrEmpty(executableDir))
+                {
+                    DebugLog("Could not determine executable directory");
+                    return null;
+                }
+
+                var targetPath = Path.Combine(executableDir, "firebase-credentials.json");
+                DebugLog($"Copying credentials to: {targetPath}");
+
+                // Copy file asynchronously
+                using (var sourceStream = new FileStream(sourcePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+                using (var targetStream = new FileStream(targetPath, FileMode.Create, FileAccess.Write, FileShare.None))
+                {
+                    await sourceStream.CopyToAsync(targetStream);
+                }
+
+                DebugLog($"✅ Successfully copied credentials to executable directory");
+                return targetPath;
+            }
+            catch (Exception ex)
+            {
+                DebugLog($"Failed to copy credentials: {ex.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Manually set credentials path and reset initialization state
+        /// Useful for debugging and manual configuration
+        /// </summary>
+        public void SetCredentialsPath(string credentialsPath)
+        {
+            if (File.Exists(credentialsPath))
+            {
+                _credentialsPath = credentialsPath;
+                _isInitialized = false; // Reset to force re-initialization
+                DebugLog($"Manually set credentials path to: {_credentialsPath}");
+            }
+            else
+            {
+                DebugLog($"Cannot set credentials path - file does not exist: {credentialsPath}");
+            }
+        }
+
+        /// <summary>
+        /// Get current credentials path for debugging
+        /// </summary>
+        public string GetCurrentCredentialsPath()
+        {
+            return _credentialsPath ?? "Not set";
         }
 
         /// <summary>
@@ -625,6 +829,20 @@ namespace PokerTracker2.Services
             {
                 DebugLog($"Connection test failed: {ex.GetType().Name}: {ex.Message}");
                 DebugLog($"Stack trace: {ex.StackTrace}");
+                
+                // Add specific handling for authentication errors
+                if (ex.Message.Contains("Unauthenticated") || ex.Message.Contains("invalid authentication"))
+                {
+                    DebugLog($"🚨 AUTHENTICATION ERROR DETECTED:");
+                    DebugLog($"   This usually means the service account key is expired or invalid");
+                    DebugLog($"   To fix this:");
+                    DebugLog($"   1. Go to Firebase Console: https://console.firebase.google.com/");
+                    DebugLog($"   2. Select project: {_projectId}");
+                    DebugLog($"   3. Go to Project Settings → Service Accounts");
+                    DebugLog($"   4. Generate new private key and replace firebase-credentials.json");
+                    DebugLog($"   Current credentials file: {_credentialsPath}");
+                }
+                
                 return false;
             }
         }

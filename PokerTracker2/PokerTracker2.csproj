@@ -9,9 +9,9 @@
     <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
     
     <!-- Version Information -->
-    <Version>1.0.7</Version>
-    <AssemblyVersion>1.0.7.0</AssemblyVersion>
-    <FileVersion>1.0.7.0</FileVersion>
+    <Version>1.0.11</Version>
+    <AssemblyVersion>1.0.11.0</AssemblyVersion>
+    <FileVersion>1.0.11.0</FileVersion>
     <Company>PokerTracker2</Company>
     <Product>PokerTracker2</Product>
     <Description>Modern poker session tracking application with Firebase integration</Description>
@@ -39,6 +39,11 @@
     <PackageReference Include="FirebaseAdmin" Version="2.4.0" />
     <PackageReference Include="Google.Cloud.Firestore" Version="3.7.0" />
     <PackageReference Include="Google.Apis.Auth" Version="1.67.0" />
+  </ItemGroup>
+
+  <!-- Embed Firebase credentials as embedded resource for security -->
+  <ItemGroup>
+    <EmbeddedResource Include="..\firebase-credentials.json" Condition="Exists('..\firebase-credentials.json')" />
   </ItemGroup>
 
 </Project> 

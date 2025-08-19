@@ -30,7 +30,7 @@ namespace PokerTracker2.Services
         }
         
         // Current log level setting
-        private LogLevel _currentLogLevel = LogLevel.Info;
+        private LogLevel _currentLogLevel = LogLevel.Debug; // Changed from Info to Debug to show all messages
         
         // Log buffer for startup messages before debug console is ready
         private readonly Queue<string> _startupLogBuffer = new Queue<string>();

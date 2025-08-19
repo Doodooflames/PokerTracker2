@@ -102,15 +102,17 @@
                    Stroke="#333333" StrokeThickness="1" 
                    Canvas.Top="0"/>
              
-             <Polyline x:Name="LineGraph" 
-                       Stroke="#4FC3F7" 
-                       StrokeThickness="2" 
-                       Fill="Transparent"
-                       Points="0,0"
-                       Canvas.ZIndex="1"/>
+             <!-- Zero line (very subtle white line) -->
+             <Line x:Name="ZeroLine" 
+                   X1="0" Y1="0" X2="0" Y2="0" 
+                   Stroke="White" StrokeThickness="0.8" 
+                   Canvas.ZIndex="1"/>
+             
+             <!-- Colored line segments canvas -->
+             <Canvas x:Name="LineSegmentsCanvas" Canvas.ZIndex="2"/>
              
              <!-- Data points -->
-             <Canvas x:Name="DataPointsCanvas" Canvas.ZIndex="2"/>
+             <Canvas x:Name="DataPointsCanvas" Canvas.ZIndex="3"/>
         </Canvas>
     </Grid>
 </UserControl>

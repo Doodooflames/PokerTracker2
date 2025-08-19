@@ -27,6 +27,9 @@ namespace PokerTracker2.Models
         private bool _isAdmin = false;
         private List<string> _sessionIds = new List<string>();
         private List<PlayerSessionSummary> _recentSessions = new List<PlayerSessionSummary>();
+        private List<SessionBreakdownItem> _sessionBreakdown = new List<SessionBreakdownItem>();
+        private List<TransactionHistoryItem> _transactionHistory = new List<TransactionHistoryItem>();
+        private List<ProfitPoint> _profitTrendData = new List<ProfitPoint>();
 
         public string Name
         {
@@ -128,6 +131,24 @@ namespace PokerTracker2.Models
         {
             get => _recentSessions;
             set => SetProperty(ref _recentSessions, value);
+        }
+        
+        public List<SessionBreakdownItem> SessionBreakdown
+        {
+            get => _sessionBreakdown;
+            set => SetProperty(ref _sessionBreakdown, value);
+        }
+        
+        public List<TransactionHistoryItem> TransactionHistory
+        {
+            get => _transactionHistory;
+            set => SetProperty(ref _transactionHistory, value);
+        }
+        
+        public List<ProfitPoint> ProfitTrendData
+        {
+            get => _profitTrendData;
+            set => SetProperty(ref _profitTrendData, value);
         }
 
         // Computed properties
