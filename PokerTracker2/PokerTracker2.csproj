@@ -7,9 +7,27 @@
     <RootNamespace>PokerTracker2</RootNamespace>
     <Platforms>x64</Platforms>
     <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+    
+    <!-- Version Information -->
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <Company>PokerTracker2</Company>
+    <Product>PokerTracker2</Product>
+    <Description>Modern poker session tracking application with Firebase integration</Description>
+    <Copyright>Copyright © 2025</Copyright>
+    
+    <!-- Publish Settings -->
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <PublishTrimmed>false</PublishTrimmed>
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Squirrel.Windows" Version="2.0.1" />
     <PackageReference Include="WPF-UI" Version="4.0.3" />
     <PackageReference Include="WPF-UI.Abstractions" Version="4.0.3" />
     <PackageReference Include="FirebaseAdmin" Version="2.4.0" />

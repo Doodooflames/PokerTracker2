@@ -95,6 +95,7 @@ namespace PokerTracker2
         private readonly PlayerManager _playerManager;
         private readonly User _currentUser;
         private readonly PermissionService _permissionService;
+        private readonly AutoUpdateService _autoUpdateService;
         private string _newPlayerName = string.Empty;
         private double _newBuyInAmount;
         private double _newCashOutAmount;
@@ -136,6 +137,9 @@ namespace PokerTracker2
                 
                 _permissionService = new PermissionService(_currentUser, _sessionManager, _playerManager);
                 LoggingService.Instance.Info("PermissionService created", "MainWindow");
+                
+                _autoUpdateService = new AutoUpdateService();
+                LoggingService.Instance.Info("AutoUpdateService created", "MainWindow");
                 
                 // Initialize both PlayerManager and SessionManager to load data from Firebase
                 _ = Task.Run(async () =>
@@ -570,6 +574,44 @@ namespace PokerTracker2
         private void AnalyticsButton_Click(object sender, RoutedEventArgs e)
         {
             ShowPage(AnalyticsPage);
+        }
+
+        private async void CheckForUpdates_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                CheckForUpdatesButton.IsEnabled = false;
+                CheckForUpdatesButton.Content = "🔍 Checking...";
+                
+                LoggingService.Instance.Info("Checking for updates...", "MainWindow");
+                
+                var updateInfo = await _autoUpdateService.CheckForUpdatesAsync();
+                
+                if (updateInfo != null && updateInfo.IsUpdateAvailable)
+                {
+                    LoggingService.Instance.Info($"Update available: {updateInfo.LatestVersion}", "MainWindow");
+                    
+                    var updateDialog = new Dialogs.UpdateDialog(updateInfo, _autoUpdateService);
+                    updateDialog.Owner = this;
+                    updateDialog.ShowDialog();
+                }
+                else
+                {
+                    MessageBox.Show("You're running the latest version of PokerTracker2!", "No Updates Available", 
+                        MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggingService.Instance.Error($"Error checking for updates: {ex.Message}", "MainWindow", ex);
+                MessageBox.Show($"Error checking for updates: {ex.Message}", "Update Check Error", 
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                CheckForUpdatesButton.IsEnabled = true;
+                CheckForUpdatesButton.Content = "🔍 Check for Updates";
+            }
         }
 
         private async void NewSessionButton_Click(object sender, RoutedEventArgs e)
