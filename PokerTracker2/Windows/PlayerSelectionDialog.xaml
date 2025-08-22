@@ -52,7 +52,7 @@
                     
                     <TextBlock Grid.Column="0" 
                                Text="👤 Add Player to Session" 
-                               FontSize="18" 
+                               FontSize="{DynamicResource ScaledDialogTitleFontSize}" 
                                FontWeight="Bold" 
                                Foreground="White" 
                                VerticalAlignment="Center" 
@@ -61,7 +61,7 @@
                     <Button Grid.Column="1" Content="✕" Width="45" Height="32" 
                             Background="Transparent" BorderThickness="0" 
                             Foreground="White" Click="CloseButton_Click"
-                            FontSize="16" FontWeight="Bold"/>
+                            FontSize="{DynamicResource ScaledDialogPlayerNameFontSize}" FontWeight="Bold"/>
                 </Grid>
             </Border>
             
@@ -90,7 +90,7 @@
                 
                 <TextBlock Grid.Column="0" 
                            Text="🔍" 
-                           FontSize="16" 
+                           FontSize="{DynamicResource ScaledDialogPlayerNameFontSize}" 
                            VerticalAlignment="Center" 
                            Margin="0,0,10,0"/>
                 
@@ -99,14 +99,14 @@
                          Background="Transparent" 
                          BorderThickness="0" 
                          Foreground="White"
-                         FontSize="14"
+                         FontSize="{DynamicResource ScaledDialogSectionTitleFontSize}"
                          VerticalAlignment="Center"
                          TextChanged="SearchTextBox_TextChanged"/>
                 
                 <TextBlock Grid.Column="1" 
                            x:Name="SearchPlaceholder"
                            Text="Search existing players..." 
-                           FontSize="14" 
+                           FontSize="{DynamicResource ScaledDialogSectionTitleFontSize}" 
                            Foreground="#AAAAAA"
                            VerticalAlignment="Center"
                            IsHitTestVisible="False"/>
@@ -114,7 +114,7 @@
                 <ui:Button Grid.Column="2" 
                            Content="➕ Create New Player" 
                            Appearance="Primary" 
-                           FontSize="12"
+                           FontSize="{DynamicResource ScaledDialogPlayerInfoFontSize}"
                            Padding="10,5"
                            Click="CreateNewPlayer_Click"/>
             </Grid>
@@ -163,22 +163,22 @@
                                     <!-- Player Info -->
                                     <StackPanel Grid.Column="0">
                                         <TextBlock Text="{Binding DisplayName}" 
-                                                   FontSize="16" 
+                                                   FontSize="{DynamicResource ScaledDialogPlayerNameFontSize}" 
                                                    FontWeight="SemiBold" 
                                                    Foreground="White"
                                                    Margin="0,0,0,5"/>
                                         
                                         <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                                            <TextBlock Text="📊 Sessions: " FontSize="12" Foreground="#CCCCCC"/>
-                                            <TextBlock Text="{Binding TotalSessionsPlayed}" FontSize="12" Foreground="White" FontWeight="Bold"/>
+                                            <TextBlock Text="📊 Sessions: " FontSize="{DynamicResource ScaledDialogPlayerInfoFontSize}" Foreground="#CCCCCC"/>
+                                            <TextBlock Text="{Binding TotalSessionsPlayed}" FontSize="{DynamicResource ScaledDialogPlayerInfoFontSize}" Foreground="White" FontWeight="Bold"/>
                                             
-                                            <TextBlock Text="   💰 Lifetime P/L: " FontSize="12" Foreground="#CCCCCC" Margin="15,0,0,0"/>
-                                            <TextBlock Text="{Binding LifetimeProfit, StringFormat=C}" FontSize="12" FontWeight="Bold" Foreground="White"/>
+                                            <TextBlock Text="   💰 Lifetime P/L: " FontSize="{DynamicResource ScaledDialogPlayerInfoFontSize}" Foreground="#CCCCCC" Margin="15,0,0,0"/>
+                                            <TextBlock Text="{Binding LifetimeProfit, StringFormat=C}" FontSize="{DynamicResource ScaledDialogPlayerInfoFontSize}" FontWeight="Bold" Foreground="White"/>
                                         </StackPanel>
                                         
                                         <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="🕒 Last Played: " FontSize="11" Foreground="#AAAAAA"/>
-                                            <TextBlock Text="{Binding LastPlayedDate, StringFormat='MM/dd/yyyy HH:mm'}" FontSize="11" Foreground="#AAAAAA"/>
+                                            <TextBlock Text="🕒 Last Played: " FontSize="{DynamicResource ScaledDialogSmallInfoFontSize}" Foreground="#AAAAAA"/>
+                                            <TextBlock Text="{Binding LastPlayedDate, StringFormat='MM/dd/yyyy HH:mm'}" FontSize="{DynamicResource ScaledDialogSmallInfoFontSize}" Foreground="#AAAAAA"/>
                                         </StackPanel>
                                     </StackPanel>
                                     
@@ -197,7 +197,7 @@
                                                     </Style.Triggers>
                                                 </Style>
                                             </Border.Style>
-                                            <TextBlock Text="✓ Active" FontSize="10" Foreground="LightGreen" FontWeight="Bold"/>
+                                            <TextBlock Text="✓ Active" FontSize="{DynamicResource ScaledDialogTinyInfoFontSize}" Foreground="LightGreen" FontWeight="Bold"/>
                                         </Border>
                                         
                                         <Border Background="#604020" 
@@ -213,7 +213,7 @@
                                                     </Style.Triggers>
                                                 </Style>
                                             </Border.Style>
-                                            <TextBlock Text="⊘ Inactive" FontSize="10" Foreground="Orange" FontWeight="Bold"/>
+                                            <TextBlock Text="⊘ Inactive" FontSize="{DynamicResource ScaledDialogTinyInfoFontSize}" Foreground="Orange" FontWeight="Bold"/>
                                         </Border>
                                     </StackPanel>
                                 </Grid>
@@ -234,7 +234,7 @@
                         x:Name="SelectedPlayerPreview"
                         Visibility="Collapsed">
             <StackPanel Margin="15,10">
-                <TextBlock Text="📋 Selected Player Details" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,10" Foreground="LightGreen"/>
+                <TextBlock Text="📋 Selected Player Details" FontSize="{DynamicResource ScaledDialogSectionTitleFontSize}" FontWeight="SemiBold" Margin="0,0,0,10" Foreground="LightGreen"/>
                 
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -243,13 +243,13 @@
                     </Grid.ColumnDefinitions>
                     
                     <StackPanel Grid.Column="0">
-                        <TextBlock x:Name="SelectedPlayerName" FontSize="16" FontWeight="Bold" Foreground="White" Margin="0,0,0,5"/>
-                        <TextBlock x:Name="SelectedPlayerStats" FontSize="12" Foreground="#CCCCCC"/>
+                        <TextBlock x:Name="SelectedPlayerName" FontSize="{DynamicResource ScaledDialogPlayerNameFontSize}" FontWeight="Bold" Foreground="White" Margin="0,0,0,5"/>
+                        <TextBlock x:Name="SelectedPlayerStats" FontSize="{DynamicResource ScaledDialogPlayerInfoFontSize}" Foreground="#CCCCCC"/>
                     </StackPanel>
                     
                     <StackPanel Grid.Column="1" HorizontalAlignment="Right">
-                        <TextBlock x:Name="SelectedPlayerContact" FontSize="11" Foreground="#AAAAAA" TextAlignment="Right"/>
-                        <TextBlock x:Name="SelectedPlayerNotes" FontSize="11" Foreground="#AAAAAA" TextAlignment="Right" Margin="0,3,0,0"/>
+                        <TextBlock x:Name="SelectedPlayerContact" FontSize="{DynamicResource ScaledDialogSmallInfoFontSize}" Foreground="#AAAAAA" TextAlignment="Right"/>
+                        <TextBlock x:Name="SelectedPlayerNotes" FontSize="{DynamicResource ScaledDialogSmallInfoFontSize}" Foreground="#AAAAAA" TextAlignment="Right" Margin="0,3,0,0"/>
                     </StackPanel>
                 </Grid>
             </StackPanel>
@@ -266,7 +266,7 @@
             <!-- Status Message -->
             <TextBlock Grid.Column="0" 
                        x:Name="StatusMessage" 
-                       FontSize="12" 
+                       FontSize="{DynamicResource ScaledDialogPlayerInfoFontSize}" 
                        Foreground="Orange" 
                        VerticalAlignment="Center"/>
             

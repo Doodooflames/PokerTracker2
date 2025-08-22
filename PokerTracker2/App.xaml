@@ -3,7 +3,8 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-    xmlns:local="clr-namespace:PokerTracker2">
+    xmlns:local="clr-namespace:PokerTracker2"
+    xmlns:system="clr-namespace:System;assembly=mscorlib">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -11,9 +12,128 @@
                 <ui:ControlsDictionary />
             </ResourceDictionary.MergedDictionaries>
             
+            <!-- Global Text Scaling Resources -->
+            <system:Double x:Key="GlobalTextSizeMultiplier">1.0</system:Double>
+            
+            <!-- Default Font Sizes (Base Values) -->
+            <system:Double x:Key="DefaultTextBlockFontSize">12</system:Double>
+            <system:Double x:Key="DefaultButtonFontSize">12</system:Double>
+            <system:Double x:Key="DefaultLabelFontSize">12</system:Double>
+            <system:Double x:Key="DefaultComboBoxFontSize">12</system:Double>
+            <system:Double x:Key="DefaultListBoxFontSize">12</system:Double>
+            <system:Double x:Key="DefaultTextBoxFontSize">12</system:Double>
+            
+            <!-- Scaled Font Sizes (Calculated) -->
+            <system:Double x:Key="ScaledTextBlockFontSize">12</system:Double>
+            <system:Double x:Key="ScaledButtonFontSize">12</system:Double>
+            <system:Double x:Key="ScaledLabelFontSize">12</system:Double>
+            <system:Double x:Key="ScaledComboBoxFontSize">12</system:Double>
+            <system:Double x:Key="ScaledListBoxFontSize">12</system:Double>
+            <system:Double x:Key="ScaledTextBoxFontSize">12</system:Double>
+            
+            <!-- Session Summary Specific Font Sizes -->
+            <system:Double x:Key="ScaledSessionSummaryTitleFontSize">14</system:Double>
+            <system:Double x:Key="ScaledSessionSummaryHeaderFontSize">12</system:Double>
+            <system:Double x:Key="ScaledSessionSummaryDetailFontSize">12</system:Double>
+            <system:Double x:Key="ScaledSessionSummaryTransactionFontSize">12</system:Double>
+            
+            <!-- Player Profile Screen Font Sizes -->
+            <system:Double x:Key="ScaledPlayerNameFontSize">20</system:Double>
+            <system:Double x:Key="ScaledPlayerDetailFontSize">14</system:Double>
+            <system:Double x:Key="ScaledStatisticsTitleFontSize">16</system:Double>
+            <system:Double x:Key="ScaledStatisticsValueFontSize">14</system:Double>
+            <system:Double x:Key="ScaledPlayerListItemNameFontSize">16</system:Double>
+            <system:Double x:Key="ScaledPlayerListItemDetailFontSize">12</system:Double>
+            
+            <!-- Profit Graph Font Sizes and Spacing -->
+            <system:Double x:Key="ScaledGraphAxisLabelFontSize">10</system:Double>
+            <system:Double x:Key="ScaledGraphTitleFontSize">14</system:Double>
+                        <system:Double x:Key="ScaledGraphYAxisWidth">30</system:Double>
+            
+            <!-- Session Manager Screen Font Sizes -->
+            <system:Double x:Key="ScaledSessionTitleFontSize">24</system:Double>
+            <system:Double x:Key="ScaledSessionSectionTitleFontSize">16</system:Double>
+            <system:Double x:Key="ScaledSessionPlayerNameFontSize">15</system:Double>
+            <system:Double x:Key="ScaledSessionPlayerInfoFontSize">12</system:Double>
+            <system:Double x:Key="ScaledSessionSmallInfoFontSize">10</system:Double>
+            <system:Double x:Key="ScaledSessionLabelFontSize">9</system:Double>
+            <system:Double x:Key="ScaledSessionActivityFontSize">11</system:Double>
+            
+            <!-- Dialog Screen Font Sizes -->
+            <system:Double x:Key="ScaledDialogTitleFontSize">18</system:Double>
+            <system:Double x:Key="ScaledDialogSectionTitleFontSize">14</system:Double>
+            <system:Double x:Key="ScaledDialogPlayerNameFontSize">16</system:Double>
+            <system:Double x:Key="ScaledDialogPlayerInfoFontSize">12</system:Double>
+            <system:Double x:Key="ScaledDialogSmallInfoFontSize">11</system:Double>
+            <system:Double x:Key="ScaledDialogTinyInfoFontSize">10</system:Double>
+            
+            <!-- New Session Screen Font Sizes -->
+            <system:Double x:Key="ScaledNewSessionTitleFontSize">24</system:Double>
+            <system:Double x:Key="ScaledNewSessionSectionTitleFontSize">16</system:Double>
+            <system:Double x:Key="ScaledNewSessionIdFontSize">14</system:Double>
+            <system:Double x:Key="ScaledNewSessionPlayerNameFontSize">14</system:Double>
+            <system:Double x:Key="ScaledNewSessionInfoFontSize">14</system:Double>
+            <system:Double x:Key="ScaledNewSessionStatusFontSize">14</system:Double>
+            <system:Double x:Key="ScaledNewSessionEmptyMessageFontSize">12</system:Double>
+            
+            <!-- Dashboard Screen Font Sizes -->
+            <system:Double x:Key="ScaledDashboardTitleFontSize">28</system:Double>
+            <system:Double x:Key="ScaledDashboardSubtitleFontSize">16</system:Double>
+            <system:Double x:Key="ScaledDashboardSectionTitleFontSize">18</system:Double>
+            <system:Double x:Key="ScaledDashboardStatValueFontSize">20</system:Double>
+            <system:Double x:Key="ScaledDashboardStatLabelFontSize">12</system:Double>
+            <system:Double x:Key="ScaledDashboardIconFontSize">24</system:Double>
+            <system:Double x:Key="ScaledDashboardSessionNameFontSize">14</system:Double>
+            <system:Double x:Key="ScaledDashboardSessionDetailFontSize">11</system:Double>
+            <system:Double x:Key="ScaledDashboardSessionStatusFontSize">10</system:Double>
+            <system:Double x:Key="ScaledDashboardComboBoxFontSize">14</system:Double>
+            <system:Double x:Key="ScaledDashboardEmptyStateFontSize">16</system:Double>
+            <system:Double x:Key="ScaledDashboardEmptyDescFontSize">12</system:Double>
+            <system:Double x:Key="ScaledDashboardDecorationFontSize">48</system:Double>
+            
+            <!-- Settings Screen Font Sizes -->
+            <system:Double x:Key="ScaledSettingsTitleFontSize">32</system:Double>
+            <system:Double x:Key="ScaledSettingsSectionTitleFontSize">20</system:Double>
+            <system:Double x:Key="ScaledSettingsDescriptionFontSize">14</system:Double>
+            <system:Double x:Key="ScaledSettingsLabelFontSize">14</system:Double>
+            <system:Double x:Key="ScaledSettingsComboBoxFontSize">14</system:Double>
+            <system:Double x:Key="ScaledSettingsHelpTextFontSize">12</system:Double>
+            <system:Double x:Key="ScaledSettingsFutureFontSize">18</system:Double>
+            
+            <!-- Session History Screen Font Sizes -->
+            <system:Double x:Key="ScaledSessionHistoryTitleFontSize">24</system:Double>
+            <system:Double x:Key="ScaledSessionHistorySectionTitleFontSize">18</system:Double>
+            <system:Double x:Key="ScaledSessionHistoryStatValueFontSize">24</system:Double>
+            <system:Double x:Key="ScaledSessionHistoryStatLabelFontSize">12</system:Double>
+            <system:Double x:Key="ScaledSessionHistorySessionNameFontSize">18</system:Double>
+            <system:Double x:Key="ScaledSessionHistorySessionDetailFontSize">14</system:Double>
+            <system:Double x:Key="ScaledSessionHistoryFinancialValueFontSize">16</system:Double>
+            <system:Double x:Key="ScaledSessionHistoryFinancialLabelFontSize">12</system:Double>
+            <system:Double x:Key="ScaledSessionHistoryStatusBadgeFontSize">10</system:Double>
+            <system:Double x:Key="ScaledSessionHistoryEmptyTitleFontSize">24</system:Double>
+            <system:Double x:Key="ScaledSessionHistoryEmptyDescFontSize">16</system:Double>
+            <system:Double x:Key="ScaledSessionHistoryEmptyIconFontSize">48</system:Double>
+            
+            <!-- Active Sessions Screen Font Sizes -->
+            <system:Double x:Key="ScaledActiveSessionsTitleFontSize">24</system:Double>
+            <system:Double x:Key="ScaledActiveSessionsSubtitleFontSize">14</system:Double>
+            <system:Double x:Key="ScaledActiveSessionsSectionTitleFontSize">18</system:Double>
+            <system:Double x:Key="ScaledActiveSessionsSessionNameFontSize">18</system:Double>
+            <system:Double x:Key="ScaledActiveSessionsSessionDetailFontSize">14</system:Double>
+            <system:Double x:Key="ScaledActiveSessionsFinancialValueFontSize">16</system:Double>
+            <system:Double x:Key="ScaledActiveSessionsFinancialLabelFontSize">12</system:Double>
+            <system:Double x:Key="ScaledActiveSessionsStatusBadgeFontSize">10</system:Double>
+            <system:Double x:Key="ScaledActiveSessionsQuickStatsTitleFontSize">16</system:Double>
+            <system:Double x:Key="ScaledActiveSessionsQuickStatsValueFontSize">20</system:Double>
+            <system:Double x:Key="ScaledActiveSessionsQuickStatsLabelFontSize">12</system:Double>
+            <system:Double x:Key="ScaledActiveSessionsEmptyTitleFontSize">24</system:Double>
+            <system:Double x:Key="ScaledActiveSessionsEmptyDescFontSize">16</system:Double>
+            <system:Double x:Key="ScaledActiveSessionsEmptyIconFontSize">48</system:Double>
+
             <!-- Converters -->
             <local:ProfitColorConverter x:Key="ProfitColorConverter"/>
             <local:StatusColorConverter x:Key="StatusColorConverter"/>
+            
         </ResourceDictionary>
     </Application.Resources>
 </Application> 

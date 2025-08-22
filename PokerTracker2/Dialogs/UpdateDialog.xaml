@@ -7,39 +7,99 @@
         Width="600"
         WindowStartupLocation="CenterOwner"
         ResizeMode="CanResize"
-        Background="{DynamicResource ApplicationBackgroundBrush}">
+        Background="Transparent"
+        AllowsTransparency="True"
+        WindowStyle="None">
     
-    <Grid Margin="20">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+    <!-- Container expanded to full window; inner padding replaces outer margin -->
+    <Border CornerRadius="12" 
+            BorderBrush="#80FFFFFF" 
+            BorderThickness="1"
+            Padding="20">
+        <Border.Effect>
+            <DropShadowEffect Color="#000000" Direction="270" ShadowDepth="10" Opacity="0.6" BlurRadius="20"/>
+        </Border.Effect>
+        <Border.Background>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#90000000" Offset="0"/>
+                <GradientStop Color="#70001133" Offset="0.3"/>
+                <GradientStop Color="#80002244" Offset="0.6"/>
+                <GradientStop Color="#90000000" Offset="1"/>
+            </LinearGradientBrush>
+        </Border.Background>
         
-        <!-- Header -->
-        <StackPanel Grid.Row="0" Margin="0,0,0,20">
-            <TextBlock Text="🎉 Update Available!" 
-                       FontSize="24" 
-                       FontWeight="Bold" 
-                       Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                       HorizontalAlignment="Center"
-                       Margin="0,0,0,10"/>
+        <!-- Content Grid -->
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
             
-            <TextBlock Text="A new version of PokerTracker2 is available for download."
-                       FontSize="14"
-                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                       HorizontalAlignment="Center"
-                       TextWrapping="Wrap"/>
-        </StackPanel>
-        
-        <!-- Update Information -->
-        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-            <StackPanel>
-                <!-- Version Information -->
-                <Border Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
-                        CornerRadius="8"
-                        Padding="15"
-                        Margin="0,0,0,15">
+            <!-- Custom Title Bar -->
+            <Border Grid.Row="0" 
+                    Background="Transparent" 
+                    CornerRadius="12,12,0,0" 
+                    Padding="20,15"
+                    MouseLeftButtonDown="TitleBar_MouseLeftButtonDown"
+                    Cursor="SizeAll">
+                
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <!-- Title -->
+                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                        <TextBlock Text="🎉 Update Available!" 
+                                   FontSize="20" 
+                                   FontWeight="Bold" 
+                                   Foreground="White"
+                                   Margin="0,0,0,5"/>
+                        <TextBlock Text="A new version of PokerTracker2 is available for download."
+                                   FontSize="12"
+                                   Foreground="#CCCCCC"
+                                   TextWrapping="Wrap"/>
+                    </StackPanel>
+                    
+                    <!-- Close Button -->
+                    <Button Grid.Column="1" 
+                            Content="✕" 
+                            FontSize="16" 
+                            Width="30" 
+                            Height="30"
+                            Background="Transparent"
+                            Foreground="#CCCCCC"
+                            BorderBrush="Transparent"
+                            Click="CloseButton_Click"
+                            Cursor="Hand"
+                            VerticalAlignment="Top">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="Foreground" Value="#CCCCCC"/>
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="#40FF0000"/>
+                                        <Setter Property="Foreground" Value="White"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </Grid>
+            </Border>
+            
+            <!-- Content Area -->
+            <Grid Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                
+                                    <!-- Version Information -->
+                    <Border Grid.Row="0" Background="#A0000000" CornerRadius="8" Padding="15" Margin="0,0,0,15" BorderBrush="#40FFFFFF" BorderThickness="1">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
@@ -54,65 +114,74 @@
                         <TextBlock Grid.Row="0" Grid.Column="0" 
                                    Text="Current Version:" 
                                    FontWeight="SemiBold"
-                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                   Foreground="White"
                                    Margin="0,0,10,5"/>
                         <TextBlock Grid.Row="0" Grid.Column="1" 
                                    x:Name="CurrentVersionText"
-                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                                   Foreground="#CCCCCC"/>
                         
                         <TextBlock Grid.Row="1" Grid.Column="0" 
                                    Text="Latest Version:" 
                                    FontWeight="SemiBold"
-                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                   Foreground="White"
                                    Margin="0,0,10,5"/>
                         <TextBlock Grid.Row="1" Grid.Column="1" 
                                    x:Name="LatestVersionText"
-                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                   Foreground="#4FC3F7"
                                    FontWeight="SemiBold"/>
                         
                         <TextBlock Grid.Row="2" Grid.Column="0" 
                                    Text="Release Date:" 
                                    FontWeight="SemiBold"
-                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                   Foreground="White"
                                    Margin="0,0,10,5"/>
                         <TextBlock Grid.Row="2" Grid.Column="1" 
                                    x:Name="ReleaseDateText"
-                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                                   Foreground="#CCCCCC"/>
                     </Grid>
                 </Border>
                 
-                <!-- Release Notes -->
-                <Border Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
-                        CornerRadius="8"
-                        Padding="15"
-                        Margin="0,0,0,15">
-                    <StackPanel>
-                        <TextBlock Text="Release Notes" 
-                                   FontWeight="SemiBold"
-                                   FontSize="16"
-                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                   Margin="0,0,0,10"/>
-                        
-                        <ScrollViewer MaxHeight="200" VerticalScrollBarVisibility="Auto">
-                            <TextBlock x:Name="ReleaseNotesText"
-                                       TextWrapping="Wrap"
-                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                       FontFamily="Consolas"/>
-                        </ScrollViewer>
-                    </StackPanel>
-                </Border>
+                                    <!-- Release Notes -->
+                    <Border Grid.Row="1" Background="#A0000000" CornerRadius="8" Padding="15" Margin="0,0,0,15" BorderBrush="#40FFFFFF" BorderThickness="1" VerticalAlignment="Stretch">
+                        <!-- Inner clip to keep scrollbar within visible bounds -->
+                        <Border CornerRadius="6" Background="Transparent" ClipToBounds="True">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Grid.Row="0" Text="Release Notes" 
+                                           FontWeight="SemiBold"
+                                           FontSize="14"
+                                           Foreground="White"
+                                           Margin="0,0,0,10"/>
+
+                                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="0,0,2,0" Padding="0" SnapsToDevicePixels="True" Background="Transparent">
+                                    <TextBlock x:Name="ReleaseNotesText"
+                                               TextWrapping="Wrap"
+                                               Foreground="#CCCCCC"
+                                               FontFamily="Consolas"
+                                               FontSize="11"
+                                               LineHeight="16"/>
+                                </ScrollViewer>
+                            </Grid>
+                        </Border>
+                    </Border>
                 
-                <!-- Progress Bar (Hidden by default) -->
-                <Border x:Name="ProgressPanel" 
-                        Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
-                        CornerRadius="8"
-                        Padding="15"
-                        Margin="0,0,0,15"
-                        Visibility="Collapsed">
+                                    <!-- Progress Panel (Hidden by default) -->
+                    <Border Grid.Row="1" x:Name="ProgressPanel" 
+                            Background="#A0000000" 
+                            CornerRadius="8" 
+                            Padding="15" 
+                            Margin="0,0,0,15"
+                            BorderBrush="#40FFFFFF" 
+                            BorderThickness="1"
+                            Visibility="Collapsed">
                     <StackPanel>
                         <TextBlock Text="Downloading Update..." 
                                    FontWeight="SemiBold"
-                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                   Foreground="White"
                                    Margin="0,0,0,10"/>
                         
                         <ui:ProgressRing x:Name="DownloadProgress"
@@ -123,29 +192,29 @@
                         
                         <TextBlock x:Name="ProgressText"
                                    Text="Preparing download..."
-                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                   Foreground="#CCCCCC"
                                    Margin="0,10,0,0"/>
                     </StackPanel>
                 </Border>
-            </StackPanel>
-        </ScrollViewer>
-        
-        <!-- Buttons -->
-        <StackPanel Grid.Row="2" 
-                    Orientation="Horizontal" 
-                    HorizontalAlignment="Right"
-                    Margin="0,20,0,0">
-            
-            <ui:Button x:Name="RemindLaterButton"
-                       Content="Remind Later"
-                       Appearance="Secondary"
-                       Click="RemindLaterButton_Click"
-                       Margin="0,0,10,0"/>
-            
-            <ui:Button x:Name="UpdateButton"
-                       Content="Download &amp; Install Update"
-                       Appearance="Primary"
-                       Click="UpdateButton_Click"/>
-        </StackPanel>
-    </Grid>
+                
+                <!-- Buttons -->
+                <StackPanel Grid.Row="2" 
+                            Orientation="Horizontal" 
+                            HorizontalAlignment="Right"
+                            Margin="0,10,0,0">
+                    
+                    <ui:Button x:Name="RemindLaterButton"
+                               Content="Remind Later"
+                               Appearance="Secondary"
+                               Click="RemindLaterButton_Click"
+                               Margin="0,0,10,0"/>
+                    
+                    <ui:Button x:Name="UpdateButton"
+                               Content="Download &amp; Install Update"
+                               Appearance="Primary"
+                               Click="UpdateButton_Click"/>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Border>
 </Window>

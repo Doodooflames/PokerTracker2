@@ -1,0 +1,22 @@
+🚀 PokerTracker2 v1.0.15 — Readability & Fit
+
+## ✨ What’s New
+- **Dynamic Text Size (Global)**: Added a text size multiplier and wired up dynamic font resources so UI text scales consistently across the app.
+- **Adaptive Window Sizing**: The app now sizes itself intelligently for smaller displays while preserving the 4K look and feel.
+- **Resolution Modes**: Added a resolution dropdown in Settings (Auto + fixed sizes) so users can pick what looks right on their screens.
+- **Update Dialog Polish**: Glassmorphism look with proper Windows backdrop blur that stays within bounds, plus we now show this dialog directly (no pre‑confirmation popup).
+
+## 🐛 Fixes & Tweaks
+- Fixed dashboard dropdown showing a single player on startup.
+- Prevented duplicate Buy‑In entries on session load.
+- Reconciled a `GridLength` vs `DynamicResource` issue in the profit graph to avoid startup crashes.
+- Minor logging and theme consistency pass.
+
+## 🔧 Under the Hood
+- Introduced dynamic `FontSize` resources and replaced hardcoded values in key areas so scaling updates instantly.
+- Applied a window region mask around the Update Dialog to contain the blur to the visible rounded shape.
+
+---
+This release focuses on two things: making text easier to read and making the window fit better on more screens. 🎯
+
+

@@ -747,14 +747,20 @@ namespace PokerTracker2.Services
                         {
                             if (playerObj is Dictionary<string, object> playerData)
                             {
-                                var player = new Player(
-                                    playerData["name"].ToString() ?? "",
-                                    playerData["totalBuyIn"] is double buyIn ? buyIn : 0.0
-                                )
+                                var name = playerData["name"].ToString() ?? "";
+                                var totalBuyInVal = playerData["totalBuyIn"] is double buyIn ? buyIn : 0.0;
+                                var totalCashOutVal = playerData["totalCashOut"] is double cashOut ? cashOut : 0.0;
+                                var finalStackVal = playerData["finalStack"] is double stack ? stack : (double?)null;
+                                var lastActivity = playerData["lastActivityTime"] is Timestamp last ? last.ToDateTime() : DateTime.MinValue;
+
+                                // IMPORTANT: Create player WITHOUT adding an initial buy-in transaction.
+                                // We will reconcile detailed transactions separately to avoid duplicates.
+                                var player = new Player(name)
                                 {
-                                    TotalCashOut = playerData["totalCashOut"] is double cashOut ? cashOut : 0.0,
-                                    FinalStack = playerData["finalStack"] is double stack ? stack : null,
-                                    LastActivityTime = playerData["lastActivityTime"] is Timestamp last ? last.ToDateTime() : DateTime.MinValue
+                                    TotalBuyIn = totalBuyInVal,
+                                    TotalCashOut = totalCashOutVal,
+                                    FinalStack = finalStackVal,
+                                    LastActivityTime = lastActivity
                                 };
                                 players.Add(player);
                             }

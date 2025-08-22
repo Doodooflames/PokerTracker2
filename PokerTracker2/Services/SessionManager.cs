@@ -240,7 +240,15 @@ namespace PokerTracker2.Services
                     
                     if (transaction.Type == TransactionType.CashOut)
                     {
-                        _cashOuts[transaction.PlayerName] = transaction.Amount;
+                        // Accumulate partial cash-outs per player when loading existing sessions
+                        if (_cashOuts.ContainsKey(transaction.PlayerName))
+                        {
+                            _cashOuts[transaction.PlayerName] += transaction.Amount;
+                        }
+                        else
+                        {
+                            _cashOuts[transaction.PlayerName] = transaction.Amount;
+                        }
                     }
                 }
             }
@@ -553,13 +561,8 @@ namespace PokerTracker2.Services
                 // Player exists - add buy-in using enhanced transaction system
                 existingPlayer.AddBuyIn(buyInAmount, DateTime.Now, "Additional buy-in");
                 
-                // If player has a final stack set, increase it by the buy-in amount
-                // because they're adding more chips to the table
-                if (existingPlayer.FinalStack.HasValue)
-                {
-                    existingPlayer.FinalStack = existingPlayer.FinalStack.Value + buyInAmount;
-                    LoggingService.Instance.Info($"Increased {name}'s final stack by ${buyInAmount} due to additional buy-in (new final stack: ${existingPlayer.FinalStack.Value})", "SessionManager");
-                }
+                // Do NOT mutate final stack when adding buy-ins.
+                // Final stack is an end-of-session input and should remain independent of intra-session events.
                 
                 existingPlayer.LastActivityTime = DateTime.Now;
                 LoggingService.Instance.Info($"Updated existing player {name} - added ${buyInAmount} buy-in (total now: ${existingPlayer.TotalBuyIn})", "SessionManager");
@@ -680,13 +683,8 @@ namespace PokerTracker2.Services
                     lastTransaction.SessionId = sessionId;
                 }
                 
-                // If player has a final stack set, reduce it by the cash-out amount
-                // because those chips are coming off the table
-                if (existingPlayer.FinalStack.HasValue)
-                {
-                    existingPlayer.FinalStack = existingPlayer.FinalStack.Value - amount;
-                    LoggingService.Instance.Info($"Reduced {playerName}'s final stack by ${amount} due to cash-out (new final stack: ${existingPlayer.FinalStack.Value})", "SessionManager");
-                }
+                // Do NOT mutate final stack when recording partial cash-outs.
+                // Partial cash-outs are tracked separately and final stack is captured at the end.
                 
                 existingPlayer.LastActivityTime = DateTime.Now;
                 LoggingService.Instance.Info($"Updated player {playerName} - added ${amount} cash-out (total now: ${existingPlayer.TotalCashOut})", "SessionManager");
@@ -723,23 +721,14 @@ namespace PokerTracker2.Services
             var existingPlayer = _players.FirstOrDefault(p => p.Name.Equals(playerName, StringComparison.OrdinalIgnoreCase));
             if (existingPlayer != null)
             {
-                // Update the player's final stack
+                // Update the player's final stack (end-of-session value) and align current stack with it
                 existingPlayer.FinalStack = finalStack;
                 existingPlayer.LastActivityTime = DateTime.Now;
-                
-                // Clear any existing cash-out data for this player since final stacks are not cash-outs
-                if (_cashOuts.ContainsKey(playerName))
-                {
-                    _cashOuts.Remove(playerName);
-                }
-                
-                // Reset the player's TotalCashOut property to 0
-                existingPlayer.TotalCashOut = 0;
-                
-                LoggingService.Instance.Info($"Set final stack for {playerName}: ${finalStack} (cleared cash-out data)", "SessionManager");
-                
+
+                LoggingService.Instance.Info($"Set final stack for {playerName}: ${finalStack}", "SessionManager");
+
                 // Notify that session balance may have changed
-                OnPropertyChanged(nameof(TotalCashOut));
+                OnPropertyChanged(nameof(TotalCurrentStacks));
                 OnPropertyChanged(nameof(TotalFinalStacks));
                 OnPropertyChanged(nameof(IsSessionBalanced));
             }
@@ -851,50 +840,61 @@ namespace PokerTracker2.Services
         /// </summary>
         private async Task MigratePlayerTransactionHistory(Player player)
         {
-            // Skip if player already has transaction history (new enhanced model)
-            if (player.TransactionHistory.Count > 0) return;
-            
-            var sessionId = CurrentSession?.Id ?? "";
-            
+            var sessionId = CurrentSession?.Id ?? string.Empty;
+
             // Get all transactions for this player from session-level log
             var playerTransactions = _buyInLog
                 .Where(t => t.PlayerName.Equals(player.Name, StringComparison.OrdinalIgnoreCase))
                 .OrderBy(t => t.Timestamp)
                 .ToList();
-            
-            LoggingService.Instance.Info($"Migrating {playerTransactions.Count} transactions for player {player.Name}", "SessionManager");
-            
-            // Migrate each transaction to the enhanced model
+
+            LoggingService.Instance.Info($"Reconciling {playerTransactions.Count} session-level transactions for player {player.Name}", "SessionManager");
+
+            // Helper to determine if a session-level transaction is already present in player's history
+            bool AlreadyTracked(Transaction tx)
+            {
+                var tolerance = 0.01;
+                var timeWindow = TimeSpan.FromSeconds(2);
+                return player.TransactionHistory.Any(htx =>
+                    htx.Type == tx.Type &&
+                    Math.Abs(htx.Amount - tx.Amount) < tolerance &&
+                    (htx.Timestamp - tx.Timestamp).Duration() <= timeWindow);
+            }
+
+            // Append any missing transactions to player's history
             foreach (var transaction in playerTransactions)
             {
+                if (AlreadyTracked(transaction))
+                {
+                    continue;
+                }
+
                 var playerTransaction = new PlayerTransaction
                 {
                     TransactionId = Guid.NewGuid().ToString(),
                     Type = transaction.Type,
                     Amount = transaction.Amount,
                     Timestamp = transaction.Timestamp,
-                    Note = $"Migrated from session log - {transaction.Notes}",
+                    Note = string.IsNullOrWhiteSpace(transaction.Notes) ? "Migrated from session log" : $"Migrated from session log - {transaction.Notes}",
                     SessionId = sessionId
                 };
-                
+
                 player.TransactionHistory.Add(playerTransaction);
             }
-            
-            // Recalculate totals by updating the properties manually
-            // The Player model will automatically calculate totals from transaction history
+
+            // Recalculate totals by updating the properties manually using calculated values
             var calculatedBuyIn = player.CalculatedTotalBuyIn;
             var calculatedCashOut = player.CalculatedTotalCashOut;
-            
-            // Update the stored totals to match calculated totals
-            if (calculatedBuyIn != player.TotalBuyIn)
+
+            if (Math.Abs(calculatedBuyIn - player.TotalBuyIn) > 0.01)
             {
                 player.TotalBuyIn = calculatedBuyIn;
             }
-            if (calculatedCashOut != player.TotalCashOut)
+            if (Math.Abs(calculatedCashOut - player.TotalCashOut) > 0.01)
             {
                 player.TotalCashOut = calculatedCashOut;
             }
-            
+
             // Ensure ProfileId is set
             if (string.IsNullOrEmpty(player.ProfileId))
             {
@@ -902,22 +902,25 @@ namespace PokerTracker2.Services
                 player.ProfileId = profile?.Name ?? player.Name;
                 player.Profile = profile;
             }
-            
+
             // Validate transaction integrity
             var isValid = player.ValidateTransactionIntegrity();
             if (!isValid)
             {
-                LoggingService.Instance.Warning($"Transaction integrity validation failed for player {player.Name} after migration", "SessionManager");
+                LoggingService.Instance.Warning($"Transaction integrity validation failed for player {player.Name} after reconciliation", "SessionManager");
             }
-            
-            LoggingService.Instance.Info($"Migrated transaction history for {player.Name} - ProfileId: {player.ProfileId}, Transactions: {player.TransactionHistory.Count}", "SessionManager");
+
+            LoggingService.Instance.Info($"Reconciled transaction history for {player.Name} - Total transactions now: {player.TransactionHistory.Count}", "SessionManager");
         }
 
         public double TotalBuyIn => _buyInLog.Where(t => t.Type == TransactionType.BuyIn).Sum(t => t.Amount);
         public double TotalCashOut => _cashOuts.Values.Sum();
         public double TotalFinalStacks => _players.Sum(p => p.FinalStack ?? 0);
+        // Chips on table display: sum of players' current stacks
+        public double TotalChipsOnTable => _players.Sum(p => p.CurrentStack);
         public double TotalCurrentStacks => _players.Sum(p => p.CurrentStack);
-        public bool IsSessionBalanced => Math.Abs(TotalBuyIn - TotalCurrentStacks) < 0.01;
+        // Balanced when: Buy-ins == Partial Cash-outs + Final Stacks
+        public bool IsSessionBalanced => Math.Abs(TotalBuyIn - (TotalCashOut + TotalFinalStacks)) < 0.01;
 
         private async Task UpdatePlayerStatistics(bool isFinalSave = false)
         {

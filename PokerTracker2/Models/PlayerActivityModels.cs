@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Windows.Media;
 
 namespace PokerTracker2.Models
@@ -13,6 +14,7 @@ namespace PokerTracker2.Models
         public double FinalStack { get; set; }
         public double Profit { get; set; }
         public string SessionId { get; set; } = string.Empty;
+        public List<TransactionHistoryItem> Transactions { get; set; } = new List<TransactionHistoryItem>();
         
         // Calculated properties
         public string SessionDateDisplay => SessionDate.ToString("MMM dd, yyyy");
@@ -24,11 +26,34 @@ namespace PokerTracker2.Models
             {
                 try
                 {
-                    return Profit >= 0 ? new SolidColorBrush(Colors.LightGreen) : new SolidColorBrush(Colors.LightCoral);
+                    return Profit >= 0 ? new SolidColorBrush(Colors.Green) : new SolidColorBrush(Colors.Red);
                 }
                 catch
                 {
                     return new SolidColorBrush(Colors.Gray);
+                }
+            }
+        }
+
+        // Display-friendly combined cash-out summary: Final stack + partial cash-outs = total
+        public string CashOutSummaryDisplay
+        {
+            get
+            {
+                try
+                {
+                    string summary = $"💵 Cash-outs: Final stack ({FinalStack.ToString("C")})";
+                    if (CashOuts > 0)
+                    {
+                        summary += $" + partials ({CashOuts.ToString("C")})";
+                    }
+                    var total = (FinalStack + CashOuts).ToString("C");
+                    summary += $" = {total}";
+                    return summary;
+                }
+                catch
+                {
+                    return "💵 Cash-outs: N/A";
                 }
             }
         }

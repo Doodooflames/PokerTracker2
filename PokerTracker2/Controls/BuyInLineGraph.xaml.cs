@@ -381,6 +381,10 @@ namespace PokerTracker2.Controls
 
                          private void UpdateScaleIndicators(double maxAmount, double minAmount, double canvasHeight, double canvasWidth)
          {
+             // Get the current Y-axis width from the dynamic resource and update the column width
+             var yAxisWidth = (double)Application.Current.Resources["ScaledGraphYAxisWidth"];
+             YAxisColumn.Width = new GridLength(yAxisWidth);
+             
              // Calculate scale positions (0%, 25%, 50%, 75%, 100%)
              var scaleHeight = canvasHeight;
              var scale0 = scaleHeight;
@@ -389,12 +393,30 @@ namespace PokerTracker2.Controls
              var scale75 = scaleHeight * 0.25;
              var scale100 = 0.0;
  
-             // Update scale line positions
-             ScaleLine0.SetValue(Canvas.TopProperty, scale0);
-             ScaleLine25.SetValue(Canvas.TopProperty, scale25);
-             ScaleLine50.SetValue(Canvas.TopProperty, scale50);
-             ScaleLine75.SetValue(Canvas.TopProperty, scale75);
-             ScaleLine100.SetValue(Canvas.TopProperty, scale100);
+            // Use the Y-axis width for line positioning
+            var lineStartX = yAxisWidth - 5;  // Start 5 pixels from the right edge
+            var lineEndX = yAxisWidth;        // End at the right edge
+            
+            // Update scale line positions and coordinates
+            ScaleLine0.SetValue(Canvas.TopProperty, scale0);
+            ScaleLine0.X1 = lineStartX;
+            ScaleLine0.X2 = lineEndX;
+            
+            ScaleLine25.SetValue(Canvas.TopProperty, scale25);
+            ScaleLine25.X1 = lineStartX;
+            ScaleLine25.X2 = lineEndX;
+            
+            ScaleLine50.SetValue(Canvas.TopProperty, scale50);
+            ScaleLine50.X1 = lineStartX;
+            ScaleLine50.X2 = lineEndX;
+            
+            ScaleLine75.SetValue(Canvas.TopProperty, scale75);
+            ScaleLine75.X1 = lineStartX;
+            ScaleLine75.X2 = lineEndX;
+            
+            ScaleLine100.SetValue(Canvas.TopProperty, scale100);
+            ScaleLine100.X1 = lineStartX;
+            ScaleLine100.X2 = lineEndX;
  
              // Update grid line positions and lengths
              GridLine0.SetValue(Canvas.TopProperty, scale0);

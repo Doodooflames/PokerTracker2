@@ -29,7 +29,8 @@ namespace PokerTracker2.Services
         }
 
         /// <summary>
-        /// Initialize the PlayerManager by loading login profiles from Firebase
+        /// Initialize the PlayerManager by loading all player profiles from Firebase
+        /// This ensures the dashboard dropdown shows all players from startup
         /// </summary>
         public async Task<bool> InitializeAsync()
         {
@@ -39,17 +40,19 @@ namespace PokerTracker2.Services
 
                 LoggingService.Instance.Info("Initializing PlayerManager...", "PlayerManager");
                 
-                // Load only profiles with passwords for login (minimal startup data)
-                var loginProfiles = await _firebaseService.GetLoginProfilesAsync();
+                // Load ALL player profiles for dashboard dropdown and general use
+                // This fixes the issue where only login profiles (with passwords) were loaded initially
+                var allProfiles = await _firebaseService.GetAllPlayerProfilesAsync();
                 
                 _players.Clear();
-                foreach (var profile in loginProfiles)
+                foreach (var profile in allProfiles)
                 {
                     _players.Add(profile);
                 }
 
                 _isInitialized = true;
-                LoggingService.Instance.Info($"PlayerManager initialized with {_players.Count} login profiles", "PlayerManager");
+                LoggingService.Instance.Info($"PlayerManager initialized with {_players.Count} player profiles (all profiles for dashboard dropdown)", "PlayerManager");
+                LoggingService.Instance.Info($"Login profiles available: {_players.Count(p => p.HasPassword)} (profiles with passwords)", "PlayerManager");
                 return true;
             }
             catch (Exception ex)
@@ -330,6 +333,14 @@ namespace PokerTracker2.Services
         public List<PlayerProfile> GetActivePlayers()
         {
             return _players.Where(p => p.IsActive).ToList();
+        }
+
+        /// <summary>
+        /// Get only players with passwords for login dropdown
+        /// </summary>
+        public List<PlayerProfile> GetLoginPlayers()
+        {
+            return _players.Where(p => p.HasPassword).ToList();
         }
 
         // REMOVED: UpdatePlayerSessionStatsAsync method - no longer needed since lifetime totals are only updated when sessions end

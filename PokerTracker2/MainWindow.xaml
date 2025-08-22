@@ -7,11 +7,9 @@
     xmlns:controls="clr-namespace:PokerTracker2.Controls"
     xmlns:services="clr-namespace:PokerTracker2.Services"
     Title="Poker Session Tracker"
-    Width="1400"
-    Height="1400"
     WindowStartupLocation="CenterScreen"
-    MinWidth="1200"
-    MinHeight="1100"
+    MinWidth="800"
+    MinHeight="700"
     Background="Transparent"
     AllowsTransparency="True"
     WindowStyle="None">
@@ -19,23 +17,6 @@
     <!-- Animation Resources -->
     <Window.Resources>
         <!-- Window Animation Storyboards -->
-        <Storyboard x:Key="MaximizeAnimation">
-            <DoubleAnimation Storyboard.TargetProperty="(Window.Width)" 
-                             From="1400" To="1920" Duration="0:0:0.3" 
-                             EasingFunction="{StaticResource ExponentialEase}"/>
-            <DoubleAnimation Storyboard.TargetProperty="(Window.Height)" 
-                             From="1400" To="1580" Duration="0:0:0.3" 
-                             EasingFunction="{StaticResource ExponentialEase}"/>
-        </Storyboard>
-        
-        <Storyboard x:Key="RestoreAnimation">
-            <DoubleAnimation Storyboard.TargetProperty="(Window.Width)" 
-                             From="1920" To="1400" Duration="0:0:0.3" 
-                             EasingFunction="{StaticResource ExponentialEase}"/>
-            <DoubleAnimation Storyboard.TargetProperty="(Window.Height)" 
-                             From="1580" To="1400" Duration="0:0:0.3" 
-                             EasingFunction="{StaticResource ExponentialEase}"/>
-        </Storyboard>
         
         <Storyboard x:Key="MinimizeAnimation">
             <DoubleAnimation Storyboard.TargetProperty="(Window.Opacity)" 
@@ -52,6 +33,8 @@
         <local:ProfitTextColorConverter x:Key="ProfitTextColorConverter"/>
         <local:StatusColorConverter x:Key="StatusColorConverter"/>
         <local:SessionVisibilityConverter x:Key="SessionVisibilityConverter"/>
+        
+
         
         <!-- Sidebar Icon Button Style -->
         <Style x:Key="NavIconButtonStyle" TargetType="Button">
@@ -279,13 +262,13 @@
                                          <Border Background="#A0000000" CornerRadius="16" Padding="30" Margin="0,0,0,20" BorderBrush="#60FFFFFF" BorderThickness="1">
                                              <StackPanel>
                                                  <TextBlock Text="Dashboard" 
-                                                            FontSize="28"
+                                                            FontSize="{DynamicResource ScaledDashboardTitleFontSize}"
                                                             FontWeight="Bold"
                                                             Foreground="White"
                                                             HorizontalAlignment="Left"
                                                             Margin="0,0,0,10"/>
                                                  <TextBlock Text="Track your poker sessions and monitor performance" 
-                                                            FontSize="16"
+                                                            FontSize="{DynamicResource ScaledDashboardSubtitleFontSize}"
                                                             Foreground="#CCCCCC"
                                                             HorizontalAlignment="Left"
                                                             Opacity="0.8"/>
@@ -295,7 +278,7 @@
                                          <!-- Player Selection -->
                                          <Border Background="#A0000000" CornerRadius="12" Padding="20" Margin="0,0,0,20" BorderBrush="#60FFFFFF" BorderThickness="1">
                                              <StackPanel>
-                                                 <TextBlock Text="👤 Player Profile" FontSize="18" FontWeight="SemiBold" Foreground="White" Margin="0,0,0,15"/>
+                                                 <TextBlock Text="👤 Player Profile" FontSize="{DynamicResource ScaledDashboardSectionTitleFontSize}" FontWeight="SemiBold" Foreground="White" Margin="0,0,0,15"/>
                                                  <Grid>
                                                      <Grid.ColumnDefinitions>
                                                          <ColumnDefinition Width="*"/>
@@ -313,7 +296,7 @@
                                                                BorderBrush="#60FFFFFF"
                                                                BorderThickness="1"
                                                                Padding="10,8"
-                                                               FontSize="14"/>
+                                                               FontSize="{DynamicResource ScaledDashboardComboBoxFontSize}"/>
                                                      <ui:Button Grid.Column="1" 
                                                                 Content="View All Players" 
                                                                 Appearance="Secondary" 
@@ -321,7 +304,7 @@
                                                  </Grid>
                                                  <TextBlock x:Name="SelectedPlayerInfo" 
                                                             Text="Select a player to view their profile and statistics" 
-                                                            FontSize="12" 
+                                                            FontSize="{DynamicResource ScaledDashboardStatLabelFontSize}" 
                                                             Foreground="#CCCCCC" 
                                                             Opacity="0.8" 
                                                             Margin="0,10,0,0"/>
@@ -340,30 +323,30 @@
                                                  
                                                  <!-- Total Sessions -->
                                                  <StackPanel Grid.Column="0" HorizontalAlignment="Center">
-                                                     <TextBlock Text="📊" FontSize="24" HorizontalAlignment="Center" Margin="0,0,0,5" Foreground="#4FC3F7"/>
-                                                     <TextBlock Text="Total Sessions" FontSize="12" HorizontalAlignment="Center" Foreground="#CCCCCC" Opacity="0.8"/>
-                                                     <TextBlock x:Name="TotalSessionsText" Text="0" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" Foreground="White"/>
+                                                     <TextBlock Text="📊" FontSize="{DynamicResource ScaledDashboardIconFontSize}" HorizontalAlignment="Center" Margin="0,0,0,5" Foreground="#4FC3F7"/>
+                                                     <TextBlock Text="Total Sessions" FontSize="{DynamicResource ScaledDashboardStatLabelFontSize}" HorizontalAlignment="Center" Foreground="#CCCCCC" Opacity="0.8"/>
+                                                     <TextBlock x:Name="TotalSessionsText" Text="0" FontSize="{DynamicResource ScaledDashboardStatValueFontSize}" FontWeight="Bold" HorizontalAlignment="Center" Foreground="White"/>
                                                  </StackPanel>
                                                  
                                                  <!-- Active Sessions -->
                                                  <StackPanel Grid.Column="1" HorizontalAlignment="Center">
-                                                     <TextBlock Text="🎯" FontSize="24" HorizontalAlignment="Center" Margin="0,0,0,5" Foreground="#4FC3F7"/>
-                                                     <TextBlock Text="Active Sessions" FontSize="12" HorizontalAlignment="Center" Foreground="#CCCCCC" Opacity="0.8"/>
-                                                     <TextBlock x:Name="ActiveSessionsText" Text="0" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" Foreground="#4FC3F7"/>
+                                                     <TextBlock Text="🎯" FontSize="{DynamicResource ScaledDashboardIconFontSize}" HorizontalAlignment="Center" Margin="0,0,0,5" Foreground="#4FC3F7"/>
+                                                     <TextBlock Text="Active Sessions" FontSize="{DynamicResource ScaledDashboardStatLabelFontSize}" HorizontalAlignment="Center" Foreground="#CCCCCC" Opacity="0.8"/>
+                                                     <TextBlock x:Name="ActiveSessionsText" Text="0" FontSize="{DynamicResource ScaledDashboardStatValueFontSize}" FontWeight="Bold" HorizontalAlignment="Center" Foreground="#4FC3F7"/>
                                                  </StackPanel>
                                                  
                                                  <!-- Total Players -->
                                                  <StackPanel Grid.Column="2" HorizontalAlignment="Center">
-                                                     <TextBlock Text="👥" FontSize="24" HorizontalAlignment="Center" Margin="0,0,0,5" Foreground="#4FC3F7"/>
-                                                     <TextBlock Text="Total Players" FontSize="12" HorizontalAlignment="Center" Foreground="#CCCCCC" Opacity="0.8"/>
-                                                     <TextBlock x:Name="TotalPlayersText" Text="0" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" Foreground="White"/>
+                                                     <TextBlock Text="👥" FontSize="{DynamicResource ScaledDashboardIconFontSize}" HorizontalAlignment="Center" Margin="0,0,0,5" Foreground="#4FC3F7"/>
+                                                     <TextBlock Text="Total Players" FontSize="{DynamicResource ScaledDashboardStatLabelFontSize}" HorizontalAlignment="Center" Foreground="#CCCCCC" Opacity="0.8"/>
+                                                     <TextBlock x:Name="TotalPlayersText" Text="0" FontSize="{DynamicResource ScaledDashboardStatValueFontSize}" FontWeight="Bold" HorizontalAlignment="Center" Foreground="White"/>
                                                  </StackPanel>
                                                  
                                                                                                      <!-- Total Volume -->
                                                     <StackPanel Grid.Column="3" HorizontalAlignment="Center">
-                                                        <TextBlock Text="💰" FontSize="24" HorizontalAlignment="Center" Margin="0,0,0,5" Foreground="#4FC3F7"/>
-                                                        <TextBlock Text="Total Volume" FontSize="12" HorizontalAlignment="Center" Foreground="#CCCCCC" Opacity="0.8"/>
-                                                        <TextBlock x:Name="TotalVolumeText" Text="$0" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" Foreground="White"/>
+                                                        <TextBlock Text="💰" FontSize="{DynamicResource ScaledDashboardIconFontSize}" HorizontalAlignment="Center" Margin="0,0,0,5" Foreground="#4FC3F7"/>
+                                                        <TextBlock Text="Total Volume" FontSize="{DynamicResource ScaledDashboardStatLabelFontSize}" HorizontalAlignment="Center" Foreground="#CCCCCC" Opacity="0.8"/>
+                                                        <TextBlock x:Name="TotalVolumeText" Text="$0" FontSize="{DynamicResource ScaledDashboardStatValueFontSize}" FontWeight="Bold" HorizontalAlignment="Center" Foreground="White"/>
                                                     </StackPanel>
                                              </Grid>
                                          </Border>
@@ -387,30 +370,30 @@
                                                  
                                                  <!-- Player Sessions -->
                                                  <StackPanel Grid.Column="0" HorizontalAlignment="Center">
-                                                     <TextBlock Text="🎲" FontSize="24" HorizontalAlignment="Center" Margin="0,0,0,5" Foreground="#4FC3F7"/>
-                                                     <TextBlock Text="Player Sessions" FontSize="12" HorizontalAlignment="Center" Foreground="#CCCCCC" Opacity="0.8"/>
-                                                     <TextBlock x:Name="PlayerSessionsText" Text="0" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" Foreground="White"/>
+                                                     <TextBlock Text="🎲" FontSize="{DynamicResource ScaledDashboardIconFontSize}" HorizontalAlignment="Center" Margin="0,0,0,5" Foreground="#4FC3F7"/>
+                                                     <TextBlock Text="Player Sessions" FontSize="{DynamicResource ScaledDashboardStatLabelFontSize}" HorizontalAlignment="Center" Foreground="#CCCCCC" Opacity="0.8"/>
+                                                     <TextBlock x:Name="PlayerSessionsText" Text="0" FontSize="{DynamicResource ScaledDashboardStatValueFontSize}" FontWeight="Bold" HorizontalAlignment="Center" Foreground="White"/>
                                                  </StackPanel>
                                                  
                                                  <!-- Player Buy-ins -->
                                                  <StackPanel Grid.Column="1" HorizontalAlignment="Center">
-                                                     <TextBlock Text="💵" FontSize="24" HorizontalAlignment="Center" Margin="0,0,0,5" Foreground="#4FC3F7"/>
-                                                     <TextBlock Text="Total Buy-ins" FontSize="12" HorizontalAlignment="Center" Foreground="#CCCCCC" Opacity="0.8"/>
-                                                     <TextBlock x:Name="PlayerBuyInsText" Text="$0" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" Foreground="White"/>
+                                                     <TextBlock Text="💵" FontSize="{DynamicResource ScaledDashboardIconFontSize}" HorizontalAlignment="Center" Margin="0,0,0,5" Foreground="#4FC3F7"/>
+                                                     <TextBlock Text="Total Buy-ins" FontSize="{DynamicResource ScaledDashboardStatLabelFontSize}" HorizontalAlignment="Center" Foreground="#CCCCCC" Opacity="0.8"/>
+                                                     <TextBlock x:Name="PlayerBuyInsText" Text="$0" FontSize="{DynamicResource ScaledDashboardStatValueFontSize}" FontWeight="Bold" HorizontalAlignment="Center" Foreground="White"/>
                                                  </StackPanel>
                                                  
                                                  <!-- Player Cash-outs -->
                                                  <StackPanel Grid.Column="2" HorizontalAlignment="Center">
-                                                     <TextBlock Text="💰" FontSize="24" HorizontalAlignment="Center" Margin="0,0,0,5" Foreground="#4FC3F7"/>
-                                                     <TextBlock Text="Total Cash-outs" FontSize="12" HorizontalAlignment="Center" Foreground="#CCCCCC" Opacity="0.8"/>
-                                                     <TextBlock x:Name="PlayerCashOutsText" Text="$0" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" Foreground="White"/>
+                                                     <TextBlock Text="💰" FontSize="{DynamicResource ScaledDashboardIconFontSize}" HorizontalAlignment="Center" Margin="0,0,0,5" Foreground="#4FC3F7"/>
+                                                     <TextBlock Text="Total Cash-outs" FontSize="{DynamicResource ScaledDashboardStatLabelFontSize}" HorizontalAlignment="Center" Foreground="#CCCCCC" Opacity="0.8"/>
+                                                     <TextBlock x:Name="PlayerCashOutsText" Text="$0" FontSize="{DynamicResource ScaledDashboardStatValueFontSize}" FontWeight="Bold" HorizontalAlignment="Center" Foreground="White"/>
                                                  </StackPanel>
                                                  
                                                  <!-- Player Net Profit -->
                                                  <StackPanel Grid.Column="3" HorizontalAlignment="Center">
-                                                     <TextBlock Text="📈" FontSize="24" HorizontalAlignment="Center" Margin="0,0,0,0" Foreground="#4FC3F7"/>
-                                                     <TextBlock Text="Net Profit" FontSize="12" HorizontalAlignment="Center" Foreground="#CCCCCC" Opacity="0.8"/>
-                                                     <TextBlock x:Name="PlayerNetProfitText" Text="$0" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" Foreground="#4CAF50"/>
+                                                     <TextBlock Text="📈" FontSize="{DynamicResource ScaledDashboardIconFontSize}" HorizontalAlignment="Center" Margin="0,0,0,0" Foreground="#4FC3F7"/>
+                                                     <TextBlock Text="Net Profit" FontSize="{DynamicResource ScaledDashboardStatLabelFontSize}" HorizontalAlignment="Center" Foreground="#CCCCCC" Opacity="0.8"/>
+                                                     <TextBlock x:Name="PlayerNetProfitText" Text="$0" FontSize="{DynamicResource ScaledDashboardStatValueFontSize}" FontWeight="Bold" HorizontalAlignment="Center" Foreground="#4CAF50"/>
                                                  </StackPanel>
                                              </Grid>
                                          </Border>
@@ -433,23 +416,23 @@
                                                  
                                                  <!-- Average Session Profit -->
                                                  <StackPanel Grid.Column="0" HorizontalAlignment="Center">
-                                                     <TextBlock Text="📊" FontSize="24" HorizontalAlignment="Center" Margin="0,0,0,5" Foreground="#4FC3F7"/>
-                                                     <TextBlock Text="Avg Session Profit" FontSize="12" HorizontalAlignment="Center" Foreground="#CCCCCC" Opacity="0.8"/>
-                                                     <TextBlock x:Name="AvgSessionProfitText" Text="$0" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" Foreground="White"/>
+                                                     <TextBlock Text="📊" FontSize="{DynamicResource ScaledDashboardIconFontSize}" HorizontalAlignment="Center" Margin="0,0,0,5" Foreground="#4FC3F7"/>
+                                                     <TextBlock Text="Avg Session Profit" FontSize="{DynamicResource ScaledDashboardStatLabelFontSize}" HorizontalAlignment="Center" Foreground="#CCCCCC" Opacity="0.8"/>
+                                                     <TextBlock x:Name="AvgSessionProfitText" Text="$0" FontSize="{DynamicResource ScaledDashboardStatValueFontSize}" FontWeight="Bold" HorizontalAlignment="Center" Foreground="White"/>
                                                  </StackPanel>
                                                  
                                                  <!-- Best Session -->
                                                  <StackPanel Grid.Column="1" HorizontalAlignment="Center">
-                                                     <TextBlock Text="🏆" FontSize="24" HorizontalAlignment="Center" Margin="0,0,0,5" Foreground="#4FC3F7"/>
-                                                     <TextBlock Text="Best Session" FontSize="12" HorizontalAlignment="Center" Foreground="#CCCCCC" Opacity="0.8"/>
-                                                     <TextBlock x:Name="BestSessionText" Text="$0" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" Foreground="#4CAF50"/>
+                                                     <TextBlock Text="🏆" FontSize="{DynamicResource ScaledDashboardIconFontSize}" HorizontalAlignment="Center" Margin="0,0,0,5" Foreground="#4FC3F7"/>
+                                                     <TextBlock Text="Best Session" FontSize="{DynamicResource ScaledDashboardStatLabelFontSize}" HorizontalAlignment="Center" Foreground="#CCCCCC" Opacity="0.8"/>
+                                                     <TextBlock x:Name="BestSessionText" Text="$0" FontSize="{DynamicResource ScaledDashboardStatValueFontSize}" FontWeight="Bold" HorizontalAlignment="Center" Foreground="#4CAF50"/>
                                                  </StackPanel>
                                                  
                                                  <!-- Total Buy-ins -->
                                                  <StackPanel Grid.Column="2" HorizontalAlignment="Center">
-                                                     <TextBlock Text="💵" FontSize="24" HorizontalAlignment="Center" Margin="0,0,0,5" Foreground="#4FC3F7"/>
-                                                     <TextBlock Text="Total Buy-ins" FontSize="12" HorizontalAlignment="Center" Foreground="#CCCCCC" Opacity="0.8"/>
-                                                     <TextBlock x:Name="TotalBuyInsText" Text="$0" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" Foreground="White"/>
+                                                     <TextBlock Text="💵" FontSize="{DynamicResource ScaledDashboardIconFontSize}" HorizontalAlignment="Center" Margin="0,0,0,5" Foreground="#4FC3F7"/>
+                                                     <TextBlock Text="Total Buy-ins" FontSize="{DynamicResource ScaledDashboardStatLabelFontSize}" HorizontalAlignment="Center" Foreground="#CCCCCC" Opacity="0.8"/>
+                                                     <TextBlock x:Name="TotalBuyInsText" Text="$0" FontSize="{DynamicResource ScaledDashboardStatValueFontSize}" FontWeight="Bold" HorizontalAlignment="Center" Foreground="White"/>
                                                  </StackPanel>
                                              </Grid>
                                          </Border>
@@ -462,7 +445,7 @@
                                                          <ColumnDefinition Width="*"/>
                                                          <ColumnDefinition Width="Auto"/>
                                                      </Grid.ColumnDefinitions>
-                                                     <TextBlock Grid.Column="0" Text="Recent Sessions" FontSize="18" FontWeight="SemiBold" Foreground="White"/>
+                                                     <TextBlock Grid.Column="0" Text="Recent Sessions" FontSize="{DynamicResource ScaledDashboardSectionTitleFontSize}" FontWeight="SemiBold" Foreground="White"/>
                                                      <ui:Button Grid.Column="1" Content="View All" Appearance="Secondary" Click="SessionHistoryButton_Click"/>
                                                  </Grid>
                                                  
@@ -483,9 +466,9 @@
                                                                              <ColumnDefinition Width="Auto"/>
                                                                          </Grid.ColumnDefinitions>
                                                                          
-                                                                         <TextBlock Grid.Column="0" Text="{Binding Name}" FontSize="14" FontWeight="SemiBold" Foreground="White"/>
+                                                                         <TextBlock Grid.Column="0" Text="{Binding Name}" FontSize="{DynamicResource ScaledDashboardSessionNameFontSize}" FontWeight="SemiBold" Foreground="White"/>
                                                                          <Border Grid.Column="1" Background="{Binding IsActive, Converter={StaticResource StatusColorConverter}}" CornerRadius="4" Padding="6,2">
-                                                                             <TextBlock Text="{Binding StatusText}" FontSize="10" FontWeight="Bold" Foreground="White"/>
+                                                                             <TextBlock Text="{Binding StatusText}" FontSize="{DynamicResource ScaledDashboardSessionStatusFontSize}" FontWeight="Bold" Foreground="White"/>
                                                                          </Border>
                                                                      </Grid>
                                                                      
@@ -496,9 +479,9 @@
                                                                              <ColumnDefinition Width="Auto"/>
                                                                          </Grid.ColumnDefinitions>
                                                                          
-                                                                         <TextBlock Grid.Column="0" Text="{Binding DurationText}" FontSize="11" Foreground="#4FC3F7"/>
-                                                                         <TextBlock Grid.Column="1" Text="{Binding TotalBuyIns, StringFormat='Buy-ins: ${0:F2}'}" FontSize="11" Foreground="#CCCCCC" Margin="10,0,0,0"/>
-                                                                         <TextBlock Grid.Column="2" Text="{Binding ProfitText}" FontSize="11" FontWeight="Bold" Margin="10,0,0,0">
+                                                                         <TextBlock Grid.Column="0" Text="{Binding DurationText}" FontSize="{DynamicResource ScaledDashboardSessionDetailFontSize}" Foreground="#4FC3F7"/>
+                                                                         <TextBlock Grid.Column="1" Text="{Binding TotalBuyIns, StringFormat='Buy-ins: ${0:F2}'}" FontSize="{DynamicResource ScaledDashboardSessionDetailFontSize}" Foreground="#CCCCCC" Margin="10,0,0,0"/>
+                                                                         <TextBlock Grid.Column="2" Text="{Binding ProfitText}" FontSize="{DynamicResource ScaledDashboardSessionDetailFontSize}" FontWeight="Bold" Margin="10,0,0,0">
                                                                              <TextBlock.Foreground>
                                                                                  <SolidColorBrush Color="{Binding NetProfit, Converter={StaticResource ProfitColorConverter}}"/>
                                                                              </TextBlock.Foreground>
@@ -514,8 +497,8 @@
                                                  <Border x:Name="NoSessionsMessage" Background="#80000000" CornerRadius="8" Padding="40" Margin="5" BorderBrush="#40FFFFFF" BorderThickness="1" Visibility="Collapsed">
                                                      <StackPanel HorizontalAlignment="Center">
                                                          <TextBlock Text="📁" FontSize="32" HorizontalAlignment="Center" Margin="0,0,0,10" Foreground="#4FC3F7"/>
-                                                         <TextBlock Text="No sessions yet" FontSize="16" FontWeight="SemiBold" Foreground="White" HorizontalAlignment="Center"/>
-                                                         <TextBlock Text="Create your first session to get started" FontSize="12" Foreground="#CCCCCC" Opacity="0.8" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+                                                         <TextBlock Text="No sessions yet" FontSize="{DynamicResource ScaledDashboardEmptyStateFontSize}" FontWeight="SemiBold" Foreground="White" HorizontalAlignment="Center"/>
+                                                         <TextBlock Text="Create your first session to get started" FontSize="{DynamicResource ScaledDashboardEmptyDescFontSize}" Foreground="#CCCCCC" Opacity="0.8" HorizontalAlignment="Center" Margin="0,5,0,0"/>
                                                          <ui:Button Content="Create New Session" Appearance="Primary" Click="NewSessionButton_Click" Margin="0,15,0,0"/>
                                                      </StackPanel>
                                                  </Border>
@@ -534,8 +517,8 @@
                                     <!-- Decorative element to restore width -->
                                     <Grid Grid.Column="1" Width="100">
                                         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Opacity="0.1">
-                                            <TextBlock Text="🎲" FontSize="48" HorizontalAlignment="Center" Margin="0,0,0,10"/>
-                                            <TextBlock Text="Poker Session Tracker" FontSize="16" HorizontalAlignment="Center" Foreground="White"/>
+                                            <TextBlock Text="🎲" FontSize="{DynamicResource ScaledDashboardDecorationFontSize}" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                                            <TextBlock Text="Poker Session Tracker" FontSize="{DynamicResource ScaledDashboardSubtitleFontSize}" HorizontalAlignment="Center" Foreground="White"/>
                                         </StackPanel>
                                     </Grid>
                                 </Grid>
@@ -582,7 +565,7 @@
                                             </Grid.ColumnDefinitions>
                                             <TextBlock x:Name="SessionTitleText"
                                                        Text="New Poker Session"
-                                                       FontSize="24"
+                                                       FontSize="{DynamicResource ScaledNewSessionTitleFontSize}"
                                                        FontWeight="Bold"
                                                        Foreground="White"/>
                                             <ui:Button Grid.Column="1" x:Name="RenameSessionTemplateButton"
@@ -595,7 +578,7 @@
                                         </Grid>
                                         <TextBlock x:Name="SessionIdText"
                                                    Text="Session ID: Not started"
-                                                   FontSize="14"
+                                                   FontSize="{DynamicResource ScaledNewSessionIdFontSize}"
                                                    Foreground="#CCCCCC"
                                                    Opacity="0.7"
                                                    Margin="0,5,0,0"/>
@@ -626,7 +609,7 @@
                                                 <RowDefinition Height="Auto"/>
                                                 <RowDefinition Height="Auto"/>
                                             </Grid.RowDefinitions>
-                                            <TextBlock Grid.Row="0" Text="💰 Buy-ins" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,15" Foreground="White"/>
+                                            <TextBlock Grid.Row="0" Text="💰 Buy-ins" FontSize="{DynamicResource ScaledNewSessionSectionTitleFontSize}" FontWeight="SemiBold" Margin="0,0,0,15" Foreground="White"/>
                                             
                                             <!-- Player Selection Section -->
                                             <Border Grid.Row="1" Background="#80000000" BorderBrush="#40FFFFFF" BorderThickness="1" CornerRadius="6" Margin="0,0,0,15" Padding="15">
@@ -645,7 +628,7 @@
                                                         </Grid.ColumnDefinitions>
                                                         <TextBlock Grid.Column="0" 
                                                                    Text="Add players to your session:" 
-                                                                   FontSize="14" 
+                                                                   FontSize="{DynamicResource ScaledNewSessionInfoFontSize}" 
                                                                    Foreground="#CCCCCC" 
                                                                    VerticalAlignment="Center"/>
                                                         <ui:Button Grid.Column="1" 
@@ -659,7 +642,7 @@
                                                     <TextBlock Grid.Row="1" 
                                                                x:Name="EmptyPlayersMessage"
                                                                Text="No players added yet. Click 'Add Player' to get started."
-                                                               FontSize="12" 
+                                                               FontSize="{DynamicResource ScaledNewSessionEmptyMessageFontSize}" 
                                                                Foreground="#888888" 
                                                                HorizontalAlignment="Center"
                                                                Margin="0,20"
@@ -684,7 +667,7 @@
                                                                                VerticalAlignment="Center" 
                                                                                Foreground="White"
                                                                                FontWeight="SemiBold"
-                                                                               FontSize="14"/>
+                                                                               FontSize="{DynamicResource ScaledNewSessionPlayerNameFontSize}"/>
                                                                     <TextBlock Grid.Column="1" 
                                                                                Text="{Binding TotalBuyIn, StringFormat=C}" 
                                                                                VerticalAlignment="Center" 
@@ -721,14 +704,14 @@
                                                 <RowDefinition Height="Auto"/>
                                                 <RowDefinition Height="Auto"/>
                                             </Grid.RowDefinitions>
-                                            <TextBlock Grid.Row="0" Text="📊 Session Summary" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,15" Foreground="White"/>
+                                            <TextBlock Grid.Row="0" Text="📊 Session Summary" FontSize="{DynamicResource ScaledNewSessionSectionTitleFontSize}" FontWeight="SemiBold" Margin="0,0,0,15" Foreground="White"/>
                                             <Grid Grid.Row="1" Margin="0,5">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="*"/>
                                                     <ColumnDefinition Width="Auto"/>
                                                 </Grid.ColumnDefinitions>
-                                                <TextBlock Grid.Column="0" Text="Total Buy-ins:" FontSize="14" Foreground="#CCCCCC"/>
-                                                <TextBlock Grid.Column="1" Text="{Binding TotalBuyIn}" FontSize="14" FontWeight="Bold" Foreground="White"/>
+                                                <TextBlock Grid.Column="0" Text="Total Buy-ins:" FontSize="{DynamicResource ScaledNewSessionInfoFontSize}" Foreground="#CCCCCC"/>
+                                                <TextBlock Grid.Column="1" Text="{Binding TotalBuyIn}" FontSize="{DynamicResource ScaledNewSessionInfoFontSize}" FontWeight="Bold" Foreground="White"/>
                                             </Grid>
                                         </Grid>
                                     </Border>
@@ -739,7 +722,7 @@
                                                 <RowDefinition Height="Auto"/>
                                                 <RowDefinition Height="*"/>
                                             </Grid.RowDefinitions>
-                                            <TextBlock Grid.Row="0" Text="📝 Session Notes" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,15" Foreground="White"/>
+                                            <TextBlock Grid.Row="0" Text="📝 Session Notes" FontSize="{DynamicResource ScaledNewSessionSectionTitleFontSize}" FontWeight="SemiBold" Margin="0,0,0,15" Foreground="White"/>
                                             <ui:TextBox Grid.Row="1" x:Name="SessionNotesTextBox"
                                                         AcceptsReturn="True"
                                                         TextWrapping="Wrap"
@@ -757,7 +740,7 @@
                                 </Border.Effect>
                                 <TextBlock x:Name="StatusText"
                                            Text="Ready to track your poker session"
-                                           FontSize="14"
+                                           FontSize="{DynamicResource ScaledNewSessionStatusFontSize}"
                                            Foreground="#CCCCCC"
                                            VerticalAlignment="Center"/>
                             </Border>
@@ -788,8 +771,8 @@
                                      </Grid.RowDefinitions>
                                      <!-- Inner highlight for shine effect -->
                                      <Border Background="Transparent" BorderBrush="#40FFFFFF" BorderThickness="0,0,0,1" Opacity="0.3" Grid.RowSpan="2"/>
-                                     <TextBlock Grid.Row="0" Text="📊 Active Sessions" FontSize="24" FontWeight="Bold" Foreground="White"/>
-                                     <TextBlock Grid.Row="1" Text="Currently running poker sessions" FontSize="14" Foreground="#CCCCCC" Opacity="0.7" Margin="0,5,0,0"/>
+                                     <TextBlock Grid.Row="0" Text="📊 Active Sessions" FontSize="{DynamicResource ScaledActiveSessionsTitleFontSize}" FontWeight="Bold" Foreground="White"/>
+                                     <TextBlock Grid.Row="1" Text="Currently running poker sessions" FontSize="{DynamicResource ScaledActiveSessionsSubtitleFontSize}" Foreground="#CCCCCC" Opacity="0.7" Margin="0,5,0,0"/>
                                  </Grid>
                              </Border>
                              
@@ -810,7 +793,7 @@
                                                  <RowDefinition Height="*"/>
                                              </Grid.RowDefinitions>
                                              
-                                             <TextBlock Grid.Row="0" Text="Active Sessions" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,15" Foreground="White"/>
+                                             <TextBlock Grid.Row="0" Text="Active Sessions" FontSize="{DynamicResource ScaledActiveSessionsSectionTitleFontSize}" FontWeight="SemiBold" Margin="0,0,0,15" Foreground="White"/>
                                              
                                              <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Background="Transparent">
                                                  <ItemsControl x:Name="ActiveSessionsList">
@@ -831,14 +814,14 @@
                                                                              <ColumnDefinition Width="Auto"/>
                                                                          </Grid.ColumnDefinitions>
                                                                          
-                                                                         <TextBlock Grid.Column="0" Text="{Binding Name}" FontSize="18" FontWeight="Bold" Foreground="White"/>
+                                                                         <TextBlock Grid.Column="0" Text="{Binding Name}" FontSize="{DynamicResource ScaledActiveSessionsSessionNameFontSize}" FontWeight="Bold" Foreground="White"/>
                                                                          <Border Grid.Column="1" Background="#4CAF50" CornerRadius="4" Padding="8,4">
-                                                                             <TextBlock Text="ACTIVE" FontSize="10" FontWeight="Bold" Foreground="White"/>
+                                                                             <TextBlock Text="ACTIVE" FontSize="{DynamicResource ScaledActiveSessionsStatusBadgeFontSize}" FontWeight="Bold" Foreground="White"/>
                                                                          </Border>
                                                                      </Grid>
                                                                      
-                                                                     <TextBlock Grid.Row="1" Text="{Binding StartTime, StringFormat='Started: {0:g}'}" FontSize="14" Foreground="#CCCCCC" Margin="0,10,0,5"/>
-                                                                     <TextBlock Grid.Row="2" Text="{Binding DurationText, StringFormat='Duration: {0}'}" FontSize="14" Foreground="#4FC3F7" Margin="0,5,0,10"/>
+                                                                     <TextBlock Grid.Row="1" Text="{Binding StartTime, StringFormat='Started: {0:g}'}" FontSize="{DynamicResource ScaledActiveSessionsSessionDetailFontSize}" Foreground="#CCCCCC" Margin="0,10,0,5"/>
+                                                                     <TextBlock Grid.Row="2" Text="{Binding DurationText, StringFormat='Duration: {0}'}" FontSize="{DynamicResource ScaledActiveSessionsSessionDetailFontSize}" Foreground="#4FC3F7" Margin="0,5,0,10"/>
                                                                      
                                                                      <Grid Grid.Row="3">
                                                                          <Grid.ColumnDefinitions>
@@ -848,13 +831,13 @@
                                                                          </Grid.ColumnDefinitions>
                                                                          
                                                                          <StackPanel Grid.Column="0">
-                                                                             <TextBlock Text="Buy-ins" FontSize="12" Foreground="#CCCCCC"/>
-                                                                             <TextBlock Text="{Binding TotalBuyIns, StringFormat='${0:F2}'}" FontSize="16" FontWeight="Bold" Foreground="White"/>
+                                                                             <TextBlock Text="Buy-ins" FontSize="{DynamicResource ScaledActiveSessionsFinancialLabelFontSize}" Foreground="#CCCCCC"/>
+                                                                             <TextBlock Text="{Binding TotalBuyIns, StringFormat='${0:F2}'}" FontSize="{DynamicResource ScaledActiveSessionsFinancialValueFontSize}" FontWeight="Bold" Foreground="White"/>
                                                                          </StackPanel>
                                                                          
                                                                          <StackPanel Grid.Column="1">
-                                                                             <TextBlock Text="Players" FontSize="12" Foreground="#CCCCCC"/>
-                                                                             <TextBlock Text="{Binding Players.Count}" FontSize="16" FontWeight="Bold" Foreground="White"/>
+                                                                             <TextBlock Text="Players" FontSize="{DynamicResource ScaledActiveSessionsFinancialLabelFontSize}" Foreground="#CCCCCC"/>
+                                                                             <TextBlock Text="{Binding Players.Count}" FontSize="{DynamicResource ScaledActiveSessionsFinancialValueFontSize}" FontWeight="Bold" Foreground="White"/>
                                                                          </StackPanel>
                                                                          
                                                                                                                                           <StackPanel Grid.Column="2" Orientation="Horizontal">
@@ -874,9 +857,9 @@
                                      <!-- No Active Sessions Message -->
                                      <Border Grid.Column="0" x:Name="NoActiveSessionsMessage" Background="#A0000000" BorderBrush="#60FFFFFF" BorderThickness="1" CornerRadius="8" Visibility="Collapsed">
                                          <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="40">
-                                             <TextBlock Text="📊" FontSize="48" HorizontalAlignment="Center" Margin="0,0,0,20" Foreground="#4FC3F7"/>
-                                             <TextBlock Text="No Active Sessions" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10" Foreground="White"/>
-                                             <TextBlock Text="Currently running poker sessions" FontSize="16" HorizontalAlignment="Center" Opacity="0.7" Foreground="#CCCCCC" Margin="0,0,0,30"/>
+                                             <TextBlock Text="📊" FontSize="{DynamicResource ScaledActiveSessionsEmptyIconFontSize}" HorizontalAlignment="Center" Margin="0,0,0,20" Foreground="#4FC3F7"/>
+                                             <TextBlock Text="No Active Sessions" FontSize="{DynamicResource ScaledActiveSessionsEmptyTitleFontSize}" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10" Foreground="White"/>
+                                             <TextBlock Text="Currently running poker sessions" FontSize="{DynamicResource ScaledActiveSessionsEmptyDescFontSize}" HorizontalAlignment="Center" Opacity="0.7" Foreground="#CCCCCC" Margin="0,0,0,30"/>
                                              <ui:Button Content="➕ Create New Session" Appearance="Primary" Click="CreateNewSessionFromActive_Click"/>
                                          </StackPanel>
                                      </Border>
@@ -892,21 +875,21 @@
                                                  <RowDefinition Height="*"/>
                                              </Grid.RowDefinitions>
                                              
-                                             <TextBlock Grid.Row="0" Text="📈 Quick Stats" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,20" Foreground="White"/>
+                                             <TextBlock Grid.Row="0" Text="📈 Quick Stats" FontSize="{DynamicResource ScaledActiveSessionsQuickStatsTitleFontSize}" FontWeight="SemiBold" Margin="0,0,0,20" Foreground="White"/>
                                              
                                              <StackPanel Grid.Row="1" Margin="0,0,0,15">
-                                                 <TextBlock Text="Active Sessions" FontSize="12" Foreground="#CCCCCC"/>
-                                                 <TextBlock x:Name="ActiveSessionsCountText" Text="0" FontSize="20" FontWeight="Bold" Foreground="#4FC3F7"/>
+                                                 <TextBlock Text="Active Sessions" FontSize="{DynamicResource ScaledActiveSessionsQuickStatsLabelFontSize}" Foreground="#CCCCCC"/>
+                                                 <TextBlock x:Name="ActiveSessionsCountText" Text="0" FontSize="{DynamicResource ScaledActiveSessionsQuickStatsValueFontSize}" FontWeight="Bold" Foreground="#4FC3F7"/>
                                              </StackPanel>
                                              
                                              <StackPanel Grid.Row="2" Margin="0,0,0,15">
-                                                 <TextBlock Text="Total Buy-ins" FontSize="12" Foreground="#CCCCCC"/>
-                                                 <TextBlock x:Name="ActiveSessionsTotalBuyInsText" Text="$0.00" FontSize="20" FontWeight="Bold" Foreground="White"/>
+                                                 <TextBlock Text="Total Buy-ins" FontSize="{DynamicResource ScaledActiveSessionsQuickStatsLabelFontSize}" Foreground="#CCCCCC"/>
+                                                 <TextBlock x:Name="ActiveSessionsTotalBuyInsText" Text="$0.00" FontSize="{DynamicResource ScaledActiveSessionsQuickStatsValueFontSize}" FontWeight="Bold" Foreground="White"/>
                                              </StackPanel>
                                              
                                              <StackPanel Grid.Row="3" Margin="0,0,0,20">
-                                                 <TextBlock Text="Total Players" FontSize="12" Foreground="#CCCCCC"/>
-                                                 <TextBlock x:Name="ActiveSessionsTotalPlayersText" Text="0" FontSize="20" FontWeight="Bold" Foreground="White"/>
+                                                 <TextBlock Text="Total Players" FontSize="{DynamicResource ScaledActiveSessionsQuickStatsLabelFontSize}" Foreground="#CCCCCC"/>
+                                                 <TextBlock x:Name="ActiveSessionsTotalPlayersText" Text="0" FontSize="{DynamicResource ScaledActiveSessionsQuickStatsValueFontSize}" FontWeight="Bold" Foreground="White"/>
                                              </StackPanel>
                                              
                                              <Border Grid.Row="4" Height="1" Background="#40FFFFFF" Margin="0,0,0,20"/>
@@ -949,7 +932,7 @@
                                              <ColumnDefinition Width="*"/>
                                              <ColumnDefinition Width="Auto"/>
                                          </Grid.ColumnDefinitions>
-                                         <TextBlock Grid.Column="0" Text="📁 Session History" FontSize="24" FontWeight="Bold" Foreground="White"/>
+                                         <TextBlock Grid.Column="0" Text="📁 Session History" FontSize="{DynamicResource ScaledSessionHistoryTitleFontSize}" FontWeight="Bold" Foreground="White"/>
                                          <StackPanel Grid.Column="1" Orientation="Horizontal">
                                              <ui:Button Content="🔄 Refresh" Appearance="Secondary" Margin="0,0,10,0" Click="RefreshSessionHistory_Click"/>
                                              <ui:Button Content="📊 Export" Appearance="Secondary" Click="ExportSessionHistory_Click"/>
@@ -972,23 +955,23 @@
                                              </Grid.ColumnDefinitions>
                                              
                                              <StackPanel Grid.Column="0" HorizontalAlignment="Center">
-                                                 <TextBlock x:Name="HistoryTotalSessionsText" Text="0" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" Foreground="White"/>
-                                                 <TextBlock Text="Total Sessions" FontSize="12" HorizontalAlignment="Center" Foreground="#CCCCCC" Opacity="0.8"/>
+                                                 <TextBlock x:Name="HistoryTotalSessionsText" Text="0" FontSize="{DynamicResource ScaledSessionHistoryStatValueFontSize}" FontWeight="Bold" HorizontalAlignment="Center" Foreground="White"/>
+                                                 <TextBlock Text="Total Sessions" FontSize="{DynamicResource ScaledSessionHistoryStatLabelFontSize}" HorizontalAlignment="Center" Foreground="#CCCCCC" Opacity="0.8"/>
                                              </StackPanel>
                                              
                                              <StackPanel Grid.Column="1" HorizontalAlignment="Center">
-                                                 <TextBlock x:Name="HistoryTotalProfitText" Text="$0.00" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" Foreground="#4CAF50"/>
-                                                 <TextBlock Text="Total Profit" FontSize="12" HorizontalAlignment="Center" Foreground="#CCCCCC" Opacity="0.8"/>
+                                                 <TextBlock x:Name="HistoryTotalProfitText" Text="$0.00" FontSize="{DynamicResource ScaledSessionHistoryStatValueFontSize}" FontWeight="Bold" HorizontalAlignment="Center" Foreground="#4CAF50"/>
+                                                 <TextBlock Text="Total Profit" FontSize="{DynamicResource ScaledSessionHistoryStatLabelFontSize}" HorizontalAlignment="Center" Foreground="#CCCCCC" Opacity="0.8"/>
                                              </StackPanel>
                                              
                                              <StackPanel Grid.Column="2" HorizontalAlignment="Center">
-                                                 <TextBlock x:Name="HistoryAverageProfitText" Text="$0.00" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" Foreground="White"/>
-                                                 <TextBlock Text="Average per Session" FontSize="12" HorizontalAlignment="Center" Foreground="#CCCCCC" Opacity="0.8"/>
+                                                 <TextBlock x:Name="HistoryAverageProfitText" Text="$0.00" FontSize="{DynamicResource ScaledSessionHistoryStatValueFontSize}" FontWeight="Bold" HorizontalAlignment="Center" Foreground="White"/>
+                                                 <TextBlock Text="Average per Session" FontSize="{DynamicResource ScaledSessionHistoryStatLabelFontSize}" HorizontalAlignment="Center" Foreground="#CCCCCC" Opacity="0.8"/>
                                              </StackPanel>
                                              
                                              <StackPanel Grid.Column="3" HorizontalAlignment="Center">
-                                                 <TextBlock x:Name="HistoryBestSessionText" Text="$0.00" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" Foreground="#4CAF50"/>
-                                                 <TextBlock Text="Best Session" FontSize="12" HorizontalAlignment="Center" Foreground="#CCCCCC" Opacity="0.8"/>
+                                                 <TextBlock x:Name="HistoryBestSessionText" Text="$0.00" FontSize="{DynamicResource ScaledSessionHistoryStatValueFontSize}" FontWeight="Bold" HorizontalAlignment="Center" Foreground="#4CAF50"/>
+                                                 <TextBlock Text="Best Session" FontSize="{DynamicResource ScaledSessionHistoryStatLabelFontSize}" HorizontalAlignment="Center" Foreground="#CCCCCC" Opacity="0.8"/>
                                              </StackPanel>
                                          </Grid>
                                      </Border>
@@ -1001,7 +984,7 @@
                                                  <RowDefinition Height="*"/>
                                              </Grid.RowDefinitions>
                                              
-                                             <TextBlock Grid.Row="0" Text="Completed Sessions" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,15" Foreground="White"/>
+                                             <TextBlock Grid.Row="0" Text="Completed Sessions" FontSize="{DynamicResource ScaledSessionHistorySectionTitleFontSize}" FontWeight="SemiBold" Margin="0,0,0,15" Foreground="White"/>
                                              
                                              <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Background="Transparent">
                                                  <ItemsControl x:Name="SessionHistoryList">
@@ -1023,9 +1006,9 @@
                                                                              <ColumnDefinition Width="Auto"/>
                                                                          </Grid.ColumnDefinitions>
                                                                          
-                                                                         <TextBlock Grid.Column="0" Text="{Binding Name}" FontSize="18" FontWeight="Bold" Foreground="White"/>
+                                                                         <TextBlock Grid.Column="0" Text="{Binding Name}" FontSize="{DynamicResource ScaledSessionHistorySessionNameFontSize}" FontWeight="Bold" Foreground="White"/>
                                                                          <Border Grid.Column="1" Background="#FF9800" CornerRadius="4" Padding="8,4">
-                                                                             <TextBlock Text="COMPLETED" FontSize="10" FontWeight="Bold" Foreground="White"/>
+                                                                             <TextBlock Text="COMPLETED" FontSize="{DynamicResource ScaledSessionHistoryStatusBadgeFontSize}" FontWeight="Bold" Foreground="White"/>
                                                                          </Border>
                                                                      </Grid>
                                                                      
@@ -1037,9 +1020,9 @@
                                                                              <ColumnDefinition Width="*"/>
                                                                          </Grid.ColumnDefinitions>
                                                                          
-                                                                         <TextBlock Grid.Column="0" Text="{Binding StartTime, StringFormat='Started: {0:g}'}" FontSize="14" Foreground="#CCCCCC"/>
-                                                                         <TextBlock Grid.Column="1" Text="{Binding EndTime, StringFormat='Ended: {0:g}'}" FontSize="14" Foreground="#CCCCCC"/>
-                                                                         <TextBlock Grid.Column="2" Text="{Binding DurationText, StringFormat='Duration: {0}'}" FontSize="14" Foreground="#4FC3F7"/>
+                                                                         <TextBlock Grid.Column="0" Text="{Binding StartTime, StringFormat='Started: {0:g}'}" FontSize="{DynamicResource ScaledSessionHistorySessionDetailFontSize}" Foreground="#CCCCCC"/>
+                                                                         <TextBlock Grid.Column="1" Text="{Binding EndTime, StringFormat='Ended: {0:g}'}" FontSize="{DynamicResource ScaledSessionHistorySessionDetailFontSize}" Foreground="#CCCCCC"/>
+                                                                         <TextBlock Grid.Column="2" Text="{Binding DurationText, StringFormat='Duration: {0}'}" FontSize="{DynamicResource ScaledSessionHistorySessionDetailFontSize}" Foreground="#4FC3F7"/>
                                                                      </Grid>
                                                                      
                                                                      <!-- Session Financial Summary Row -->
@@ -1051,18 +1034,18 @@
                                                                          </Grid.ColumnDefinitions>
                                                                          
                                                                          <StackPanel Grid.Column="0">
-                                                                             <TextBlock Text="Buy-ins" FontSize="12" Foreground="#CCCCCC"/>
-                                                                             <TextBlock Text="{Binding TotalBuyIns, StringFormat='${0:F2}'}" FontSize="16" FontWeight="Bold" Foreground="White"/>
+                                                                             <TextBlock Text="Buy-ins" FontSize="{DynamicResource ScaledSessionHistoryFinancialLabelFontSize}" Foreground="#CCCCCC"/>
+                                                                             <TextBlock Text="{Binding TotalBuyIns, StringFormat='${0:F2}'}" FontSize="{DynamicResource ScaledSessionHistoryFinancialValueFontSize}" FontWeight="Bold" Foreground="White"/>
                                                                          </StackPanel>
                                                                          
                                                                          <StackPanel Grid.Column="1">
-                                                                             <TextBlock Text="Cash-outs" FontSize="12" Foreground="#CCCCCC"/>
-                                                                             <TextBlock Text="{Binding TotalCashOuts, StringFormat='${0:F2}'}" FontSize="16" FontWeight="Bold" Foreground="White"/>
+                                                                             <TextBlock Text="Cash-outs" FontSize="{DynamicResource ScaledSessionHistoryFinancialLabelFontSize}" Foreground="#CCCCCC"/>
+                                                                             <TextBlock Text="{Binding TotalCashOuts, StringFormat='${0:F2}'}" FontSize="{DynamicResource ScaledSessionHistoryFinancialValueFontSize}" FontWeight="Bold" Foreground="White"/>
                                                                          </StackPanel>
                                                                          
                                                                          <StackPanel Grid.Column="2">
-                                                                             <TextBlock Text="Net Profit" FontSize="12" Foreground="#CCCCCC"/>
-                                                                             <TextBlock Text="{Binding NetProfit, StringFormat='${0:F2}'}" FontSize="16" FontWeight="Bold">
+                                                                             <TextBlock Text="Net Profit" FontSize="{DynamicResource ScaledSessionHistoryFinancialLabelFontSize}" Foreground="#CCCCCC"/>
+                                                                             <TextBlock Text="{Binding NetProfit, StringFormat='${0:F2}'}" FontSize="{DynamicResource ScaledSessionHistoryFinancialValueFontSize}" FontWeight="Bold">
                                                                                  <TextBlock.Foreground>
                                                                                      <SolidColorBrush Color="{Binding NetProfit, Converter={StaticResource ProfitColorConverter}}"/>
                                                                                  </TextBlock.Foreground>
@@ -1096,9 +1079,9 @@
                                      <!-- No Sessions Message -->
                                      <Border x:Name="NoHistorySessionsMessage" Background="#A0000000" BorderBrush="#60FFFFFF" BorderThickness="1" CornerRadius="8" Visibility="Collapsed">
                                          <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="40">
-                                             <TextBlock Text="📁" FontSize="48" HorizontalAlignment="Center" Margin="0,0,0,20" Foreground="#4FC3F7"/>
-                                             <TextBlock Text="No Completed Sessions" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10" Foreground="White"/>
-                                             <TextBlock Text="Complete a session to see it here" FontSize="16" HorizontalAlignment="Center" Opacity="0.7" Foreground="#CCCCCC"/>
+                                             <TextBlock Text="📁" FontSize="{DynamicResource ScaledSessionHistoryEmptyIconFontSize}" HorizontalAlignment="Center" Margin="0,0,0,20" Foreground="#4FC3F7"/>
+                                             <TextBlock Text="No Completed Sessions" FontSize="{DynamicResource ScaledSessionHistoryEmptyTitleFontSize}" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10" Foreground="White"/>
+                                             <TextBlock Text="Complete a session to see it here" FontSize="{DynamicResource ScaledSessionHistoryEmptyDescFontSize}" HorizontalAlignment="Center" Opacity="0.7" Foreground="#CCCCCC"/>
                                          </StackPanel>
                                      </Border>
                                  </StackPanel>
@@ -1182,13 +1165,13 @@
                                                                      MouseLeftButtonDown="PlayerCard_Click" Tag="{Binding}"
                                                                      Cursor="Hand" MinHeight="80">
                                                                  <StackPanel VerticalAlignment="Center">
-                                                                     <TextBlock Text="{Binding DisplayName}" FontSize="16" FontWeight="SemiBold" Foreground="White" Margin="0,0,0,4"/>
-                                                                     <TextBlock Text="{Binding Email}" FontSize="12" Foreground="#CCCCCC" Margin="0,0,0,8"/>
+                                                                                                                                         <TextBlock Text="{Binding DisplayName}" FontSize="{DynamicResource ScaledPlayerListItemNameFontSize}" FontWeight="SemiBold" Foreground="White" Margin="0,0,0,4"/>
+                                                                    <TextBlock Text="{Binding Email}" FontSize="{DynamicResource ScaledPlayerListItemDetailFontSize}" Foreground="#CCCCCC" Margin="0,0,0,8"/>
                                                                      <StackPanel Orientation="Horizontal" Margin="0,0,0,0">
-                                                                         <TextBlock Text="{Binding TotalSessionsPlayed}" FontSize="12" Foreground="#4FC3F7"/>
-                                                                         <TextBlock Text=" sessions" FontSize="12" Foreground="#CCCCCC"/>
-                                                                         <TextBlock Text=" • " FontSize="12" Foreground="#CCCCCC"/>
-                                                                         <TextBlock Text="{Binding LifetimeProfit, StringFormat='C'}" FontSize="12" Foreground="#4FC3F7"/>
+                                                                        <TextBlock Text="{Binding TotalSessionsPlayed}" FontSize="{DynamicResource ScaledPlayerListItemDetailFontSize}" Foreground="#4FC3F7"/>
+                                                                        <TextBlock Text=" sessions" FontSize="{DynamicResource ScaledPlayerListItemDetailFontSize}" Foreground="#CCCCCC"/>
+                                                                        <TextBlock Text=" • " FontSize="{DynamicResource ScaledPlayerListItemDetailFontSize}" Foreground="#CCCCCC"/>
+                                                                        <TextBlock Text="{Binding LifetimeProfit, StringFormat='C'}" FontSize="{DynamicResource ScaledPlayerListItemDetailFontSize}" Foreground="#4FC3F7"/>
                                                                      </StackPanel>
                                                                  </StackPanel>
                                                              </Border>
@@ -1219,9 +1202,9 @@
                                              
                                              <!-- Player Info -->
                                              <StackPanel Grid.Row="0" Margin="0,0,0,20">
-                                                 <TextBlock x:Name="SelectedPlayerName" Text="Select a player to view details" FontSize="20" FontWeight="Bold" Foreground="White"/>
-                                                 <TextBlock x:Name="SelectedPlayerEmail" Text="" FontSize="14" Foreground="#CCCCCC" Margin="0,5,0,0"/>
-                                                 <TextBlock x:Name="SelectedPlayerPhone" Text="" FontSize="14" Foreground="#CCCCCC" Margin="0,2,0,0"/>
+                                                <TextBlock x:Name="SelectedPlayerName" Text="Select a player to view details" FontSize="{DynamicResource ScaledPlayerNameFontSize}" FontWeight="Bold" Foreground="White"/>
+                                                <TextBlock x:Name="SelectedPlayerEmail" Text="" FontSize="{DynamicResource ScaledPlayerDetailFontSize}" Foreground="#CCCCCC" Margin="0,5,0,0"/>
+                                                <TextBlock x:Name="SelectedPlayerPhone" Text="" FontSize="{DynamicResource ScaledPlayerDetailFontSize}" Foreground="#CCCCCC" Margin="0,2,0,0"/>
                                              </StackPanel>
                                              
                                              <!-- Statistics -->
@@ -1233,15 +1216,15 @@
                                                          <RowDefinition Height="Auto"/>
                                                          <RowDefinition Height="Auto"/>
                                                      </Grid.RowDefinitions>
-                                                     <TextBlock Grid.Row="0" Text="📊 Statistics" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,10" Foreground="White"/>
+                                                     <TextBlock Grid.Row="0" Text="📊 Statistics" FontSize="{DynamicResource ScaledStatisticsTitleFontSize}" FontWeight="SemiBold" Margin="0,0,0,10" Foreground="White"/>
                                                      
                                                      <Grid Grid.Row="1" Margin="0,5">
                                                          <Grid.ColumnDefinitions>
                                                              <ColumnDefinition Width="*"/>
                                                              <ColumnDefinition Width="Auto"/>
                                                          </Grid.ColumnDefinitions>
-                                                         <TextBlock Grid.Column="0" Text="Total Sessions:" FontSize="14" Foreground="#CCCCCC"/>
-                                                         <TextBlock Grid.Column="1" x:Name="SelectedPlayerSessions" Text="0" FontSize="14" FontWeight="Bold" Foreground="White"/>
+                                                                                                                 <TextBlock Grid.Column="0" Text="Total Sessions:" FontSize="{DynamicResource ScaledStatisticsValueFontSize}" Foreground="#CCCCCC"/>
+                                                        <TextBlock Grid.Column="1" x:Name="SelectedPlayerSessions" Text="0" FontSize="{DynamicResource ScaledStatisticsValueFontSize}" FontWeight="Bold" Foreground="White"/>
                                                      </Grid>
                                                      
                                                      <Grid Grid.Row="2" Margin="0,5">
@@ -1249,8 +1232,8 @@
                                                              <ColumnDefinition Width="*"/>
                                                              <ColumnDefinition Width="Auto"/>
                                                          </Grid.ColumnDefinitions>
-                                                         <TextBlock Grid.Column="0" Text="Lifetime Buy-ins:" FontSize="14" Foreground="#CCCCCC"/>
-                                                         <TextBlock Grid.Column="1" x:Name="SelectedPlayerBuyIns" Text="$0" FontSize="14" FontWeight="Bold" Foreground="White"/>
+                                                                                                                 <TextBlock Grid.Column="0" Text="Lifetime Buy-ins:" FontSize="{DynamicResource ScaledStatisticsValueFontSize}" Foreground="#CCCCCC"/>
+                                                        <TextBlock Grid.Column="1" x:Name="SelectedPlayerBuyIns" Text="$0" FontSize="{DynamicResource ScaledStatisticsValueFontSize}" FontWeight="Bold" Foreground="White"/>
                                                      </Grid>
                                                      
                                                      <Grid Grid.Row="3" Margin="0,5">
@@ -1258,8 +1241,8 @@
                                                              <ColumnDefinition Width="*"/>
                                                              <ColumnDefinition Width="Auto"/>
                                                          </Grid.ColumnDefinitions>
-                                                         <TextBlock Grid.Column="0" Text="Lifetime Profit:" FontSize="14" Foreground="#CCCCCC"/>
-                                                         <TextBlock Grid.Column="1" x:Name="SelectedPlayerProfit" Text="$0" FontSize="14" FontWeight="Bold" Foreground="White"/>
+                                                                                                                 <TextBlock Grid.Column="0" Text="Lifetime Profit:" FontSize="{DynamicResource ScaledStatisticsValueFontSize}" Foreground="#CCCCCC"/>
+                                                        <TextBlock Grid.Column="1" x:Name="SelectedPlayerProfit" Text="$0" FontSize="{DynamicResource ScaledStatisticsValueFontSize}" FontWeight="Bold" Foreground="White"/>
                                                      </Grid>
                                                  </Grid>
                                              </Border>
@@ -1271,8 +1254,8 @@
                                                          <RowDefinition Height="Auto"/>
                                                          <RowDefinition Height="Auto"/>
                                                      </Grid.RowDefinitions>
-                                                     <TextBlock Grid.Row="0" Text="📝 Notes" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,10" Foreground="White"/>
-                                                     <TextBlock Grid.Row="1" x:Name="SelectedPlayerNotes" Text="No notes available" FontSize="14" Foreground="#CCCCCC" TextWrapping="Wrap"/>
+                                                                                                         <TextBlock Grid.Row="0" Text="📝 Notes" FontSize="{DynamicResource ScaledStatisticsTitleFontSize}" FontWeight="SemiBold" Margin="0,0,0,10" Foreground="White"/>
+                                                    <TextBlock Grid.Row="1" x:Name="SelectedPlayerNotes" Text="No notes available" FontSize="{DynamicResource ScaledPlayerDetailFontSize}" Foreground="#CCCCCC" TextWrapping="Wrap"/>
                                                  </Grid>
                                              </Border>
                                              
@@ -1287,7 +1270,7 @@
                                                      </Grid.RowDefinitions>
                                                      
                                                      <!-- Header -->
-                                                     <TextBlock Grid.Row="0" Text="🕒 Recent Activity" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,15" Foreground="White"/>
+                                                     <TextBlock Grid.Row="0" Text="🕒 Recent Activity" FontSize="{DynamicResource ScaledStatisticsTitleFontSize}" FontWeight="SemiBold" Margin="0,0,0,15" Foreground="White"/>
                                                      
                                                      <!-- Profit Line Graph -->
                                                      <Border Grid.Row="1" Background="#60000000" BorderBrush="#30FFFFFF" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,0,0,15">
@@ -1296,26 +1279,69 @@
                                                                  <RowDefinition Height="Auto"/>
                                                                  <RowDefinition Height="Auto"/>
                                                              </Grid.RowDefinitions>
-                                                             <TextBlock Grid.Row="0" Text="📈 Profit Trend" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,8" Foreground="#4FC3F7"/>
+                                                             <TextBlock Grid.Row="0" Text="📈 Profit Trend" FontSize="{DynamicResource ScaledGraphTitleFontSize}" FontWeight="SemiBold" Margin="0,0,0,8" Foreground="#4FC3F7"/>
                                                              <controls:BuyInLineGraph x:Name="PlayerProfitGraph" Grid.Row="1" Height="80" Width="Auto" HorizontalAlignment="Stretch" IsProfitGraph="True"/>
                                                          </Grid>
                                                      </Border>
                                                      
-                                                     <!-- Session Summary -->
+                                                     <!-- Session Summary (with nested transactions) -->
                                                      <Border Grid.Row="2" Background="#60000000" BorderBrush="#30FFFFFF" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,0,0,15">
                                                          <StackPanel>
-                                                             <TextBlock Text="🎯 Session Summary" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,8" Foreground="#4FC3F7"/>
-                                                             <TextBlock x:Name="SessionSummaryText" Text="No session data available" FontSize="12" Foreground="#CCCCCC"/>
+                                                                                                                         <TextBlock Text="🎯 Session Summary" FontSize="{DynamicResource ScaledSessionSummaryTitleFontSize}" FontWeight="SemiBold" Margin="0,0,0,8" Foreground="#4FC3F7"/>
+                                                             <ItemsControl x:Name="SessionSummaryList">
+                                                                 <ItemsControl.ItemTemplate>
+                                                                     <DataTemplate>
+                                                                         <StackPanel Margin="0,0,0,10">
+                                                                             <!-- Session header: bold blue name/date -->
+                                                                            <TextBlock FontSize="{DynamicResource ScaledSessionSummaryHeaderFontSize}">
+                                                                                 <Run Text="📅 "/>
+                                                                                 <Run Text="{Binding SessionName}" FontWeight="Bold" Foreground="#4FC3F7"/>
+                                                                                 <Run Text=" "/>
+                                                                                 <Run Text="{Binding SessionDate, StringFormat=({0:MMM dd, yyyy})}" FontWeight="Bold" Foreground="#4FC3F7"/>
+                                                                             </TextBlock>
+                                                                             <!-- Key figures and PL color -->
+                                                                             <StackPanel Margin="14,2,0,6">
+                                                                                 <Grid>
+                                                                                     <Grid.ColumnDefinitions>
+                                                                                         <ColumnDefinition Width="*"/>
+                                                                                         <ColumnDefinition Width="Auto"/>
+                                                                                     </Grid.ColumnDefinitions>
+                                                                                    <TextBlock Grid.Column="0" FontSize="{DynamicResource ScaledSessionSummaryDetailFontSize}" Foreground="#CCCCCC">
+                                                                                         <Run Text="🎯 "/>
+                                                                                         <Run Text="{Binding CashOutSummaryDisplay, Mode=OneWay}"/>
+                                                                                     </TextBlock>
+                                                                                    <TextBlock Grid.Column="1" FontSize="{DynamicResource ScaledSessionSummaryDetailFontSize}" Foreground="#CCCCCC" Margin="20,0,0,0">
+                                                                                         <Run Text="💰 Total buy-ins: "/>
+                                                                                         <Run Text="{Binding BuyIns, StringFormat={}{0:C}}"/>
+                                                                                     </TextBlock>
+                                                                                 </Grid>
+                                                                                <TextBlock Text="{Binding Profit, StringFormat=📊 Session P/L: {0:C}}" FontSize="{DynamicResource ScaledSessionSummaryDetailFontSize}" Foreground="{Binding ProfitColor}"/>
+                                                                             </StackPanel>
+                                                                             <!-- Nested transactions -->
+                                                                             <ItemsControl ItemsSource="{Binding Transactions}">
+                                                                                 <ItemsControl.ItemTemplate>
+                                                                                     <DataTemplate>
+                                                                                        <TextBlock FontSize="{DynamicResource ScaledSessionSummaryTransactionFontSize}" Foreground="#BBBBBB" Margin="18,0,0,0">
+                                                                                             <Run Text="{Binding TypeIcon}"/>
+                                                                                             <Run Text=" "/>
+                                                                                             <Run Text="{Binding Amount, StringFormat={}{0:C}}"/>
+                                                                                             <Run Text=" - "/>
+                                                                                             <Run Text="{Binding Notes}"/>
+                                                                                             <Run Text=" "/>
+                                                                                             <Run Text="{Binding Timestamp, StringFormat=({0:HH:mm})}"/>
+                                                                                         </TextBlock>
+                                                                                     </DataTemplate>
+                                                                                 </ItemsControl.ItemTemplate>
+                                                                             </ItemsControl>
+                                                                         </StackPanel>
+                                                                     </DataTemplate>
+                                                                 </ItemsControl.ItemTemplate>
+                                                             </ItemsControl>
                                                          </StackPanel>
                                                      </Border>
                                                      
-                                                     <!-- Transaction Summary Text -->
-                                                     <ScrollViewer Grid.Row="3" VerticalScrollBarVisibility="Auto" Background="Transparent">
-                                                         <StackPanel>
-                                                             <TextBlock Text="💳 Transaction Summary" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,8" Foreground="#4FC3F7"/>
-                                                             <TextBlock x:Name="TransactionSummaryText" Text="No transaction data available" FontSize="12" Foreground="#CCCCCC"/>
-                                                         </StackPanel>
-                                                     </ScrollViewer>
+                                                     <!-- Spacer for scroll alignment -->
+                                                     <Border Grid.Row="3" Background="Transparent"/>
                                                  </Grid>
                                              </Border>
                                          </Grid>
@@ -1345,10 +1371,107 @@
                          </Grid>
                         <!-- Settings Page -->
                         <Grid x:Name="SettingsPage" Visibility="Collapsed" Background="Transparent">
-                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                                <TextBlock Text="⚙️ Settings" FontSize="32" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,20" Foreground="White"/>
-                                <TextBlock Text="Settings will be available soon!" FontSize="18" HorizontalAlignment="Center" Opacity="0.7" Foreground="#CCCCCC"/>
+                            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Margin="20">
+                                <StackPanel MaxWidth="800" HorizontalAlignment="Center" VerticalAlignment="Top">
+                                    <!-- Settings Title -->
+                                    <TextBlock Text="⚙️ Settings" FontSize="{DynamicResource ScaledSettingsTitleFontSize}" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,20,0,40" Foreground="White"/>
+                                    
+                                    <!-- Window Resolution Settings -->
+                                    <Border Background="#A0000000" CornerRadius="12" Padding="25" Margin="0,0,0,20" BorderBrush="#60FFFFFF" BorderThickness="1">
+                                        <StackPanel>
+                                            <TextBlock Text="🖥️ Window Resolution" FontSize="{DynamicResource ScaledSettingsSectionTitleFontSize}" FontWeight="SemiBold" Foreground="White" Margin="0,0,0,15"/>
+                                            <TextBlock Text="Choose how the application window should be sized on your screen" FontSize="{DynamicResource ScaledSettingsDescriptionFontSize}" Foreground="#CCCCCC" Margin="0,0,0,20" TextWrapping="Wrap"/>
+                                            
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                
+                                                <TextBlock Grid.Column="0" Text="Resolution Mode:" FontSize="{DynamicResource ScaledSettingsLabelFontSize}" Foreground="White" VerticalAlignment="Center" Margin="0,0,15,0"/>
+                                                
+                                                <ComboBox x:Name="ResolutionModeComboBox" 
+                                                          Grid.Column="1"
+                                                          SelectionChanged="ResolutionModeComboBox_SelectionChanged"
+                                                          Background="#80000000"
+                                                          Foreground="White"
+                                                          BorderBrush="#60FFFFFF"
+                                                          BorderThickness="1"
+                                                          Padding="10,8"
+                                                          FontSize="{DynamicResource ScaledSettingsComboBoxFontSize}"
+                                                          MinWidth="200">
+                                                    <ComboBoxItem Content="Auto (Adaptive)" Tag="Auto" IsSelected="True"/>
+                                                    <ComboBoxItem Content="Small (1000×800)" Tag="Small"/>
+                                                    <ComboBoxItem Content="Medium (1200×1000)" Tag="Medium"/>
+                                                    <ComboBoxItem Content="Large (1400×1200)" Tag="Large"/>
+                                                    <ComboBoxItem Content="Extra Large (1600×1300)" Tag="ExtraLarge"/>
+                                                    <ComboBoxItem Content="Optimized for 1080p (1400×900)" Tag="Fixed1080p"/>
+                                                    <ComboBoxItem Content="Optimized for 1440p (1800×1150)" Tag="Fixed1440p"/>
+                                                    <ComboBoxItem Content="Optimized for 4K (2400×1600)" Tag="Fixed4K"/>
+                                                </ComboBox>
+                                            </Grid>
+                                            
+                                            <TextBlock Text="• Auto: Automatically sizes the window based on your screen resolution&#x0a;• Fixed sizes: Set specific window dimensions regardless of screen size&#x0a;• Optimized modes: Predefined sizes that work well for common screen resolutions" 
+                                                       FontSize="{DynamicResource ScaledSettingsHelpTextFontSize}" 
+                                                       Foreground="#AAAAAA" 
+                                                       Margin="0,15,0,0" 
+                                                       TextWrapping="Wrap"/>
                             </StackPanel>
+                                    </Border>
+                                    
+                                    <!-- Text Size Settings -->
+                                    <Border Background="#A0000000" CornerRadius="12" Padding="25" Margin="0,0,0,20" BorderBrush="#60FFFFFF" BorderThickness="1">
+                                        <StackPanel>
+                                            <TextBlock Text="🔤 Text Size" FontSize="{DynamicResource ScaledSettingsSectionTitleFontSize}" FontWeight="SemiBold" Foreground="White" Margin="0,0,0,15"/>
+                                            <TextBlock Text="Adjust the text size throughout the application for better readability" FontSize="{DynamicResource ScaledSettingsDescriptionFontSize}" Foreground="#CCCCCC" Margin="0,0,0,20" TextWrapping="Wrap"/>
+                                            
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                
+                                                <TextBlock Grid.Column="0" Text="Text Size:" FontSize="{DynamicResource ScaledSettingsLabelFontSize}" Foreground="White" VerticalAlignment="Center" Margin="0,0,15,0"/>
+                                                
+                                                <ComboBox x:Name="TextSizeComboBox" 
+                                                          Grid.Column="1"
+                                                          SelectionChanged="TextSizeComboBox_SelectionChanged"
+                                                          Background="#80000000"
+                                                          Foreground="White"
+                                                          BorderBrush="#60FFFFFF"
+                                                          BorderThickness="1"
+                                                          Padding="10,8"
+                                                          FontSize="{DynamicResource ScaledSettingsComboBoxFontSize}"
+                                                          MinWidth="200">
+                                                    <ComboBoxItem Content="Tiny (0.8x)" Tag="Tiny"/>
+                                                    <ComboBoxItem Content="Small (0.9x)" Tag="Small"/>
+                                                    <ComboBoxItem Content="Normal (1.0x)" Tag="Normal" IsSelected="True"/>
+                                                    <ComboBoxItem Content="Large (1.2x)" Tag="Large"/>
+                                                    <ComboBoxItem Content="Extra Large (1.4x)" Tag="ExtraLarge"/>
+                                                    <ComboBoxItem Content="Huge (1.6x)" Tag="Huge"/>
+                                                </ComboBox>
+                                            </Grid>
+                                            
+                                            <TextBlock Text="• Choose a larger text size if you have difficulty reading the current text&#x0a;• Smaller sizes provide more content on screen&#x0a;• Changes apply immediately and affect all text in the application" 
+                                                       FontSize="{DynamicResource ScaledSettingsHelpTextFontSize}" 
+                                                       Foreground="#AAAAAA" 
+                                                       Margin="0,15,0,0" 
+                                                       TextWrapping="Wrap"/>
+                                        </StackPanel>
+                                    </Border>
+                                    
+                                    
+                                    <!-- Test Update Dialog removed for release -->
+                                    
+                                    <!-- Future Settings Placeholder -->
+                                    <Border Background="#A0000000" CornerRadius="12" Padding="25" Margin="0,0,0,20" BorderBrush="#60FFFFFF" BorderThickness="1">
+                                        <StackPanel>
+                                            <TextBlock Text="🔮 More Settings Coming Soon" FontSize="{DynamicResource ScaledSettingsFutureFontSize}" FontWeight="SemiBold" Foreground="White" Margin="0,0,0,10"/>
+                                            <TextBlock Text="Additional customization options will be available in future updates." FontSize="{DynamicResource ScaledSettingsDescriptionFontSize}" Foreground="#CCCCCC" TextWrapping="Wrap"/>
+                                        </StackPanel>
+                                    </Border>
+                                </StackPanel>
+                            </ScrollViewer>
                         </Grid>
                          <!-- Session Management Page -->
                          <Grid x:Name="SessionManagementPage" Visibility="Collapsed" Background="Transparent">
@@ -1386,7 +1509,7 @@
                                          <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                              <TextBlock x:Name="ManagementTitleText"
                                                         Text="Session Management"
-                                                        FontSize="24"
+                                                        FontSize="{DynamicResource ScaledSessionTitleFontSize}"
                                                         FontWeight="Bold"
                                                         Foreground="White"
                                                         VerticalAlignment="Center"/>
@@ -1437,7 +1560,7 @@
                                                      <RowDefinition Height="Auto"/>
                                                      <RowDefinition Height="*"/>
                                                  </Grid.RowDefinitions>
-                                                 <TextBlock Grid.Row="0" Text="👥 Players and Buy-ins" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,15" Foreground="White"/>
+                                                 <TextBlock Grid.Row="0" Text="👥 Players and Buy-ins" FontSize="{DynamicResource ScaledSessionSectionTitleFontSize}" FontWeight="SemiBold" Margin="0,0,0,15" Foreground="White"/>
                                                  <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Background="Transparent">
                                                      <ItemsControl x:Name="ManagementPlayersList">
                                                          <ItemsControl.ItemTemplate>
@@ -1460,8 +1583,8 @@
                                                                              
                                                                              <!-- Player Name -->
                                                                              <StackPanel Grid.Column="0" Margin="0">
-                                                                                 <TextBlock Text="{Binding Name}" FontSize="15" FontWeight="Bold" Foreground="White"/>
-                                                                                 <TextBlock Text="{Binding FirstBuyInTime, StringFormat='Joined: 'HH:mm}" FontSize="10" Foreground="#AAAAAA" Margin="0,1,0,0"/>
+                                                                                 <TextBlock Text="{Binding Name}" FontSize="{DynamicResource ScaledSessionPlayerNameFontSize}" FontWeight="Bold" Foreground="White"/>
+                                                                                 <TextBlock Text="{Binding FirstBuyInTime, StringFormat='Joined: 'HH:mm}" FontSize="{DynamicResource ScaledSessionSmallInfoFontSize}" Foreground="#AAAAAA" Margin="0,1,0,0"/>
                                                                              </StackPanel>
                                                                              
                                                                              <!-- Stats Row -->
@@ -1472,16 +1595,16 @@
                                                                                      <ColumnDefinition Width="*"/>
                                                                                  </Grid.ColumnDefinitions>
                                                                                  <StackPanel Grid.Column="0">
-                                                                                     <TextBlock Text="Buy-in" FontSize="9" Foreground="#AAAAAA"/>
-                                                                                     <TextBlock Text="{Binding TotalBuyIn, StringFormat=C}" FontSize="12" FontWeight="SemiBold" Foreground="#4A90E2"/>
+                                                                                                                                                                          <TextBlock Text="Buy-in" FontSize="{DynamicResource ScaledSessionLabelFontSize}" Foreground="#AAAAAA"/> 
+                                                                                     <TextBlock Text="{Binding TotalBuyIn, StringFormat=C}" FontSize="{DynamicResource ScaledSessionPlayerInfoFontSize}" FontWeight="SemiBold" Foreground="#4A90E2"/>
                                                                                  </StackPanel>
                                                                                  <StackPanel Grid.Column="1">
-                                                                                     <TextBlock Text="Cash-out" FontSize="9" Foreground="#AAAAAA"/>
-                                                                                     <TextBlock Text="{Binding TotalCashOut, StringFormat=C}" FontSize="12" FontWeight="SemiBold" Foreground="#FF8C00"/>
+                                                                                     <TextBlock Text="Cash-out" FontSize="{DynamicResource ScaledSessionLabelFontSize}" Foreground="#AAAAAA"/>
+                                                                                     <TextBlock Text="{Binding TotalCashOut, StringFormat=C}" FontSize="{DynamicResource ScaledSessionPlayerInfoFontSize}" FontWeight="SemiBold" Foreground="#FF8C00"/>
                                                                                  </StackPanel>
                                                                                  <StackPanel Grid.Column="2">
-                                                                                     <TextBlock Text="Current Stack" FontSize="9" Foreground="#AAAAAA"/>
-                                                                                     <TextBlock Text="{Binding CurrentStack, StringFormat=C}" FontSize="12" FontWeight="SemiBold">
+                                                                                     <TextBlock Text="Current Stack" FontSize="{DynamicResource ScaledSessionLabelFontSize}" Foreground="#AAAAAA"/>
+                                                                                     <TextBlock Text="{Binding CurrentStack, StringFormat=C}" FontSize="{DynamicResource ScaledSessionPlayerInfoFontSize}" FontWeight="SemiBold">
                                                                                          <TextBlock.Foreground>
                                                                                              <SolidColorBrush Color="{Binding CurrentStack, Converter={StaticResource ProfitColorConverter}}"/>
                                                                                          </TextBlock.Foreground>
@@ -1583,42 +1706,42 @@
                                                      <RowDefinition Height="Auto"/>
                                                      <RowDefinition Height="Auto"/>
                                                  </Grid.RowDefinitions>
-                                                 <TextBlock Grid.Row="0" Text="📊 Session Totals" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,15" Foreground="White"/>
+                                                 <TextBlock Grid.Row="0" Text="📊 Session Totals" FontSize="{DynamicResource ScaledSessionSectionTitleFontSize}" FontWeight="SemiBold" Margin="0,0,0,15" Foreground="White"/>
                                                  <Grid Grid.Row="1" Margin="0,5">
                                                      <Grid.ColumnDefinitions>
                                                          <ColumnDefinition Width="*"/>
                                                          <ColumnDefinition Width="Auto"/>
                                                      </Grid.ColumnDefinitions>
-                                                     <TextBlock Grid.Column="0" Text="Total Buy-ins:" FontSize="14" Foreground="#CCCCCC"/>
-                                                     <TextBlock Grid.Column="1" Text="{Binding TotalBuyIn}" FontSize="14" FontWeight="Bold" Foreground="White"/>
+                                                     <TextBlock Grid.Column="0" Text="Total Buy-ins:" FontSize="{DynamicResource ScaledSessionPlayerInfoFontSize}" Foreground="#CCCCCC"/>
+                                                     <TextBlock Grid.Column="1" Text="{Binding TotalBuyIn}" FontSize="{DynamicResource ScaledSessionPlayerInfoFontSize}" FontWeight="Bold" Foreground="White"/>
                                                  </Grid>
                                                                                                  <Grid Grid.Row="2" Margin="0,5">
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="*"/>
                                                         <ColumnDefinition Width="Auto"/>
                                                     </Grid.ColumnDefinitions>
-                                                    <TextBlock Grid.Column="0" Text="Total Cash-outs:" FontSize="14" Foreground="#CCCCCC"/>
-                                                    <TextBlock Grid.Column="1" Text="{Binding TotalCashOut}" FontSize="14" FontWeight="Bold" Foreground="White"/>
+                                                    <TextBlock Grid.Column="0" Text="Total Cash-outs:" FontSize="{DynamicResource ScaledSessionPlayerInfoFontSize}" Foreground="#CCCCCC"/>
+                                                    <TextBlock Grid.Column="1" Text="{Binding TotalCashOut}" FontSize="{DynamicResource ScaledSessionPlayerInfoFontSize}" FontWeight="Bold" Foreground="White"/>
                                                 </Grid>
                                                 <Grid Grid.Row="3" Margin="0,5">
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="*"/>
                                                         <ColumnDefinition Width="Auto"/>
                                                     </Grid.ColumnDefinitions>
-                                                    <TextBlock Grid.Column="0" Text="Chips on Table:" FontSize="14" Foreground="#CCCCCC"/>
-                                                    <TextBlock Grid.Column="1" x:Name="ManagementTotalFinalStacksText" FontSize="14" FontWeight="Bold" Foreground="White"/>
+                                                    <TextBlock Grid.Column="0" Text="Chips on Table:" FontSize="{DynamicResource ScaledSessionPlayerInfoFontSize}" Foreground="#CCCCCC"/>
+                                                    <TextBlock Grid.Column="1" x:Name="ManagementTotalFinalStacksText" FontSize="{DynamicResource ScaledSessionPlayerInfoFontSize}" FontWeight="Bold" Foreground="White"/>
                                                 </Grid>
                                                 <Grid Grid.Row="4" Margin="0,5">
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="*"/>
                                                         <ColumnDefinition Width="Auto"/>
                                                     </Grid.ColumnDefinitions>
-                                                    <TextBlock Grid.Column="0" Text="Session Balance:" FontSize="14" Foreground="#CCCCCC"/>
-                                                    <TextBlock Grid.Column="1" x:Name="ManagementSessionBalanceText" FontSize="14" FontWeight="Bold"/>
+                                                    <TextBlock Grid.Column="0" Text="Session Balance:" FontSize="{DynamicResource ScaledSessionPlayerInfoFontSize}" Foreground="#CCCCCC"/>
+                                                    <TextBlock Grid.Column="1" x:Name="ManagementSessionBalanceText" FontSize="{DynamicResource ScaledSessionPlayerInfoFontSize}" FontWeight="Bold"/>
                                                 </Grid>
                                                  <Border Grid.Row="5" Height="1" Background="#40FFFFFF" Margin="0,10"/>
-                                                 <TextBlock Grid.Row="6" Text="Session Status" FontSize="12" FontWeight="SemiBold" Foreground="#CCCCCC" Margin="0,15,0,5"/>
-                                                 <TextBlock Grid.Row="7" x:Name="ManagementSessionStatusText" Text="No active session" FontSize="12" Foreground="#FF6B6B" Margin="0,5,0,0"/>
+                                                 <TextBlock Grid.Row="6" Text="Session Status" FontSize="{DynamicResource ScaledSessionPlayerInfoFontSize}" FontWeight="SemiBold" Foreground="#CCCCCC" Margin="0,15,0,5"/>
+                                                 <TextBlock Grid.Row="7" x:Name="ManagementSessionStatusText" Text="No active session" FontSize="{DynamicResource ScaledSessionPlayerInfoFontSize}" Foreground="#FF6B6B" Margin="0,5,0,0"/>
                                              </Grid>
                                          </Border>
 
@@ -1631,7 +1754,7 @@
                                                      <RowDefinition Height="Auto"/>
                                                      <RowDefinition Height="Auto"/>
                                                  </Grid.RowDefinitions>
-                                                 <TextBlock Grid.Row="0" Text="⚡ Quick Actions" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,15" Foreground="White"/>
+                                                 <TextBlock Grid.Row="0" Text="⚡ Quick Actions" FontSize="{DynamicResource ScaledSessionSectionTitleFontSize}" FontWeight="SemiBold" Margin="0,0,0,15" Foreground="White"/>
                                                  <ui:Button Grid.Row="1" Content="👤 Add Player" Appearance="Primary" Margin="0,0,0,10" Click="AddPlayerToActiveSession_Click" Visibility="{Binding CurrentSession, Converter={StaticResource SessionVisibilityConverter}}"/>
                                                  <ui:Button Grid.Row="2" Content="📊 Calculate Optimal Payouts" Appearance="Primary" Margin="0,0,0,10" Click="CalculateOptimalPayouts_Click"/>
                                                  <ui:Button Grid.Row="3" Content="📋 Session Summary" Appearance="Secondary" Click="ShowSessionSummary_Click"/>
@@ -1646,7 +1769,7 @@
                                                      <RowDefinition Height="*"/>
                                                      <RowDefinition Height="Auto"/>
                                                  </Grid.RowDefinitions>
-                                                 <TextBlock Grid.Row="0" Text="📝 Session Notes" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,15" Foreground="White"/>
+                                                 <TextBlock Grid.Row="0" Text="📝 Session Notes" FontSize="{DynamicResource ScaledSessionSectionTitleFontSize}" FontWeight="SemiBold" Margin="0,0,0,15" Foreground="White"/>
                                                  <ui:TextBox Grid.Row="1" x:Name="ManagementSessionNotesTextBox"
                                                              AcceptsReturn="True"
                                                              TextWrapping="Wrap"
@@ -1664,7 +1787,7 @@
                                                      <RowDefinition Height="Auto"/>
                                                      <RowDefinition Height="*"/>
                                                  </Grid.RowDefinitions>
-                                                 <TextBlock Grid.Row="0" Text="📊 Session Activity" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,15" Foreground="White"/>
+                                                 <TextBlock Grid.Row="0" Text="📊 Session Activity" FontSize="{DynamicResource ScaledSessionSectionTitleFontSize}" FontWeight="SemiBold" Margin="0,0,0,15" Foreground="White"/>
                                                  <ScrollViewer Grid.Row="1" MaxHeight="200" VerticalScrollBarVisibility="Auto" Background="Transparent">
                                                      <ItemsControl x:Name="SessionActivityList">
                                                          <ItemsControl.ItemTemplate>
@@ -1687,15 +1810,15 @@
                                                                          
                                                                          <!-- Transaction Details -->
                                                                          <StackPanel Grid.Column="1" Margin="0">
-                                                                             <TextBlock Text="{Binding PlayerName}" FontSize="12" FontWeight="SemiBold" Foreground="White"/>
-                                                                             <TextBlock Text="{Binding Description}" FontSize="11" Foreground="#CCCCCC" TextWrapping="Wrap"/>
-                                                                             <TextBlock Text="{Binding Note}" FontSize="10" Foreground="#888888" TextWrapping="Wrap" Visibility="{Binding NoteVisibility}"/>
+                                                                             <TextBlock Text="{Binding PlayerName}" FontSize="{DynamicResource ScaledSessionPlayerInfoFontSize}" FontWeight="SemiBold" Foreground="White"/>
+                                                                             <TextBlock Text="{Binding Description}" FontSize="{DynamicResource ScaledSessionActivityFontSize}" Foreground="#CCCCCC" TextWrapping="Wrap"/>
+                                                                             <TextBlock Text="{Binding Note}" FontSize="{DynamicResource ScaledSessionSmallInfoFontSize}" Foreground="#888888" TextWrapping="Wrap" Visibility="{Binding NoteVisibility}"/>
                                                                          </StackPanel>
                                                                          
                                                                          <!-- Amount and Time -->
                                                                          <StackPanel Grid.Column="2" HorizontalAlignment="Right" Margin="8,0,0,0">
-                                                                             <TextBlock Text="{Binding Amount}" FontSize="12" FontWeight="Bold" Foreground="{Binding TypeColor}" HorizontalAlignment="Right"/>
-                                                                             <TextBlock Text="{Binding Time}" FontSize="10" Foreground="#888888" HorizontalAlignment="Right"/>
+                                                                             <TextBlock Text="{Binding Amount}" FontSize="{DynamicResource ScaledSessionPlayerInfoFontSize}" FontWeight="Bold" Foreground="{Binding TypeColor}" HorizontalAlignment="Right"/>
+                                                                             <TextBlock Text="{Binding Time}" FontSize="{DynamicResource ScaledSessionSmallInfoFontSize}" Foreground="#888888" HorizontalAlignment="Right"/>
                                                                          </StackPanel>
                                                                      </Grid>
                                                                  </Border>

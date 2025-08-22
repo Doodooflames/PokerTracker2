@@ -9,6 +9,14 @@ namespace PokerTracker2
     /// </summary>
     public partial class App : Application
     {
+        public App()
+        {
+            // Global exception handlers to prevent crash and surface errors in logs/UI
+            this.DispatcherUnhandledException += App_DispatcherUnhandledException;
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+            System.Threading.Tasks.TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
+        }
+
         protected override void OnStartup(StartupEventArgs e)
         {
             try
@@ -55,6 +63,47 @@ namespace PokerTracker2
                 // Re-throw to prevent silent failure
                 throw;
             }
+        }
+        
+        private void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+        {
+            try
+            {
+                Console.WriteLine($"[${DateTime.Now:HH:mm:ss.fff}] UI Unhandled Exception: {e.Exception.Message}\n{e.Exception.StackTrace}");
+                Services.LoggingService.Instance?.Critical($"UI Unhandled Exception: {e.Exception.Message}", "App", e.Exception);
+            }
+            catch { }
+            
+            try
+            {
+                MessageBox.Show($"An unexpected error occurred:\n\n{e.Exception.Message}", "Unexpected Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            catch { }
+            
+            e.Handled = true; // prevent crash
+        }
+
+        private void CurrentDomain_UnhandledException(object? sender, UnhandledExceptionEventArgs e)
+        {
+            var ex = e.ExceptionObject as Exception;
+            try
+            {
+                Console.WriteLine($"[${DateTime.Now:HH:mm:ss.fff}] Domain Unhandled Exception: {ex?.Message}\n{ex?.StackTrace}");
+                Services.LoggingService.Instance?.Critical($"Domain Unhandled Exception: {ex?.Message}", "App", ex);
+            }
+            catch { }
+        }
+
+        private void TaskScheduler_UnobservedTaskException(object? sender, System.Threading.Tasks.UnobservedTaskExceptionEventArgs e)
+        {
+            try
+            {
+                Console.WriteLine($"[${DateTime.Now:HH:mm:ss.fff}] Task Unobserved Exception: {e.Exception.Message}\n{e.Exception.StackTrace}");
+                Services.LoggingService.Instance?.Critical($"Task Unobserved Exception: {e.Exception.Message}", "App", e.Exception);
+            }
+            catch { }
+            
+            e.SetObserved();
         }
         
         protected override void OnExit(ExitEventArgs e)

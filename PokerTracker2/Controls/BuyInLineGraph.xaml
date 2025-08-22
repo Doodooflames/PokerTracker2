@@ -5,71 +5,66 @@
     
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="30"/>
+            <ColumnDefinition x:Name="YAxisColumn" Width="30"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         
         <!-- Y-axis scale indicators -->
         <Canvas x:Name="ScaleCanvas" 
                 Grid.Column="0"
-                Width="30" 
+                Width="{DynamicResource ScaledGraphYAxisWidth}" 
                 HorizontalAlignment="Left" 
                 VerticalAlignment="Stretch"
                 Margin="0,5,0,5">
             
             <!-- Scale lines and labels -->
             <Line x:Name="ScaleLine0" 
-                  X1="25" Y1="0" X2="30" Y2="0" 
                   Stroke="#666666" StrokeThickness="1" 
                   Canvas.Top="0"/>
-                         <TextBlock x:Name="ScaleLabel0" 
+            <TextBlock x:Name="ScaleLabel0" 
                         Text="$0" 
                         Foreground="#CCCCCC" 
-                        FontSize="10" 
+                        FontSize="{DynamicResource ScaledGraphAxisLabelFontSize}" 
                         Canvas.Left="0" 
                         Canvas.Top="-8"/>
             
             <Line x:Name="ScaleLine25" 
-                  X1="25" Y1="0" X2="30" Y2="0" 
                   Stroke="#666666" StrokeThickness="1" 
                   Canvas.Top="0"/>
-                         <TextBlock x:Name="ScaleLabel25" 
+            <TextBlock x:Name="ScaleLabel25" 
                         Text="$0" 
                         Foreground="#CCCCCC" 
-                        FontSize="10" 
+                        FontSize="{DynamicResource ScaledGraphAxisLabelFontSize}" 
                         Canvas.Left="0" 
                         Canvas.Top="-8"/>
             
             <Line x:Name="ScaleLine50" 
-                  X1="25" Y1="0" X2="30" Y2="0" 
                   Stroke="#666666" StrokeThickness="1" 
                   Canvas.Top="0"/>
-                         <TextBlock x:Name="ScaleLabel50" 
+            <TextBlock x:Name="ScaleLabel50" 
                         Text="$0" 
                         Foreground="#CCCCCC" 
-                        FontSize="10" 
+                        FontSize="{DynamicResource ScaledGraphAxisLabelFontSize}" 
                         Canvas.Left="0" 
                         Canvas.Top="-8"/>
             
             <Line x:Name="ScaleLine75" 
-                  X1="25" Y1="0" X2="30" Y2="0" 
                   Stroke="#666666" StrokeThickness="1" 
                   Canvas.Top="0"/>
-                         <TextBlock x:Name="ScaleLabel75" 
+            <TextBlock x:Name="ScaleLabel75" 
                         Text="$0" 
                         Foreground="#CCCCCC" 
-                        FontSize="10" 
+                        FontSize="{DynamicResource ScaledGraphAxisLabelFontSize}" 
                         Canvas.Left="0" 
                         Canvas.Top="-8"/>
             
             <Line x:Name="ScaleLine100" 
-                  X1="25" Y1="0" X2="30" Y2="0" 
                   Stroke="#666666" StrokeThickness="1" 
                   Canvas.Top="0"/>
-                         <TextBlock x:Name="ScaleLabel100" 
+            <TextBlock x:Name="ScaleLabel100" 
                         Text="$0" 
                         Foreground="#CCCCCC" 
-                        FontSize="10" 
+                        FontSize="{DynamicResource ScaledGraphAxisLabelFontSize}" 
                         Canvas.Left="0" 
                         Canvas.Top="-8"/>
         </Canvas>

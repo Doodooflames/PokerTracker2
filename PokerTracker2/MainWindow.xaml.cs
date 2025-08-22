@@ -8,6 +8,7 @@ using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Effects;
+using System.Windows.Controls.Primitives;
 using PokerTracker2.Services;
 using PokerTracker2.Models;
 using PokerTracker2.Dialogs;
@@ -23,6 +24,28 @@ using System.Text;
 
 namespace PokerTracker2
 {
+    public enum WindowResolutionMode
+    {
+        Auto,        // Adaptive sizing based on screen resolution
+        Small,       // 1000x800
+        Medium,      // 1200x1000
+        Large,       // 1400x1200
+        ExtraLarge,  // 1600x1300
+        Fixed1080p,  // Optimized for 1080p screens: 1400x900
+        Fixed1440p,  // Optimized for 1440p screens: 1800x1150
+        Fixed4K      // Optimized for 4K screens: 2400x1600
+    }
+
+    public enum TextSizeMultiplier
+    {
+        Tiny,        // 0.8x - Compact text for power users
+        Small,       // 0.9x - Slightly smaller than default
+        Normal,      // 1.0x - Default size
+        Large,       // 1.2x - Easier to read
+        ExtraLarge,  // 1.4x - Much easier to read
+        Huge         // 1.6x - Maximum accessibility
+    }
+
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
         // Windows API for modern Aero blur (Windows 10/11)
@@ -104,6 +127,8 @@ namespace PokerTracker2
         private ObservableCollection<ActivityLogEntry> _activityLog = new();
         private string _playerSearchText = string.Empty;
         private PlayerProfile? _selectedPlayerProfile;
+        private WindowResolutionMode _windowResolutionMode = WindowResolutionMode.Auto;
+        private TextSizeMultiplier _textSizeMultiplier = TextSizeMultiplier.Normal;
 
 
 
@@ -113,6 +138,12 @@ namespace PokerTracker2
             {
                 _currentUser = user;
                 InitializeComponent();
+                
+                // Load preferences and apply settings
+                LoadResolutionPreference();
+                LoadTextSizePreference();
+                ApplyWindowResolution(_windowResolutionMode);
+                ApplyTextSizeMultiplier(_textSizeMultiplier);
                 
                         // Set up unified logging service
         LoggingService.DebugCallback = AddDebugMessage;
@@ -227,6 +258,9 @@ namespace PokerTracker2
                 ShowPage(DashboardPage);
                 // UpdateDashboardStats(); // REMOVED - will be called after Firebase data loads
                 
+                // TEST: Show UpdateDialog on startup for demo purposes
+                // ShowTestUpdateDialog(); // Commented out for now
+                
                 // Check for updates automatically on startup
                 _ = Task.Run(async () =>
                 {
@@ -250,6 +284,516 @@ namespace PokerTracker2
                 throw;
             }
         }
+
+        /// <summary>
+        /// Applies the specified window resolution mode
+        /// </summary>
+        private void ApplyWindowResolution(WindowResolutionMode mode)
+        {
+            try
+            {
+                double width, height;
+                
+                switch (mode)
+                {
+                    case WindowResolutionMode.Auto:
+                        (width, height) = CalculateAdaptiveSize();
+                        break;
+                    case WindowResolutionMode.Small:
+                        width = 1000; height = 800;
+                        break;
+                    case WindowResolutionMode.Medium:
+                        width = 1200; height = 1000;
+                        break;
+                    case WindowResolutionMode.Large:
+                        width = 1400; height = 1200;
+                        break;
+                    case WindowResolutionMode.ExtraLarge:
+                        width = 1600; height = 1300;
+                        break;
+                    case WindowResolutionMode.Fixed1080p:
+                        width = 1400; height = 900;
+                        break;
+                    case WindowResolutionMode.Fixed1440p:
+                        width = 1800; height = 1150;
+                        break;
+                    case WindowResolutionMode.Fixed4K:
+                        width = 2400; height = 1600;
+                        break;
+                    default:
+                        (width, height) = CalculateAdaptiveSize();
+                        break;
+                }
+                
+                // Apply the calculated size
+                this.Width = width;
+                this.Height = height;
+                
+                LoggingService.Instance.Info($"Window resolution applied: {mode} = {width:F0}x{height:F0}", "MainWindow");
+            }
+            catch (Exception ex)
+            {
+                LoggingService.Instance.Error($"Failed to apply window resolution {mode}: {ex.Message}", "MainWindow", ex);
+                // Fallback to reasonable defaults
+                this.Width = 1000;
+                this.Height = 1000;
+            }
+        }
+
+        /// <summary>
+        /// Calculates adaptive window size based on screen resolution
+        /// </summary>
+        private (double width, double height) CalculateAdaptiveSize()
+        {
+            // Get the working area of the primary screen (excludes taskbar)
+            double screenWidth = SystemParameters.WorkArea.Width;
+            double screenHeight = SystemParameters.WorkArea.Height;
+            
+            // Design ratios for better screen utilization while maintaining safe margins
+            double designRatioWidth = 0.70;   // 70% of screen width
+            double designRatioHeight = 0.80;  // 80% of screen height
+            
+            // Calculate target size based on current screen
+            double targetWidth = screenWidth * designRatioWidth;
+            double targetHeight = screenHeight * designRatioHeight;
+            
+            // Maintain minimum usable size (nothing smaller than 800x700)
+            targetWidth = Math.Max(800, targetWidth);
+            targetHeight = Math.Max(700, targetHeight);
+            
+            // Ensure we don't exceed 85% of screen size for safety margin
+            double maxWidth = screenWidth * 0.85;
+            double maxHeight = screenHeight * 0.85;
+            
+            targetWidth = Math.Min(targetWidth, maxWidth);
+            targetHeight = Math.Min(targetHeight, maxHeight);
+            
+            // Maintain aspect ratio close to square (original was 1400x1400)
+            // Use the smaller dimension to ensure we fit in both directions
+            double size = Math.Min(targetWidth, targetHeight);
+            
+            LoggingService.Instance.Debug($"Adaptive size calculated: {size:F0}x{size:F0} (Screen: {screenWidth:F0}x{screenHeight:F0})", "MainWindow");
+            return (size, size);
+        }
+
+        /// <summary>
+        /// Loads the saved resolution preference from application settings
+        /// </summary>
+        private void LoadResolutionPreference()
+        {
+            try
+            {
+                var savedMode = Properties.Settings.Default.WindowResolutionMode;
+                if (Enum.TryParse<WindowResolutionMode>(savedMode, out var mode))
+                {
+                    _windowResolutionMode = mode;
+                    LoggingService.Instance.Info($"Loaded resolution preference: {mode}", "MainWindow");
+                }
+                else
+                {
+                    _windowResolutionMode = WindowResolutionMode.Auto;
+                    LoggingService.Instance.Info("No valid resolution preference found, using Auto", "MainWindow");
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggingService.Instance.Error($"Failed to load resolution preference: {ex.Message}", "MainWindow", ex);
+                _windowResolutionMode = WindowResolutionMode.Auto;
+            }
+        }
+
+        /// <summary>
+        /// Saves the current resolution preference to application settings
+        /// </summary>
+        private void SaveResolutionPreference(WindowResolutionMode mode)
+        {
+            try
+            {
+                Properties.Settings.Default.WindowResolutionMode = mode.ToString();
+                Properties.Settings.Default.Save();
+                LoggingService.Instance.Info($"Saved resolution preference: {mode}", "MainWindow");
+            }
+            catch (Exception ex)
+            {
+                LoggingService.Instance.Error($"Failed to save resolution preference: {ex.Message}", "MainWindow", ex);
+            }
+        }
+
+        /// <summary>
+        /// Loads the saved text size preference from application settings
+        /// </summary>
+        private void LoadTextSizePreference()
+        {
+            try
+            {
+                var savedSize = Properties.Settings.Default.TextSizeMultiplier;
+                if (Enum.TryParse<TextSizeMultiplier>(savedSize, out var size))
+                {
+                    _textSizeMultiplier = size;
+                    LoggingService.Instance.Info($"Loaded text size preference: {size}", "MainWindow");
+                }
+                else
+                {
+                    _textSizeMultiplier = TextSizeMultiplier.Normal;
+                    LoggingService.Instance.Info("No valid text size preference found, using Normal", "MainWindow");
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggingService.Instance.Error($"Failed to load text size preference: {ex.Message}", "MainWindow", ex);
+                _textSizeMultiplier = TextSizeMultiplier.Normal;
+            }
+        }
+
+        /// <summary>
+        /// Saves the current text size preference to application settings
+        /// </summary>
+        private void SaveTextSizePreference(TextSizeMultiplier size)
+        {
+            try
+            {
+                Properties.Settings.Default.TextSizeMultiplier = size.ToString();
+                Properties.Settings.Default.Save();
+                LoggingService.Instance.Info($"Saved text size preference: {size}", "MainWindow");
+            }
+            catch (Exception ex)
+            {
+                LoggingService.Instance.Error($"Failed to save text size preference: {ex.Message}", "MainWindow", ex);
+            }
+        }
+
+        /// <summary>
+        /// Applies the specified text size multiplier globally to the application by directly scaling all text elements
+        /// </summary>
+        private void ApplyTextSizeMultiplier(TextSizeMultiplier multiplier)
+        {
+            try
+            {
+                double scale = GetTextSizeMultiplierValue(multiplier);
+                
+                // Update the global multiplier resource
+                Application.Current.Resources["GlobalTextSizeMultiplier"] = scale;
+                
+                // Update Session Summary specific font size resources
+                Application.Current.Resources["ScaledSessionSummaryTitleFontSize"] = 14.0 * scale;
+                Application.Current.Resources["ScaledSessionSummaryHeaderFontSize"] = 12.0 * scale;
+                Application.Current.Resources["ScaledSessionSummaryDetailFontSize"] = 12.0 * scale;
+                Application.Current.Resources["ScaledSessionSummaryTransactionFontSize"] = 12.0 * scale;
+                
+                // Update Player Profile specific font size resources
+                Application.Current.Resources["ScaledPlayerNameFontSize"] = 20.0 * scale;
+                Application.Current.Resources["ScaledPlayerDetailFontSize"] = 14.0 * scale;
+                Application.Current.Resources["ScaledStatisticsTitleFontSize"] = 16.0 * scale;
+                Application.Current.Resources["ScaledStatisticsValueFontSize"] = 14.0 * scale;
+                Application.Current.Resources["ScaledPlayerListItemNameFontSize"] = 16.0 * scale;
+                Application.Current.Resources["ScaledPlayerListItemDetailFontSize"] = 12.0 * scale;
+                
+                // Update Profit Graph specific resources
+                Application.Current.Resources["ScaledGraphAxisLabelFontSize"] = 10.0 * scale;
+                Application.Current.Resources["ScaledGraphTitleFontSize"] = 14.0 * scale;
+                Application.Current.Resources["ScaledGraphYAxisWidth"] = 30.0 * scale;
+                
+                // Update Session Manager specific font size resources
+                Application.Current.Resources["ScaledSessionTitleFontSize"] = 24.0 * scale;
+                Application.Current.Resources["ScaledSessionSectionTitleFontSize"] = 16.0 * scale;
+                Application.Current.Resources["ScaledSessionPlayerNameFontSize"] = 15.0 * scale;
+                Application.Current.Resources["ScaledSessionPlayerInfoFontSize"] = 12.0 * scale;
+                Application.Current.Resources["ScaledSessionSmallInfoFontSize"] = 10.0 * scale;
+                Application.Current.Resources["ScaledSessionLabelFontSize"] = 9.0 * scale;
+                Application.Current.Resources["ScaledSessionActivityFontSize"] = 11.0 * scale;
+                
+                // Update Dialog specific font size resources
+                Application.Current.Resources["ScaledDialogTitleFontSize"] = 18.0 * scale;
+                Application.Current.Resources["ScaledDialogSectionTitleFontSize"] = 14.0 * scale;
+                Application.Current.Resources["ScaledDialogPlayerNameFontSize"] = 16.0 * scale;
+                Application.Current.Resources["ScaledDialogPlayerInfoFontSize"] = 12.0 * scale;
+                Application.Current.Resources["ScaledDialogSmallInfoFontSize"] = 11.0 * scale;
+                Application.Current.Resources["ScaledDialogTinyInfoFontSize"] = 10.0 * scale;
+                
+                // Update New Session specific font size resources
+                Application.Current.Resources["ScaledNewSessionTitleFontSize"] = 24.0 * scale;
+                Application.Current.Resources["ScaledNewSessionSectionTitleFontSize"] = 16.0 * scale;
+                Application.Current.Resources["ScaledNewSessionIdFontSize"] = 14.0 * scale;
+                Application.Current.Resources["ScaledNewSessionPlayerNameFontSize"] = 14.0 * scale;
+                Application.Current.Resources["ScaledNewSessionInfoFontSize"] = 14.0 * scale;
+                Application.Current.Resources["ScaledNewSessionStatusFontSize"] = 14.0 * scale;
+                Application.Current.Resources["ScaledNewSessionEmptyMessageFontSize"] = 12.0 * scale;
+                
+                // Update Dashboard specific font size resources
+                Application.Current.Resources["ScaledDashboardTitleFontSize"] = 28.0 * scale;
+                Application.Current.Resources["ScaledDashboardSubtitleFontSize"] = 16.0 * scale;
+                Application.Current.Resources["ScaledDashboardSectionTitleFontSize"] = 18.0 * scale;
+                Application.Current.Resources["ScaledDashboardStatValueFontSize"] = 20.0 * scale;
+                Application.Current.Resources["ScaledDashboardStatLabelFontSize"] = 12.0 * scale;
+                Application.Current.Resources["ScaledDashboardIconFontSize"] = 24.0 * scale;
+                Application.Current.Resources["ScaledDashboardSessionNameFontSize"] = 14.0 * scale;
+                Application.Current.Resources["ScaledDashboardSessionDetailFontSize"] = 11.0 * scale;
+                Application.Current.Resources["ScaledDashboardSessionStatusFontSize"] = 10.0 * scale;
+                Application.Current.Resources["ScaledDashboardComboBoxFontSize"] = 14.0 * scale;
+                Application.Current.Resources["ScaledDashboardEmptyStateFontSize"] = 16.0 * scale;
+                Application.Current.Resources["ScaledDashboardEmptyDescFontSize"] = 12.0 * scale;
+                Application.Current.Resources["ScaledDashboardDecorationFontSize"] = 48.0 * scale;
+                
+                // Update Settings specific font size resources
+                Application.Current.Resources["ScaledSettingsTitleFontSize"] = 32.0 * scale;
+                Application.Current.Resources["ScaledSettingsSectionTitleFontSize"] = 20.0 * scale;
+                Application.Current.Resources["ScaledSettingsDescriptionFontSize"] = 14.0 * scale;
+                Application.Current.Resources["ScaledSettingsLabelFontSize"] = 14.0 * scale;
+                Application.Current.Resources["ScaledSettingsComboBoxFontSize"] = 14.0 * scale;
+                Application.Current.Resources["ScaledSettingsHelpTextFontSize"] = 12.0 * scale;
+                Application.Current.Resources["ScaledSettingsFutureFontSize"] = 18.0 * scale;
+                
+                // Update Session History specific font size resources
+                Application.Current.Resources["ScaledSessionHistoryTitleFontSize"] = 24.0 * scale;
+                Application.Current.Resources["ScaledSessionHistorySectionTitleFontSize"] = 18.0 * scale;
+                Application.Current.Resources["ScaledSessionHistoryStatValueFontSize"] = 24.0 * scale;
+                Application.Current.Resources["ScaledSessionHistoryStatLabelFontSize"] = 12.0 * scale;
+                Application.Current.Resources["ScaledSessionHistorySessionNameFontSize"] = 18.0 * scale;
+                Application.Current.Resources["ScaledSessionHistorySessionDetailFontSize"] = 14.0 * scale;
+                Application.Current.Resources["ScaledSessionHistoryFinancialValueFontSize"] = 16.0 * scale;
+                Application.Current.Resources["ScaledSessionHistoryFinancialLabelFontSize"] = 12.0 * scale;
+                Application.Current.Resources["ScaledSessionHistoryStatusBadgeFontSize"] = 10.0 * scale;
+                Application.Current.Resources["ScaledSessionHistoryEmptyTitleFontSize"] = 24.0 * scale;
+                Application.Current.Resources["ScaledSessionHistoryEmptyDescFontSize"] = 16.0 * scale;
+                Application.Current.Resources["ScaledSessionHistoryEmptyIconFontSize"] = 48.0 * scale;
+                
+                // Update Active Sessions specific font size resources
+                Application.Current.Resources["ScaledActiveSessionsTitleFontSize"] = 24.0 * scale;
+                Application.Current.Resources["ScaledActiveSessionsSubtitleFontSize"] = 14.0 * scale;
+                Application.Current.Resources["ScaledActiveSessionsSectionTitleFontSize"] = 18.0 * scale;
+                Application.Current.Resources["ScaledActiveSessionsSessionNameFontSize"] = 18.0 * scale;
+                Application.Current.Resources["ScaledActiveSessionsSessionDetailFontSize"] = 14.0 * scale;
+                Application.Current.Resources["ScaledActiveSessionsFinancialValueFontSize"] = 16.0 * scale;
+                Application.Current.Resources["ScaledActiveSessionsFinancialLabelFontSize"] = 12.0 * scale;
+                Application.Current.Resources["ScaledActiveSessionsStatusBadgeFontSize"] = 10.0 * scale;
+                Application.Current.Resources["ScaledActiveSessionsQuickStatsTitleFontSize"] = 16.0 * scale;
+                Application.Current.Resources["ScaledActiveSessionsQuickStatsValueFontSize"] = 20.0 * scale;
+                Application.Current.Resources["ScaledActiveSessionsQuickStatsLabelFontSize"] = 12.0 * scale;
+                Application.Current.Resources["ScaledActiveSessionsEmptyTitleFontSize"] = 24.0 * scale;
+                Application.Current.Resources["ScaledActiveSessionsEmptyDescFontSize"] = 16.0 * scale;
+                Application.Current.Resources["ScaledActiveSessionsEmptyIconFontSize"] = 48.0 * scale;
+                
+                // Apply scaling directly to all text elements in the window
+                ApplyTextScalingToAllElements(this, scale);
+                
+                LoggingService.Instance.Info($"Applied text size multiplier: {multiplier} (scale: {scale:F1}x)", "MainWindow");
+            }
+            catch (Exception ex)
+            {
+                LoggingService.Instance.Error($"Failed to apply text size multiplier: {ex.Message}", "MainWindow", ex);
+            }
+        }
+
+        /// <summary>
+        /// Applies text scaling directly to all elements in the visual tree
+        /// </summary>
+        private void ApplyTextScalingToAllElements(DependencyObject parent, double scale)
+        {
+            try
+            {
+                if (parent == null) return;
+
+                // Apply scaling to the current element if it has a FontSize property
+                ApplyScalingToElement(parent, scale);
+
+                // Recursively apply to all child elements
+                int childCount = VisualTreeHelper.GetChildrenCount(parent);
+                for (int i = 0; i < childCount; i++)
+                {
+                    var child = VisualTreeHelper.GetChild(parent, i);
+                    ApplyTextScalingToAllElements(child, scale);
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggingService.Instance.Warning($"Error applying text scaling to element: {ex.Message}", "MainWindow");
+            }
+        }
+
+        /// <summary>
+        /// Applies text scaling to a specific UI element
+        /// </summary>
+        private void ApplyScalingToElement(DependencyObject element, double scale)
+        {
+            try
+            {
+                if (element is FrameworkElement frameworkElement)
+                {
+                    // Store original font size in Tag if not already stored
+                    var originalFontSizeKey = "OriginalFontSize";
+                    
+                    if (frameworkElement.Tag is not Dictionary<string, object> tagDict)
+                    {
+                        tagDict = new Dictionary<string, object>();
+                        frameworkElement.Tag = tagDict;
+                    }
+
+                    // Get the FontSize property if the element has one
+                    var fontSizeProperty = GetFontSizeProperty(element);
+                    if (fontSizeProperty != null)
+                    {
+                        var currentFontSize = (double)element.GetValue(fontSizeProperty);
+                        
+                        // Store original font size if not already stored
+                        if (!tagDict.ContainsKey(originalFontSizeKey))
+                        {
+                            tagDict[originalFontSizeKey] = currentFontSize;
+                        }
+                        
+                        // Apply scaling using the original font size
+                        var originalFontSize = (double)tagDict[originalFontSizeKey];
+                        var newFontSize = originalFontSize * scale;
+                        element.SetValue(fontSizeProperty, newFontSize);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggingService.Instance.Warning($"Error scaling font for element {element?.GetType().Name}: {ex.Message}", "MainWindow");
+            }
+        }
+
+        /// <summary>
+        /// Gets the FontSize dependency property for different element types
+        /// </summary>
+        private DependencyProperty GetFontSizeProperty(DependencyObject element)
+        {
+            return element switch
+            {
+                TextBlock => TextBlock.FontSizeProperty,
+                Button => Button.FontSizeProperty,
+                Label => Label.FontSizeProperty,
+                ComboBox => ComboBox.FontSizeProperty,
+                ComboBoxItem => ComboBoxItem.FontSizeProperty,
+                ListBox => ListBox.FontSizeProperty,
+                ListBoxItem => ListBoxItem.FontSizeProperty,
+                TextBox => TextBox.FontSizeProperty,
+                CheckBox => CheckBox.FontSizeProperty,
+                RadioButton => RadioButton.FontSizeProperty,
+                MenuItem => MenuItem.FontSizeProperty,
+                Control control when control.GetType().GetProperty("FontSize") != null => Control.FontSizeProperty,
+                _ => null
+            };
+        }
+
+        /// <summary>
+        /// Refreshes text scaling for dynamically loaded content
+        /// </summary>
+        public void RefreshTextScalingForNewContent(FrameworkElement element)
+        {
+            try
+            {
+                double currentScale = GetTextSizeMultiplierValue(_textSizeMultiplier);
+                ApplyTextScalingToAllElements(element, currentScale);
+                LoggingService.Instance.Debug($"Applied text scaling to new content: {element.GetType().Name}", "MainWindow");
+            }
+            catch (Exception ex)
+            {
+                LoggingService.Instance.Warning($"Error applying text scaling to new content: {ex.Message}", "MainWindow");
+            }
+        }
+
+        /// <summary>
+        /// Gets the numeric multiplier value for a text size enum
+        /// </summary>
+        private double GetTextSizeMultiplierValue(TextSizeMultiplier multiplier)
+        {
+            return multiplier switch
+            {
+                TextSizeMultiplier.Tiny => 0.8,
+                TextSizeMultiplier.Small => 0.9,
+                TextSizeMultiplier.Normal => 1.0,
+                TextSizeMultiplier.Large => 1.2,
+                TextSizeMultiplier.ExtraLarge => 1.4,
+                TextSizeMultiplier.Huge => 1.6,
+                _ => 1.0
+            };
+        }
+
+
+
+        /// <summary>
+        /// Initializes the settings page UI with current values
+        /// </summary>
+        private void InitializeSettingsPage()
+        {
+            try
+            {
+                // Set the resolution ComboBox selection based on current resolution mode
+                foreach (ComboBoxItem item in ResolutionModeComboBox.Items)
+                {
+                    if (item.Tag?.ToString() == _windowResolutionMode.ToString())
+                    {
+                        ResolutionModeComboBox.SelectedItem = item;
+                        break;
+                    }
+                }
+                
+                // Set the text size ComboBox selection based on current text size mode
+                foreach (ComboBoxItem item in TextSizeComboBox.Items)
+                {
+                    if (item.Tag?.ToString() == _textSizeMultiplier.ToString())
+                    {
+                        TextSizeComboBox.SelectedItem = item;
+                        break;
+                    }
+                }
+                
+                LoggingService.Instance.Debug($"Settings page initialized - Resolution: {_windowResolutionMode}, Text Size: {_textSizeMultiplier}", "MainWindow");
+            }
+            catch (Exception ex)
+            {
+                LoggingService.Instance.Error($"Failed to initialize settings page: {ex.Message}", "MainWindow", ex);
+            }
+        }
+
+        /// <summary>
+        /// Handles resolution mode ComboBox selection changes
+        /// </summary>
+        private void ResolutionModeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                if (ResolutionModeComboBox.SelectedItem is ComboBoxItem selectedItem && selectedItem.Tag != null)
+                {
+                    var tagValue = selectedItem.Tag.ToString();
+                    if (Enum.TryParse<WindowResolutionMode>(tagValue, out var newMode))
+                    {
+                        WindowResolutionMode = newMode;
+                        LoggingService.Instance.Info($"Resolution mode changed to: {newMode}", "MainWindow");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggingService.Instance.Error($"Error handling resolution mode change: {ex.Message}", "MainWindow", ex);
+            }
+        }
+
+        /// <summary>
+        /// Handles text size ComboBox selection changes
+        /// </summary>
+        private void TextSizeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                if (TextSizeComboBox.SelectedItem is ComboBoxItem selectedItem && selectedItem.Tag != null)
+                {
+                    var tagValue = selectedItem.Tag.ToString();
+                    if (Enum.TryParse<TextSizeMultiplier>(tagValue, out var newSize))
+                    {
+                        TextSizeMultiplier = newSize;
+                        LoggingService.Instance.Info($"Text size changed to: {newSize}", "MainWindow");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggingService.Instance.Error($"Error handling text size change: {ex.Message}", "MainWindow", ex);
+            }
+        }
+
+        // TestUpdateDialog_Click removed for release
 
         private void MainWindow_SourceInitialized(object sender, EventArgs e)
         {
@@ -549,6 +1093,32 @@ namespace PokerTracker2
         public List<PlayerProfile> AvailablePlayers => _playerManager.GetActivePlayers();
         public List<PlayerProfile> AllPlayers => _playerManager.Players.ToList();
 
+        public WindowResolutionMode WindowResolutionMode
+        {
+            get => _windowResolutionMode;
+            set
+            {
+                if (SetProperty(ref _windowResolutionMode, value))
+                {
+                    ApplyWindowResolution(value);
+                    SaveResolutionPreference(value);
+                }
+            }
+        }
+
+        public TextSizeMultiplier TextSizeMultiplier
+        {
+            get => _textSizeMultiplier;
+            set
+            {
+                if (SetProperty(ref _textSizeMultiplier, value))
+                {
+                    ApplyTextSizeMultiplier(value);
+                    SaveTextSizePreference(value);
+                }
+            }
+        }
+
         // Session management
         public Session? CurrentSession => _sessionManager.CurrentSession;
 
@@ -641,24 +1211,12 @@ namespace PokerTracker2
                 {
                     LoggingService.Instance.Info($"Startup update check: Update available - {updateInfo.LatestVersion}", "MainWindow");
                     
-                    // Show update dialog on UI thread
+                    // Show our custom UpdateDialog directly (no pre-confirmation dialog)
                     await Dispatcher.InvokeAsync(() =>
                     {
-                        var result = MessageBox.Show(
-                            $"A new version of PokerTracker2 is available!\n\n" +
-                            $"Current Version: {updateInfo.CurrentVersion}\n" +
-                            $"Latest Version: {updateInfo.LatestVersion}\n\n" +
-                            "Would you like to download and install the update now?",
-                            "Update Available",
-                            MessageBoxButton.YesNo,
-                            MessageBoxImage.Information);
-                        
-                        if (result == MessageBoxResult.Yes)
-                        {
-                            var updateDialog = new Dialogs.UpdateDialog(updateInfo, _autoUpdateService);
-                            updateDialog.Owner = this;
-                            updateDialog.ShowDialog();
-                        }
+                        var updateDialog = new Dialogs.UpdateDialog(updateInfo, _autoUpdateService);
+                        updateDialog.Owner = this;
+                        updateDialog.ShowDialog();
                     });
                 }
                 else
@@ -688,6 +1246,7 @@ namespace PokerTracker2
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
         {
             ShowPage(SettingsPage);
+            InitializeSettingsPage();
         }
 
         private void DebugButton_Click(object sender, RoutedEventArgs e)
@@ -1485,11 +2044,11 @@ namespace PokerTracker2
                 ManagementSessionStatusText.Text = "Active session";
                 ManagementSessionStatusText.Foreground = System.Windows.Media.Brushes.Green;
                 
-                // Update total current stacks (chips on table)
-                ManagementTotalFinalStacksText.Text = $"${_sessionManager.TotalCurrentStacks:F2}";
+                // Update chips on table: show sum of players' current stacks
+                ManagementTotalFinalStacksText.Text = $"${_sessionManager.TotalChipsOnTable:F2}";
                 
-                // Update session balance - now uses current stacks
-                var balance = _sessionManager.TotalBuyIn - _sessionManager.TotalCurrentStacks;
+                // Update session balance: Buy-ins vs (partial cash-outs + final stacks)
+                var balance = _sessionManager.TotalBuyIn - (_sessionManager.TotalCashOut + _sessionManager.TotalFinalStacks);
                 var balanceText = $"${balance:F2}";
                 
                 if (Math.Abs(balance) < 0.01)
@@ -1918,8 +2477,28 @@ namespace PokerTracker2
         {
             try
             {
-                // Load ALL player profiles from Firebase for the Players page
-                var allProfiles = await _playerManager.GetAllPlayersAsync();
+                // Check if PlayerManager already has all profiles loaded (from initialization)
+                // If not, load them now (this handles edge cases where initialization failed)
+                List<PlayerProfile> allProfiles;
+                if (_playerManager.Players.Count == 0)
+                {
+                    LoggingService.Instance.Warning("PlayerManager appears empty, loading all profiles from Firebase", "MainWindow");
+                    allProfiles = await _playerManager.GetAllPlayersAsync();
+                    
+                    // Update PlayerManager's collection
+                    _playerManager.Players.Clear();
+                    foreach (var p in allProfiles)
+                    {
+                        _playerManager.Players.Add(p);
+                    }
+                    OnPropertyChanged(nameof(AllPlayers));
+                }
+                else
+                {
+                    // Use already loaded profiles from PlayerManager initialization
+                    allProfiles = _playerManager.Players.ToList();
+                    LoggingService.Instance.Info($"Using already loaded profiles from PlayerManager ({allProfiles.Count} profiles)", "MainWindow");
+                }
                 
                 // Create a temporary collection for display
                 var displayProfiles = new ObservableCollection<PlayerProfile>(allProfiles);
@@ -1928,15 +2507,21 @@ namespace PokerTracker2
                 PlayerProfilesList.ItemsSource = null;
                 PlayerProfilesList.ItemsSource = displayProfiles;
                 
+                // Refresh text scaling for the updated content
+                RefreshTextScalingForNewContent(PlayerProfilesList);
+                
                 // Log the update for debugging
-                System.Diagnostics.Debug.WriteLine($"Updated Players page with {allProfiles.Count} profiles from Firebase");
+                System.Diagnostics.Debug.WriteLine($"Updated Players page with {allProfiles.Count} profiles");
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Failed to update Players page: {ex.Message}");
-                // Fallback to showing only login profiles
+                LoggingService.Instance.Error($"Failed to update Players page: {ex.Message}", "MainWindow", ex);
+                // Fallback to showing only what's in PlayerManager
                 PlayerProfilesList.ItemsSource = null;
                 PlayerProfilesList.ItemsSource = _playerManager.Players;
+                
+                OnPropertyChanged(nameof(AllPlayers));
             }
         }
 
@@ -2051,37 +2636,15 @@ namespace PokerTracker2
             {
                 if (this.WindowState == WindowState.Maximized)
                 {
-                    // Restore animation
-                    var storyboard = (Storyboard)FindResource("RestoreAnimation");
-                    if (storyboard != null)
-                    {
-                        storyboard.Begin(this);
-                        
-                        // Set window state after animation starts
-                        Dispatcher.BeginInvoke(() => this.WindowState = WindowState.Normal, System.Windows.Threading.DispatcherPriority.Loaded);
-                    }
-                    else
-                    {
-                        // Fallback if animation not found
-                        this.WindowState = WindowState.Normal;
-                    }
+                    // Restore to adaptive size
+                    this.WindowState = WindowState.Normal;
+                    LoggingService.Instance.Debug("Window restored to normal state", "MainWindow");
                 }
                 else
                 {
-                    // Maximize animation
-                    var storyboard = (Storyboard)FindResource("MaximizeAnimation");
-                    if (storyboard != null)
-                    {
-                        storyboard.Begin(this);
-                        
-                        // Set window state after animation starts
-                        Dispatcher.BeginInvoke(() => this.WindowState = WindowState.Maximized, System.Windows.Threading.DispatcherPriority.Loaded);
-                    }
-                    else
-                    {
-                        // Fallback if animation not found
-                        this.WindowState = WindowState.Maximized;
-                    }
+                    // Maximize to full screen
+                    this.WindowState = WindowState.Maximized;
+                    LoggingService.Instance.Debug("Window maximized", "MainWindow");
                 }
             }
             catch (Exception ex)
@@ -2534,8 +3097,8 @@ namespace PokerTracker2
                         LoggingService.Instance.Debug($"Session '{session.Name}' profit calculation: CashOut={playerInSession.TotalCashOut:C}, FinalStack={playerInSession.CurrentStack:C}, BuyIns={playerInSession.TotalBuyIn:C}, Profit={sessionProfit:C}", "MainWindow");
                         cumulativeProfit += sessionProfit;
                         
-                        // Add to session breakdown
-                        sessionBreakdown.Add(new SessionBreakdownItem
+                        // Add to session breakdown with nested transactions list
+                        var breakdownItem = new SessionBreakdownItem
                         {
                             SessionName = session.Name,
                             SessionDate = session.StartTime,
@@ -2544,7 +3107,7 @@ namespace PokerTracker2
                             FinalStack = playerInSession.CurrentStack,
                             Profit = sessionProfit,
                             SessionId = session.Id
-                        });
+                        };
                         
                         // Add to profit trend data
                         profitTrendData.Add(new ProfitPoint
@@ -2554,7 +3117,7 @@ namespace PokerTracker2
                             SessionId = session.Id
                         });
                         
-                        // Add transactions to history
+                        // Add transactions to history and attach per-session nested list
                         if (session.Transactions != null)
                         {
                             var playerTransactions = session.Transactions
@@ -2576,6 +3139,7 @@ namespace PokerTracker2
                                 };
                                 
                                 transactionHistory.Add(historyItem);
+                                breakdownItem.Transactions.Add(historyItem);
                             }
                             
                             // Add final stack as a cash-out transaction if there's a remaining stack
@@ -2588,8 +3152,11 @@ namespace PokerTracker2
                                     session.EndTime != DateTime.MinValue ? session.EndTime : session.StartTime.AddHours(4) // Use end time or estimate
                                 );
                                 transactionHistory.Add(finalCashOut);
+                                breakdownItem.Transactions.Add(finalCashOut);
                             }
                         }
+
+                        sessionBreakdown.Add(breakdownItem);
                     }
                 }
                 
@@ -2615,24 +3182,14 @@ namespace PokerTracker2
                 else
                     SelectedPlayerProfit.Foreground = System.Windows.Media.Brushes.Gray;
                 
-                // Update the summary text controls
-                var sessionDetails = string.Join("\n", sessionBreakdown.Select(s => 
-                    $"📅 {s.SessionName} ({s.SessionDateDisplay}):\n" +
-                    $"   💰 Buy-ins: {s.BuyIns:C}\n" +
-                    $"   💵 Cash-outs: {s.CashOuts:C}\n" +
-                    $"   🎯 Final Stack: {s.FinalStack:C}\n" +
-                    $"   📊 Session P/L: {s.Profit:C}\n"));
+                // Populate session summary list with reverse-chronological sorting (most recent first)
+                var orderedBreakdown = sessionBreakdown
+                    .OrderByDescending(s => s.SessionDate)
+                    .ToList();
+                SessionSummaryList.ItemsSource = orderedBreakdown;
                 
-                SessionSummaryText.Text = sessionDetails;
-                
-                // Sort transactions chronologically and display detailed history
-                var sortedTransactions = transactionHistory.OrderBy(t => t.Timestamp).ToList();
-                var transactionDetails = string.Join("\n", sortedTransactions.Select(t => 
-                    $"{t.TypeIcon} {t.Amount:C} - {t.Notes} ({t.Timestamp:HH:mm})")
-                );
-                
-                TransactionSummaryText.Text = string.IsNullOrEmpty(transactionDetails) ? 
-                    "No transaction data available" : transactionDetails;
+                // Refresh text scaling for the newly loaded session summary content
+                RefreshTextScalingForNewContent(SessionSummaryList);
                 
                 // Convert profit trend data to BuyInPoint format for the existing graph control
                 var buyInData = new ObservableCollection<BuyInPoint>(profitTrendData.Select(p => new BuyInPoint 
@@ -2659,9 +3216,8 @@ namespace PokerTracker2
         
         private void ClearPlayerActivityData()
         {
-            // Clear all activity-related UI controls
-            SessionSummaryText.Text = "No session data available";
-            TransactionSummaryText.Text = "No transaction data available";
+            // Clear activity-related UI controls
+            SessionSummaryList.ItemsSource = null;
             PlayerProfitGraph.BuyInData = null;
         }
 
@@ -3721,4 +4277,4 @@ namespace PokerTracker2
             throw new NotImplementedException();
         }
     }
-} 
+}

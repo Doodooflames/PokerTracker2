@@ -1,129 +1,59 @@
-# POKERTRACKER2 AI RELEASE MANIFEST
-**Purpose**: Track version-specific changes, releases, and development history  
-**Created**: January 15, 2025  
-**Last Updated**: January 15, 2025  
-**AI Assistant**: Claude Sonnet 4
+# PokerTracker2 AI Release Manifest
 
-## 📋 MANIFEST PURPOSE
-This file serves as a companion to AIMANIFEST.txt, specifically tracking:
-- **Version releases** and their specific changes
-- **Release-to-release development** continuity
-- **Version-specific implementation** details
-- **Release notes** and change summaries
-
-## 🚀 VERSION RELEASE HISTORY
-
-### V1.0.7 - Version Display Fix (January 15, 2025)
-**Status**: ✅ RELEASED - Available on GitHub
-
-#### What Was Fixed
-- **Version Display Issue**: Application was showing "v1.0" instead of correct version number
-- **Root Cause**: VersionService was only reading Major.Minor instead of full version
-- **UI Impact**: Login screen and main window title showed incorrect version
-
-#### Technical Changes Made
-- **Project File**: Updated version from 1.0.6 to 1.0.7 in PokerTracker2.csproj
-- **VersionService.cs**: Changed from `$"{version.Major}.{version.Minor}"` to `version.ToString()`
-- **Fallback Values**: Updated all fallback version strings to 1.0.7.0
-
-#### Files Modified
-- `PokerTracker2/PokerTracker2.csproj` - Version bump to 1.0.7
-- `PokerTracker2/Services/VersionService.cs` - Version reading logic fix
-- `AIMANIFEST.txt` - Updated with v1.0.7 release information
-
-#### Release Process
-- **Build**: ✅ Successful with 206 warnings (no errors)
-- **Publish**: ✅ Application published to PublishSingle directory
-- **Git Operations**: ✅ Tag v1.0.7 created and committed
-- **GitHub Release**: ✅ Successfully created at https://github.com/Doodooflames/PokerTracker2/releases/tag/v1.0.7
-- **Executable**: ✅ PokerTracker2.exe (12MB) uploaded
-
-#### User Experience Impact
-- **Before**: Application showed "v1.0" in login and title bars
-- **After**: Application now shows "v1.0.7.0" correctly
-- **Consistency**: All UI elements display the same, accurate version
-
-#### Lessons Learned
-- **Version Caching**: VersionService caches version information and must be updated when version changes
-- **Fallback Values**: All fallback version strings must be updated to match new project version
-- **Best Practice**: Always update both .csproj version AND VersionService fallback values together
+Purpose: Soft release notes during development. Keep entries brief per version. Use `AIMANIFEST.txt` for deep dives, and `release-notes-*.txt` for formal releases.
 
 ---
 
-### V1.0.6 - Enhanced Session Activity Panel (January 15, 2025)
-**Status**: ✅ RELEASED - Available on GitHub
-
-#### Major Features Released
-- **Enhanced Session Activity Panel**: Complete transaction history display with visual indicators
-- **Permission System**: Comprehensive role-based access control for admin and player users
-- **Admin Status Management**: Toggle admin privileges for player profiles
-- **Session Creation UI Overhaul**: Streamlined player addition using familiar PlayerSelectionDialog
-
-#### Technical Improvements
-- **Enhanced Player Model**: Profile linking and transaction history integration
-- **Session Manager**: Improved player management with proper transaction cleanup
-- **Firebase Integration**: Better session data persistence and loading
-- **Performance**: Optimized UI rendering and data binding
-
-#### Bug Fixes
-- **Buy-In Calculation**: Fixed double buy-in addition bug that caused incorrect totals
-- **Dashboard Layout**: Resolved layout jumping when selecting player profiles
-- **Profile Dropdown**: Fixed empty player profile dropdown in dashboard
-- **Session Loading**: Improved Firebase session loading and initialization
+## Index
+- v1.0.11 (Current)
+- v1.0.10
+- v1.0.9
+- v1.0.8
+- v1.0.7
+- v1.0.6
 
 ---
 
-## 🔄 RELEASE WORKFLOW NOTES
+## v1.0.11 (Current)
+- Version: 1.0.11
+- Focus: Stability, Firebase credentials discovery, session math fixes
+- Notes:
+  - Improved credentials path resolution and clearer diagnostics in `FirebaseService`
+  - Corrected chips-on-table and session balance calculations in `SessionManager`/UI
+  - Minor logging and UI polish
+  - Player Profile: Nested per-session transactions in Session Summary; chronological sorting; bold blue session name/date; green/red session P/L
 
-### Automated Release System
-- **Scripts**: Both PowerShell (.ps1) and Batch (.bat) versions available
-- **GitHub CLI**: Located at `C:\Program Files\GitHub CLI\gh.exe`
-- **No-Zip Default**: Releases upload executable directly without zipping
-- **Full Automation**: Build → Publish → Git Tag → GitHub Release → File Upload
+## v1.0.10
+- Focus: Version/UI consistency and release scripting
+- Notes:
+  - Verified dynamic version binding throughout UI
+  - Hardened PowerShell release workflow as primary path
 
-### Version Management
-- **Dynamic Binding**: Version numbers automatically update in UI from project file
-- **VersionService**: Handles runtime version reading from assembly
-- **UI Elements**: Login screen and main window title automatically show current version
-- **No Manual Updates**: Just change version in .csproj and rebuild
+## v1.0.9
+- Focus: Analytics groundwork and profile/session linkage
+- Notes:
+  - Added/refined session references for profiles to enable targeted Firestore queries
+  - Lightweight player session summaries for trends/averages
 
-### Critical Notes for Future Releases
-- **VersionService Fallbacks**: Must update fallback values in VersionService.cs when version changes
-- **Lines to Update**: ~30, ~67, ~85 in VersionService.cs
-- **Release Notes**: Keep concise and focused - avoid excessive verbosity
-- **Dual Manifest**: Update both AIMANIFEST.txt (overall knowledge) and AI-RELEASE-MANIFEST.txt (version-specific)
+## v1.0.8
+- Focus: Firebase connection reliability
+- Notes:
+  - Expanded search for `firebase-credentials.json` and added fallback copy behavior
+  - Better error messaging and logging for credential resolution
 
----
+## v1.0.7
+- Focus: Version display correctness
+- Notes:
+  - UI shows full version (e.g., v1.0.7.0) via `VersionService`
 
-## 📝 TEMPLATE FOR FUTURE RELEASES
-
-### V[X.Y.Z] - [Release Name] ([Date])
-**Status**: [Status] - [Location if released]
-
-#### What Was [Fixed/Added/Changed]
-- **[Change Category]**: [Description of change]
-
-#### Technical Changes Made
-- **[File/Component]**: [What was changed]
-
-#### Files Modified
-- `[file path]` - [What was changed]
-
-#### Release Process
-- **Build**: [Status] with [X] warnings/errors
-- **Publish**: [Status] - [Location]
-- **Git Operations**: [Status] - [Details]
-- **GitHub Release**: [Status] - [URL]
-- **Executable**: [Status] - [File details]
-
-#### User Experience Impact
-- **Before**: [Previous behavior]
-- **After**: [New behavior]
-- **Consistency**: [Impact on UI consistency]
-
-#### Lessons Learned
-- **[Lesson Category]**: [Description of lesson]
+## v1.0.6
+- Focus: Session activity and permissions
+- Notes:
+  - Enhanced session activity panel and admin controls
+  - Improved session creation UX
 
 ---
 
-**Next Release**: Ready for v1.0.8 when needed
+Tip: Update this file with quick bullets as we work; keep it short and current.
+
+

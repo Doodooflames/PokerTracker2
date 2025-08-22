@@ -153,8 +153,8 @@ namespace PokerTracker2.Windows
             {
                 LoggingService.Instance.Info("Loading player profiles with passwords for login dropdown...", "LoginWindow");
                 
-                // Only load player profiles with passwords from Firebase
-                var profilesWithPasswords = _playerManager.Players.Where(p => p.HasPassword).ToList();
+                // Use the new GetLoginPlayers method to get only profiles with passwords
+                var profilesWithPasswords = _playerManager.GetLoginPlayers();
                 
                 LoggingService.Instance.Info($"Found {profilesWithPasswords.Count} player profiles with passwords", "LoginWindow");
 
