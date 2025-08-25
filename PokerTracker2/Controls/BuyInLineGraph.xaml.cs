@@ -121,10 +121,12 @@ namespace PokerTracker2.Controls
                 // Calculate Y positions for start ($0) and end (profit value)
                 var startY = canvasHeight - ((0 - minAmount) / amountRange) * canvasHeight;
                 var endY = canvasHeight - ((point.Amount - minAmount) / amountRange) * canvasHeight;
+                var buyInY = canvasHeight - ((point.Amount - minAmount) / amountRange) * canvasHeight;
                 
                 // Ensure Y positions are within canvas bounds
                 startY = Math.Max(0, Math.Min(canvasHeight, startY));
                 endY = Math.Max(0, Math.Min(canvasHeight, endY));
+                buyInY = Math.Max(0, Math.Min(canvasHeight, buyInY));
 
                 if (IsProfitGraph)
                 {
@@ -159,15 +161,16 @@ namespace PokerTracker2.Controls
                 }
                 else
                 {
-                    // BUY-IN GRAPH: Original simple line logic
-                    var singleLine = new Line
+                    // BUY-IN GRAPH: Flat horizontal line at the buy-in amount
+                    // Draw horizontal line across the entire width
+                    var horizontalLine = new Line
                     {
-                        X1 = 0, Y1 = startY,
-                        X2 = canvasWidth, Y2 = endY,
+                        X1 = 0, Y1 = buyInY,
+                        X2 = canvasWidth, Y2 = buyInY,
                         Stroke = new SolidColorBrush(Color.FromRgb(79, 195, 247)), // #4FC3F7
                         StrokeThickness = 2
                     };
-                    LineSegmentsCanvas.Children.Add(singleLine);
+                    LineSegmentsCanvas.Children.Add(horizontalLine);
                 }
                 
                 // Create data points
@@ -199,19 +202,19 @@ namespace PokerTracker2.Controls
                 else
                 {
                     // Buy-in graph: single point in middle
-                var ellipse = new Ellipse
-                {
+                    var ellipse = new Ellipse
+                    {
                         Width = 6, Height = 6,
                         Fill = new SolidColorBrush(Color.FromRgb(79, 195, 247)),
-                    Stroke = new SolidColorBrush(Colors.White),
-                    StrokeThickness = 1
-                };
+                        Stroke = new SolidColorBrush(Colors.White),
+                        StrokeThickness = 1
+                    };
                     Canvas.SetLeft(ellipse, canvasWidth / 2 - 3);
-                    Canvas.SetTop(ellipse, endY - 3);
-                DataPointsCanvas.Children.Add(ellipse);
+                    Canvas.SetTop(ellipse, buyInY - 3);
+                    DataPointsCanvas.Children.Add(ellipse);
                 }
                 
-                System.Diagnostics.Debug.WriteLine($"BuyInLineGraph: Single point: Amount=${point.Amount}, StartY={startY} ($0), EndY={endY} (${point.Amount})");
+                System.Diagnostics.Debug.WriteLine($"BuyInLineGraph: Single point: Amount=${point.Amount}, Y={buyInY} (${point.Amount})");
             }
             else
             {

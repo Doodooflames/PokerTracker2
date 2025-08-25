@@ -280,12 +280,6 @@
                 <StackPanel Grid.Row="1" VerticalAlignment="Center" Margin="0,10,0,10">
                     <TextBlock Text="Login" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,25" Foreground="White"/>
                     
-                    <!-- Loading Indicator -->
-                    <StackPanel x:Name="LoadingPanel" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,20" Visibility="Visible">
-                        <TextBlock Text="🔄" FontSize="16" Margin="0,0,8,0" Foreground="#FFCCCCCC"/>
-                        <TextBlock Text="Loading profiles..." FontSize="12" Foreground="#FFCCCCCC"/>
-                    </StackPanel>
-                    
                     <!-- Username Field -->
                      <TextBlock Text="Username:" Margin="0,0,0,8" Foreground="#FFCCCCCC" FontSize="14"/>
                      <ComboBox x:Name="UsernameComboBox" 

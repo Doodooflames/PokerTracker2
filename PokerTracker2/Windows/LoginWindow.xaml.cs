@@ -39,6 +39,11 @@ namespace PokerTracker2.Windows
                 this.MouseLeftButtonDown += Window_MouseLeftButtonDown;
                 LoggingService.Instance.Info("MouseLeftButtonDown event handler attached", "LoginWindow");
                 
+                // Set initial loading state in username field
+                UsernameComboBox.ItemsSource = new List<string> { "Loading..." };
+                UsernameComboBox.SelectedIndex = 0;
+                UsernameComboBox.IsEnabled = false;
+                
                 // Apply Aero blur effect when window is initialized
                 LoggingService.Instance.Info("Setting up SourceInitialized event...", "LoginWindow");
                 SourceInitialized += (s, e) => 
@@ -94,6 +99,14 @@ namespace PokerTracker2.Windows
             {
                 LoggingService.Instance.Info("Starting async initialization...", "LoginWindow");
                 
+                // Show loading state in username field
+                Dispatcher.Invoke(() =>
+                {
+                    UsernameComboBox.ItemsSource = new List<string> { "Loading..." };
+                    UsernameComboBox.SelectedIndex = 0;
+                    UsernameComboBox.IsEnabled = false;
+                });
+                
                 // Initialize PlayerManager first
                 LoggingService.Instance.Info("Initializing PlayerManager...", "LoginWindow");
                 var playerManagerSuccess = await _playerManager.InitializeAsync();
@@ -104,7 +117,8 @@ namespace PokerTracker2.Windows
                     Dispatcher.Invoke(() =>
                     {
                         StatusText.Text = "Error: Failed to initialize PlayerManager";
-                        LoadingPanel.Visibility = Visibility.Collapsed;
+                        UsernameComboBox.ItemsSource = new List<string> { "Error: Failed to load profiles" };
+                        UsernameComboBox.SelectedIndex = 0;
                     });
                     return;
                 }
@@ -123,7 +137,6 @@ namespace PokerTracker2.Windows
                 // Update UI to show loaded state
                 Dispatcher.Invoke(() =>
                 {
-                    LoadingPanel.Visibility = Visibility.Collapsed;
                     UsernameComboBox.IsEnabled = true;
                     StatusText.Text = "Status: Ready";
                 });
@@ -137,7 +150,8 @@ namespace PokerTracker2.Windows
                 Dispatcher.Invoke(() =>
                 {
                     StatusText.Text = $"Error: {ex.Message}";
-                    LoadingPanel.Visibility = Visibility.Collapsed;
+                    UsernameComboBox.ItemsSource = new List<string> { "Error: Failed to load profiles" };
+                    UsernameComboBox.SelectedIndex = 0;
                 });
             }
         }

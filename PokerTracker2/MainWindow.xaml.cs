@@ -1127,6 +1127,119 @@ namespace PokerTracker2
 
         #region Navigation Events
 
+        // Track current animation state to prevent conflicts
+        private bool _isExpanded = false;
+        private bool _isAnimating = false;
+        private const double ExpandedWidth = 220;
+        private const double CollapsedWidth = 70;
+        private readonly Duration AnimationDuration = new Duration(TimeSpan.FromMilliseconds(300));
+
+        private void AnimateSidebar(double toWidth)
+        {
+            // Stop any current animation cleanly
+            Sidebar.BeginAnimation(Border.WidthProperty, null);
+            SidebarClip.BeginAnimation(RectangleGeometry.RectProperty, null);
+
+            var fromWidth = Sidebar.ActualWidth;
+
+            var widthAnimation = new DoubleAnimation
+            {
+                From = fromWidth,
+                To = toWidth,
+                Duration = AnimationDuration,
+                EasingFunction = new ExponentialEase { Exponent = 2 },
+                FillBehavior = FillBehavior.HoldEnd
+            };
+
+            var clipAnimation = new RectAnimation
+            {
+                From = new Rect(0, 0, fromWidth, 1000),
+                To = new Rect(0, 0, toWidth, 1000),
+                Duration = AnimationDuration,
+                EasingFunction = new ExponentialEase { Exponent = 2 },
+                FillBehavior = FillBehavior.HoldEnd
+            };
+
+            _isAnimating = true;
+
+            widthAnimation.Completed += (s, e) => {
+                _isAnimating = false;
+                Sidebar.Width = toWidth; // Ensure final state
+                Sidebar.BeginAnimation(Border.WidthProperty, null); // Remove animation
+            };
+
+            clipAnimation.Completed += (s, e) => {
+                SidebarClip.Rect = new Rect(0, 0, toWidth, 1000);
+                SidebarClip.BeginAnimation(RectangleGeometry.RectProperty, null);
+            };
+
+            Sidebar.BeginAnimation(Border.WidthProperty, widthAnimation);
+            SidebarClip.BeginAnimation(RectangleGeometry.RectProperty, clipAnimation);
+        }
+
+        private void ShowSidebarText()
+        {
+            DashboardText.Visibility = Visibility.Visible;
+            ActiveSessionsNavText.Visibility = Visibility.Visible;
+            SessionManagementText.Visibility = Visibility.Visible;
+            SessionHistoryText.Visibility = Visibility.Visible;
+            PlayersText.Visibility = Visibility.Visible;
+            AnalyticsText.Visibility = Visibility.Visible;
+            NewSessionText.Visibility = Visibility.Visible;
+            SettingsText.Visibility = Visibility.Visible;
+            LogoutText.Visibility = Visibility.Visible;
+            DebugText.Visibility = Visibility.Visible;
+        }
+
+        private void HideSidebarText()
+        {
+            if (_isExpanded) return; // Don't hide if re-expanded before delay
+
+            DashboardText.Visibility = Visibility.Collapsed;
+            ActiveSessionsNavText.Visibility = Visibility.Collapsed;
+            SessionManagementText.Visibility = Visibility.Collapsed;
+            SessionHistoryText.Visibility = Visibility.Collapsed;
+            PlayersText.Visibility = Visibility.Collapsed;
+            AnalyticsText.Visibility = Visibility.Collapsed;
+            NewSessionText.Visibility = Visibility.Collapsed;
+            SettingsText.Visibility = Visibility.Collapsed;
+            LogoutText.Visibility = Visibility.Collapsed;
+            DebugText.Visibility = Visibility.Collapsed;
+        }
+
+        private void Sidebar_MouseEnter(object sender, MouseEventArgs e)
+        {
+            LoggingService.Instance.Debug($"Sidebar_MouseEnter: _isExpanded={_isExpanded}, _isAnimating={_isAnimating}", "NavigationPane");
+            
+            if (_isExpanded && !_isAnimating)
+                return;
+
+            _isExpanded = true;
+            ShowSidebarText(); // Only unmask, don't rely on visibility
+
+            AnimateSidebar(ExpandedWidth);
+        }
+
+        private void Sidebar_MouseLeave(object sender, MouseEventArgs e)
+        {
+            LoggingService.Instance.Debug($"Sidebar_MouseLeave: _isExpanded={_isExpanded}, _isAnimating={_isAnimating}", "NavigationPane");
+            
+            if (!_isExpanded && !_isAnimating)
+                return;
+
+            _isExpanded = false;
+            AnimateSidebar(CollapsedWidth);
+
+            // Hide text *after* animation completes
+            // Could delay or do it in widthAnimation.Completed
+            Task.Delay(AnimationDuration.TimeSpan).ContinueWith(_ =>
+            {
+                Dispatcher.Invoke(HideSidebarText);
+            });
+        }
+
+
+
         private void DashboardButton_Click(object sender, RoutedEventArgs e)
         {
             ShowPage(DashboardPage);
@@ -2305,13 +2418,16 @@ namespace PokerTracker2
                     // REMOVED: NetProfit calculation - poker sessions should always balance to 0
                     // var totalNetProfit = _sessionManager.TotalNetProfit;
                     
+                    // Update Total Volume (sum of all buy-ins across all sessions)
+                    TotalVolumeText.Text = totalBuyIns.ToString("C");
+                    
                     TotalBuyInsText.Text = totalBuyIns.ToString("C");
                     // REMOVED: TotalCashOutsText reference - element doesn't exist in XAML
                     // TotalCashOutsText.Text = totalCashOuts.ToString("C");
                     // REMOVED: NetProfit display - poker sessions should always balance to 0
                     // TotalNetProfitText.Text = totalNetProfit.ToString("C");
                     
-                    LoggingService.Instance.Debug($"Global stats calculated - TotalBuyIns: {totalBuyIns:C}, TotalCashOuts: {totalCashOuts:C}", "MainWindow");
+                    LoggingService.Instance.Debug($"Global stats calculated - TotalVolume: {totalBuyIns:C}, TotalBuyIns: {totalBuyIns:C}, TotalCashOuts: {totalCashOuts:C}", "MainWindow");
                 }
                 
                 // Reset player info text
