@@ -1,0 +1,39 @@
+🚀 PokerTracker2 v1.0.18 - CRITICAL Firebase Credentials Fix
+
+## ⚠️ CRITICAL UPDATE REQUIRED
+**This release fixes a critical Firebase authentication issue that prevents the app from connecting to your data!**
+
+## ✨ What's New
+- **CRITICAL FIX**: Brand new Firebase service account credentials embedded
+- **Authentication Restored**: App now successfully connects to Firebase Firestore
+- **Data Access Fixed**: Users can now access their poker session data from the cloud
+- **No More Auth Errors**: Eliminated "Request had invalid authentication credentials" errors
+
+## 🔧 Technical Improvements
+- **Fresh Credentials**: Completely new Firebase service account key with project ID pokertracker-1ece5
+- **Embedded Update**: New credentials properly embedded in the executable
+- **Security Enhanced**: Credentials file properly ignored by git and never committed
+- **Reliable Connection**: Firebase integration now works as intended
+
+## 🎯 Why You Need This Update
+- **v1.0.17 and earlier**: Cannot connect to Firebase due to expired/invalid credentials
+- **v1.0.18**: ✅ Successfully connects and loads your poker session data
+- **Data Loss Prevention**: Without this update, you cannot access your cloud-stored sessions
+- **Immediate Fix**: No configuration needed - just download and run
+
+## 🔮 How It Works
+- **Automatic Credentials**: Firebase credentials are embedded in the .exe during build
+- **Secure Storage**: Credentials never stored as separate files on your machine
+- **Instant Connection**: App automatically connects to Firebase when launched
+- **Cloud Sync**: Your poker sessions and player data are now accessible
+
+## 🚀 Getting Started
+1. **Download v1.0.18** from this release
+2. **Replace your old executable** with the new one
+3. **Launch the app** - Firebase connection will work automatically
+4. **Access your data** - All your poker sessions are now available
+
+## ⚡ Update Priority: HIGH
+This is not an optional update - if you want to access your Firebase-stored poker data, you MUST update to v1.0.18!
+
+Your poker session data is safe and waiting for you in the cloud! 🎯✨

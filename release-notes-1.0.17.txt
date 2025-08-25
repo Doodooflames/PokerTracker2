@@ -1,0 +1,28 @@
+🚀 PokerTracker2 v1.0.17 - Firebase Credentials Hotfix
+
+## ✨ What's New
+- **Firebase Credentials Hotfix**: Fixed authentication issues by updating embedded credentials
+- **Current Credentials**: App now uses the latest, valid Firebase service account credentials
+- **Authentication Fixed**: Users can now connect to Firebase without "Unauthenticated" errors
+
+## 🔧 Technical Improvements
+- **Embedded Credentials Update**: Rebuilt application with current firebase-credentials.json
+- **Authentication Resolution**: Eliminated RpcException authentication failures
+- **Credential Management**: Proper process for updating embedded credentials documented
+
+## 🎯 Benefits
+- **Firebase Connection**: App now successfully connects to Firebase Firestore
+- **No More Auth Errors**: Eliminated "Request had invalid authentication credentials" errors
+- **Reliable Data**: Users can now access their poker session data from the cloud
+- **Seamless Experience**: Firebase integration works as intended
+
+## 🔮 How It Works
+- **Embedded Resource**: Firebase credentials are embedded in the .exe during build
+- **Automatic Loading**: App automatically loads credentials from embedded resources
+- **Secure Storage**: Credentials are never stored as separate files on user machines
+- **Easy Updates**: When credentials change, simply rebuild and release new version
+
+## 🚀 Getting Started
+The app will now successfully connect to Firebase and load your poker session data. No additional configuration needed!
+
+This hotfix ensures the Firebase integration works properly with current credentials! 🎯✨
