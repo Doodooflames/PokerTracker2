@@ -1,1 +1,295 @@
-you seem to have misunderstood. the add player button should be where its pictured right now, but look at the active session panel in the second picture, thats where i wanted the add player button. also while were at it, the button icons for adding a buy in or a cash out seem weird and i cant tell the meaning from the picture, can you fix that?
+# Navigation Pane Animation Fighting Issue - Need Fresh Perspective
+
+## Problem Description
+I have a WPF navigation sidebar that expands/collapses on mouse enter/leave. The issue is that when users quickly mouse away to start collapse and then quickly mouse back over during collapse, the animations "fight" - causing visual glitches, jittering, and poor performance.
+
+## What I Want
+Users should be able to:
+1. Mouse away to start collapse animation
+2. Quickly mouse back over the shrinking area to interrupt collapse
+3. Smoothly re-expand from the current intermediate state
+4. Have NO visual fighting, jittering, or performance issues
+
+## Current Implementation Issues
+Despite multiple attempts to fix this, the animations still fight. Here are the key problems I've identified:
+
+### 1. Animation State Conflicts
+- When interrupting a collapse animation, both expand and collapse animations can run simultaneously
+- The sidebar width and clipping mask get conflicting animation commands
+- Visual fighting occurs between the two animation states
+
+### 2. Event Handler Accumulation (Fixed)
+- Previously had event handler accumulation causing performance degradation
+- This has been resolved with proper event handler management
+
+### 3. Race Conditions (Partially Fixed)
+- Added animation interruption handling but still getting fighting
+- Current approach tries to stop running animations and create custom ones
+
+## Current Code Structure
+
+### MainWindow.xaml.cs - Navigation Pane Logic
+```csharp
+private Storyboard? _currentAnimation = null;
+private bool _isExpanded = false;
+private bool _isAnimating = false;
+private EventHandler? _expandCompletedHandler = null;
+private EventHandler? _collapseCompletedHandler = null;
+
+private void Sidebar_MouseEnter(object sender, MouseEventArgs e)
+{
+    LoggingService.Instance.Debug($"Sidebar_MouseEnter: _isExpanded={_isExpanded}, _isAnimating={_isAnimating}, _currentAnimation={(_currentAnimation != null ? "Running" : "None")}", "NavigationPane");
+    
+    // If already expanded, do nothing
+    if (_isExpanded) 
+    {
+        LoggingService.Instance.Debug("Sidebar_MouseEnter: Already expanded, ignoring", "NavigationPane");
+        return;
+    }
+    
+    LoggingService.Instance.Debug("Sidebar_MouseEnter: Starting expand animation", "NavigationPane");
+    
+    // Cancel any running animation to prevent conflicts
+    if (_currentAnimation != null)
+    {
+        LoggingService.Instance.Debug("Sidebar_MouseEnter: Stopping current animation", "NavigationPane");
+        _currentAnimation.Stop();
+        _currentAnimation = null;
+        _isAnimating = false;
+    }
+    
+    // Expand the sidebar to show labels - start from current state for smooth interruption
+    var expandAnimation = (Storyboard)FindResource("ExpandSidebar");
+    
+    // If we're interrupting a collapse, start from current width for smooth transition
+    if (Sidebar.Width < 220)
+    {
+        LoggingService.Instance.Debug($"Sidebar_MouseEnter: Interrupting collapse at width {Sidebar.Width}, creating smooth expand", "NavigationPane");
+        
+        // Create a custom animation that starts from current state
+        var customExpandAnimation = new Storyboard();
+        
+        // Animate sidebar width from current to expanded
+        var widthAnimation = new DoubleAnimation
+        {
+            From = Sidebar.Width,
+            To = 220,
+            Duration = TimeSpan.FromMilliseconds(300),
+            EasingFunction = new ExponentialEase { Exponent = 2 }
+        };
+        Storyboard.SetTarget(widthAnimation, Sidebar);
+        Storyboard.SetTargetProperty(widthAnimation, new PropertyPath(Border.WidthProperty));
+        
+        // Animate clipping mask from current to expanded
+        var clipAnimation = new RectAnimation
+        {
+            From = new Rect(0, 0, Sidebar.Width, 1000),
+            To = new Rect(0, 0, 220, 1000),
+            Duration = TimeSpan.FromMilliseconds(300),
+            EasingFunction = new ExponentialEase { Exponent = 2 }
+        };
+        Storyboard.SetTarget(clipAnimation, SidebarClip);
+        Storyboard.SetTargetProperty(clipAnimation, new PropertyPath(RectangleGeometry.RectProperty));
+        
+        customExpandAnimation.Children.Add(widthAnimation);
+        customExpandAnimation.Children.Add(clipAnimation);
+        
+        _currentAnimation = customExpandAnimation;
+    }
+    else
+    {
+        _currentAnimation = expandAnimation;
+    }
+    
+    _isExpanded = true;
+    _isAnimating = true;
+    
+    // Show all text labels immediately - clipping mask will handle the reveal effect
+    DashboardText.Visibility = Visibility.Visible;
+    ActiveSessionsNavText.Visibility = Visibility.Visible;
+    SessionManagementText.Visibility = Visibility.Visible;
+    SessionHistoryText.Visibility = Visibility.Visible;
+    PlayersText.Visibility = Visibility.Visible;
+    AnalyticsText.Visibility = Visibility.Visible;
+    NewSessionText.Visibility = Visibility.Visible;
+    SettingsText.Visibility = Visibility.Visible;
+    LogoutText.Visibility = Visibility.Visible;
+    DebugText.Visibility = Visibility.Visible;
+    
+    // Remove any existing completed handler to prevent accumulation
+    if (_expandCompletedHandler != null)
+    {
+        expandAnimation.Completed -= _expandCompletedHandler;
+    }
+    
+    // Create and store the completed handler
+    _expandCompletedHandler = (s, args) =>
+    {
+        LoggingService.Instance.Debug("Sidebar_MouseEnter: Expand animation completed", "NavigationPane");
+        if (_currentAnimation == expandAnimation)
+        {
+            _currentAnimation = null;
+            _isAnimating = false;
+            LoggingService.Instance.Debug("Sidebar_MouseEnter: Expand animation state reset", "NavigationPane");
+        }
+    };
+    
+    // Add the handler and start the animation
+    expandAnimation.Completed += _expandCompletedHandler;
+    expandAnimation.Begin();
+}
+
+private void Sidebar_MouseLeave(object sender, MouseEventArgs e)
+{
+    LoggingService.Instance.Debug($"Sidebar_MouseLeave: _isExpanded={_isExpanded}, _isAnimating={_isAnimating}, _currentAnimation={(_currentAnimation != null ? "Running" : "None")}", "NavigationPane");
+    
+    // If already collapsed, do nothing
+    if (!_isExpanded) 
+    {
+        LoggingService.Instance.Debug("Sidebar_MouseLeave: Already collapsed, ignoring", "NavigationPane");
+        return;
+    }
+    
+    LoggingService.Instance.Debug("Sidebar_MouseLeave: Starting collapse animation", "NavigationPane");
+    
+    // Cancel any running animation to prevent conflicts
+    if (_currentAnimation != null)
+    {
+        LoggingService.Instance.Debug("Sidebar_MouseLeave: Stopping current animation", "NavigationPane");
+        _currentAnimation.Stop();
+        _currentAnimation = null;
+        _isAnimating = false;
+    }
+    
+    // Collapse the sidebar to hide labels
+    var collapseAnimation = (Storyboard)FindResource("CollapseSidebar");
+    _currentAnimation = collapseAnimation;
+    _isExpanded = false;
+    _isAnimating = true;
+    
+    // Don't hide text labels immediately - let the clipping mask handle the masking effect
+    // The text will be procedurally masked away as the sidebar shrinks
+    
+    // Remove any existing completed handler to prevent accumulation
+    if (_collapseCompletedHandler != null)
+    {
+        collapseAnimation.Completed -= _collapseCompletedHandler;
+    }
+    
+    // Create and store the completed handler
+    _collapseCompletedHandler = (s, args) =>
+    {
+        LoggingService.Instance.Debug("Sidebar_MouseLeave: Collapse animation completed", "NavigationPane");
+        DashboardText.Visibility = Visibility.Collapsed;
+        ActiveSessionsNavText.Visibility = Visibility.Collapsed;
+        SessionManagementText.Visibility = Visibility.Collapsed;
+        SessionHistoryText.Visibility = Visibility.Collapsed;
+        PlayersText.Visibility = Visibility.Collapsed;
+        AnalyticsText.Visibility = Visibility.Collapsed;
+        NewSessionText.Visibility = Visibility.Collapsed;
+        SettingsText.Visibility = Visibility.Collapsed;
+        LogoutText.Visibility = Visibility.Collapsed;
+        DebugText.Visibility = Visibility.Collapsed;
+        
+        // Clean up when animation completes
+        if (_currentAnimation == collapseAnimation)
+        {
+            _currentAnimation = null;
+            _isAnimating = false;
+            LoggingService.Instance.Debug("Sidebar_MouseLeave: Animation state reset", "NavigationPane");
+        }
+    };
+    
+    // Add the handler and start the animation
+    collapseAnimation.Completed += _collapseCompletedHandler;
+    collapseAnimation.Begin();
+}
+```
+
+### MainWindow.xaml - Animation Definitions
+```xml
+<Storyboard x:Key="ExpandSidebar">
+    <DoubleAnimation Storyboard.TargetName="Sidebar" 
+                     Storyboard.TargetProperty="Width" 
+                     From="70" To="220" 
+                     Duration="0:0:0.3">
+        <DoubleAnimation.EasingFunction>
+            <ExponentialEase Exponent="2"/>
+        </DoubleAnimation.EasingFunction>
+    </DoubleAnimation>
+    <RectAnimation Storyboard.TargetName="SidebarClip" 
+                   Storyboard.TargetProperty="Rect" 
+                   From="0,0,70,1000" To="0,0,220,1000" 
+                   Duration="0:0:0.3">
+        <RectAnimation.EasingFunction>
+            <ExponentialEase Exponent="2"/>
+        </RectAnimation.EasingFunction>
+    </RectAnimation>
+</Storyboard>
+
+<Storyboard x:Key="CollapseSidebar">
+    <DoubleAnimation Storyboard.TargetName="Sidebar" 
+                     Storyboard.TargetProperty="Width" 
+                     From="220" To="70" 
+                     Duration="0:0:0.3">
+        <DoubleAnimation.EasingFunction>
+            <ExponentialEase Exponent="2"/>
+        </DoubleAnimation.EasingFunction>
+    </DoubleAnimation>
+    <RectAnimation Storyboard.TargetName="SidebarClip" 
+                   Storyboard.TargetProperty="Rect" 
+                   From="0,0,220,1000" To="0,0,70,1000" 
+                   Duration="0:0:0.3">
+        <RectAnimation.EasingFunction>
+            <ExponentialEase Exponent="2"/>
+        </RectAnimation.EasingFunction>
+    </RectAnimation>
+</Storyboard>
+```
+
+## What I've Tried (That Didn't Work)
+
+### 1. Animation Cooldowns
+- Added time-based cooldowns to prevent rapid toggling
+- Result: Made the pane unresponsive and couldn't dismiss
+
+### 2. Animation State Flags
+- Added `_isAnimating` flag to prevent multiple animations
+- Result: Still getting fighting when interrupting
+
+### 3. Custom State-Aware Animations
+- Created animations that start from current state
+- Result: Still getting visual fighting and conflicts
+
+### 4. Event Handler Management
+- Fixed event handler accumulation issue
+- Result: Performance improved but fighting persists
+
+## Core Questions for Grok
+
+1. **What's the fundamental architectural issue** causing these animations to fight?
+
+2. **Is my approach of trying to manage animation states manually** the right approach, or should I be using a different WPF animation pattern?
+
+3. **How can I implement true interruption handling** where a collapse animation can be smoothly reversed without conflicts?
+
+4. **Are there WPF-specific animation techniques** I'm missing that would handle this more elegantly?
+
+5. **Should I be using a different animation approach entirely** (like Composition API, or a different animation framework)?
+
+## What I Need
+
+A **completely different approach** that eliminates animation fighting while maintaining smooth, interruption-friendly behavior. I'm open to:
+
+- Rewriting the animation system from scratch
+- Using different WPF animation techniques
+- Implementing a state machine approach
+- Using a different UI framework for this component
+- Any other solution that actually works
+
+## Current Behavior vs Desired Behavior
+
+**Current**: Animations fight, visual glitches, poor performance
+**Desired**: Smooth, interruption-friendly animations with no fighting
+
+Please provide a fresh perspective and a working solution. I've been working on this for too long and need a different approach.

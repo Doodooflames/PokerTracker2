@@ -1,0 +1,33 @@
+🚀 PokerTracker2 v10.0.16 - Navigation Pane Revolution & UI Polish
+
+## ✨ What's New
+- **Navigation Pane Revolution**: Completely rewrote the sidebar animation system to eliminate fighting
+- **Procedural Animation Magic**: Replaced problematic Storyboards with smooth BeginAnimation() calls
+- **True Interruption Handling**: Users can now catch the shrinking sidebar and smoothly re-expand from any point
+- **UI Polish**: Cleaned up login screen loading displacement and added scrollbars throughout
+
+## 🔧 Technical Improvements
+- **Animation Architecture Overhaul**: Eliminated static Storyboards that caused visual conflicts
+- **Dynamic State Management**: Animations now start from current position instead of fixed values
+- **Clean Animation Replacement**: BeginAnimation(null) ensures smooth transitions without fighting
+- **Scrollbar Enhancements**: Added scrollbars to dashboard panel and improved padding consistency
+- **Graph Fixes**: Session management graphs now show proper flat lines for single buy-ins
+- **Dashboard Accuracy**: Fixed total volume calculation to properly sum all player buy-ins
+
+## 🎯 Benefits
+- **No More Animation Fighting**: Sidebar animations are now buttery smooth and interruption-friendly
+- **Professional Feel**: Navigation feels like a native, polished application
+- **Better User Experience**: Users can interact with the sidebar naturally without visual glitches
+- **Consistent UI**: Scrollbars and spacing are now uniform throughout the app
+- **Accurate Data**: Dashboard shows correct totals and graphs display properly
+
+## 🔮 How It Works
+- **Procedural Animations**: Each animation is created fresh from current state, eliminating conflicts
+- **Smart Interruption**: Mouse over during collapse smoothly reverses the animation
+- **Dynamic Start Points**: Animations always begin from where the UI actually is, not where it should be
+- **Clean State Management**: Simplified architecture that's easier to debug and maintain
+
+## 🚀 Getting Started
+The navigation sidebar now provides smooth, professional animations that respect user input. Try mousing away to start collapse, then quickly mouse back over - it should smoothly re-expand without any fighting!
+
+This release represents a major improvement in animation quality and user experience! 🎯✨

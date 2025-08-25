@@ -5,7 +5,10 @@ Purpose: Soft release notes during development. Keep entries brief per version. 
 ---
 
 ## Index
-- v1.0.11 (Current)
+- v1.0.14 (Current)
+- v1.0.13
+- v1.0.12
+- v1.0.11
 - v1.0.10
 - v1.0.9
 - v1.0.8
@@ -13,6 +16,44 @@ Purpose: Soft release notes during development. Keep entries brief per version. 
 - v1.0.6
 
 ---
+
+## v1.0.14 (Current)
+- Version: 1.0.14
+- Focus: Session Activity panel scrollbar positioning consistency
+- Notes:
+  - Fixed Session Activity sub-panel scrollbar positioning in session management
+  - Changed Grid Margin="20" to Border Padding="20" to move scrollbar to edge
+  - Added right margin (20px) to ItemsControl content to prevent scrollbar overlap
+  - Ensured consistent scrollbar behavior across all application panels
+  - Scrollbar now positioned cleanly at the right edge like dashboard panels
+  - **Fixed scrollbar overlapping the rightmost content (amount and time)**
+  - Improved visual consistency and user experience
+
+## v1.0.13 (Current)
+- Version: 1.0.13
+- Focus: Dashboard responsive layout and UI bounding improvements
+- Notes:
+  - Added ScrollViewer to dashboard content for proper content bounding at all resolutions
+  - Ensured dashboard panels stay within application window bounds regardless of text size or resolution
+  - Improved responsive layout with proper centering and overflow handling
+  - Added vertical scrollbar when content exceeds window height
+  - Added horizontal scrollbar support to prevent panel border clipping at small window sizes
+  - Applied safety margins (5px left/right) to all dashboard panels to prevent edge trimming
+  - Reduced minimum width constraint from 800px to 600px for better small window support
+  - **Fixed scrollbar positioning consistency across all application panels**
+  - **Changed ScrollViewer Margin to Padding for edge-aligned scrollbars like dashboard**
+  - **Applied to: New Session, Active Sessions, Player Profiles, Session History, Settings, Debug Console**
+  - Maintained decorative background elements while ensuring main content is properly bounded
+  - Enhanced user experience across different display configurations and accessibility settings
+
+## v1.0.12 (Current)
+- Version: 1.0.12
+- Focus: UI polish and seamless user experience
+- Notes:
+  - Fixed login window loading text layout shift - now shows "Loading..." in username field instead of separate panel
+  - Eliminated vertical displacement of UI elements during startup
+  - Seamless transition from loading to loaded state without layout jumping
+  - Improved user experience with consistent UI positioning
 
 ## v1.0.11 (Current)
 - Version: 1.0.11
