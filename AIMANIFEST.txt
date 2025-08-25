@@ -1,5 +1,32 @@
 # PokerTracker2 AI Manifest
 
+## 🚨 CRITICAL: RELEASE INSTRUCTIONS - KEEP AT TOP
+**ALWAYS READ THESE INSTRUCTIONS FIRST BEFORE DOING ANY RELEASE WORK**
+
+### GitHub Release Process (SINGLE EXE, NOT ZIPPED):
+1. **Update version** in `PokerTracker2/PokerTracker2.csproj` (lines 12-14)
+2. **Build and publish**: `dotnet publish --configuration Release --output bin\Release\net8.0-windows\publish`
+3. **Git operations**: 
+   - `git add . && git commit -m "Release v1.0.X"`
+   - `git tag -a v1.0.X -m "Release v1.0.X"`
+4. **Push to GitHub**: `git push origin master && git push origin v1.0.X`
+5. **Create GitHub release**: `& "C:\Program Files\GitHub CLI\gh.exe" release create v1.0.X "bin\Release\net8.0-windows\publish\PokerTracker2.exe" --title "Release v1.0.X" --notes-file "..\release-notes-1.0.X.txt"`
+
+### IMPORTANT NOTES:
+- **SINGLE EXE FILE**: Upload the .exe directly, NOT a zip file
+- **Firebase credentials**: Keep `firebase-credentials.json` in root directory, update embedded credentials when needed
+- **Version binding**: UI automatically shows version from project file
+- **Release notes**: Use AI-sloppy style like `release-notes-1.0.5.txt`
+
+### Firebase Credentials Management:
+- **Root file**: `firebase-credentials.json` in project root (NOT committed to git)
+- **Embedded resource**: Credentials are embedded in the .exe during build
+- **Update process**: When credentials change, rebuild and re-upload the .exe
+- **Security**: Never commit credentials to git (use .gitignore)
+- **Debug logs**: Check debug output for authentication errors and credential paths
+
+---
+
 ## 🚨 IMPORTANT: NEW MANIFEST REQUIREMENT
 **AI-RELEASE-MANIFEST.txt**: A second manifest file is now required to track changes for each version release. This file should be created alongside AIMANIFEST.txt and contain:
 - **Version-specific changes** and modifications
@@ -12,6 +39,69 @@
 ---
 
 ## 🚀 QUICK REFERENCE - RELEASE WORKFLOW
+
+## 🔥 FIREBASE CREDENTIALS UPDATE - v1.0.17 HOTFIX
+**Date**: 2025-08-25
+**Status**: ✅ Implemented and deployed
+
+### Problem Identified
+After releasing v1.0.16, users reported Firebase authentication failures with error:
+```
+RpcException: Status (StatusCode="Unauthenticated", Detail="Request had invalid authentication credentials")
+```
+
+### Root Cause
+The embedded Firebase credentials in the v1.0.16 release were outdated compared to the current `firebase-credentials.json` file in the root directory.
+
+### Solution Applied
+1. **Rebuilt application** with current `firebase-credentials.json` to update embedded credentials
+2. **Updated GitHub release** using `gh release upload v1.0.16 --clobber` to replace the executable
+3. **Enhanced manifest** with Firebase credentials management instructions
+
+### Technical Details
+- **Embedded Resource**: Firebase credentials are embedded in the .exe during build via `EmbeddedResource Include="..\firebase-credentials.json"`
+- **Update Process**: When credentials change, rebuild and re-upload the .exe to GitHub releases
+- **Security**: Credentials file is in .gitignore and never committed to repository
+
+### Files Modified
+- **AIMANIFEST.txt**: Added Firebase credentials management section and release instructions
+- **GitHub Release**: Updated v1.0.16 executable with current Firebase credentials
+
+---
+
+## 🔥 FIREBASE CREDENTIALS UPDATE - v1.0.17 HOTFIX (SECOND ATTEMPT)
+**Date**: 2025-08-25
+**Status**: ✅ Implemented and deployed
+
+### Problem Identified
+Even after updating v1.0.16 with new credentials, users still reported Firebase authentication failures. The issue persisted with the same "Unauthenticated" error.
+
+### Root Cause
+The Firebase service account key was completely invalid or expired, requiring a brand new service account key from Firebase Console.
+
+### Solution Applied
+1. **Obtained new service account key**: Generated fresh Firebase service account credentials
+2. **Replaced credentials file**: Updated `firebase-credentials.json` with new valid credentials
+3. **Rebuilt application**: Created new executable with updated embedded credentials
+4. **Updated GitHub release**: Replaced v1.0.17 executable using `gh release upload v1.0.17 --clobber`
+
+### Technical Details
+- **New Credentials**: Fresh service account key with project ID `pokertracker-1ece5`
+- **Proper Git Ignoring**: New credentials file properly ignored by .gitignore patterns
+- **Embedded Update**: New credentials embedded in executable during build process
+- **Release Update**: GitHub release updated with new executable containing valid credentials
+
+### Security Notes
+- **Git Ignored**: New credentials file properly excluded from version control
+- **Embedded Only**: Credentials only exist as embedded resources in the .exe
+- **No Local Files**: Users never see or need to manage credential files
+
+### Files Modified
+- **firebase-credentials.json**: Completely replaced with new valid service account key
+- **GitHub Release v1.0.17**: Updated executable with new embedded credentials
+- **AIMANIFEST.txt**: Documented the second credentials update attempt
+
+---
 
 ## 🧭 NAVIGATION PANE REDESIGN - LATEST IMPLEMENTATION
 **Date**: 2025-08-22
