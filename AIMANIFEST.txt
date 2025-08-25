@@ -103,6 +103,43 @@ The Firebase service account key was completely invalid or expired, requiring a 
 
 ---
 
+## 🚀 RELEASE v1.0.18 - CRITICAL FIREBASE CREDENTIALS FIX
+**Date**: 2025-08-25
+**Status**: ✅ Released and deployed
+
+### Release Rationale
+After multiple attempts to fix Firebase credentials in v1.0.17, it was decided to release v1.0.18 as a critical update to ensure users get the fix and can access their Firebase-stored poker data.
+
+### What Was Fixed
+- **Brand New Firebase Credentials**: Completely fresh service account key embedded
+- **Authentication Restored**: App now successfully connects to Firebase Firestore
+- **Data Access Fixed**: Users can now access their poker session data from the cloud
+- **No More Auth Errors**: Eliminated "Request had invalid authentication credentials" errors
+
+### Technical Implementation
+- **Version Update**: Updated project file to v1.0.18
+- **Fresh Build**: Rebuilt application with new embedded credentials
+- **New Release**: Created GitHub release v1.0.18 with critical update messaging
+- **User Communication**: Emphasized this is a required update for Firebase functionality
+
+### Release Notes Style
+- **AI-Sloppy Format**: Used enthusiastic, urgent tone to emphasize critical nature
+- **Clear Instructions**: Provided step-by-step update process for users
+- **Priority Messaging**: Marked as "CRITICAL UPDATE REQUIRED" with high priority
+
+### Files Modified
+- **PokerTracker2.csproj**: Version updated to 1.0.18
+- **release-notes-1.0.18.txt**: Created with critical update messaging
+- **GitHub Release**: New v1.0.18 release with single executable file
+- **AIMANIFEST.txt**: Documented the v1.0.18 release process
+
+### User Impact
+- **v1.0.17 and earlier**: Cannot connect to Firebase due to expired/invalid credentials
+- **v1.0.18**: ✅ Successfully connects and loads poker session data
+- **Update Required**: Users must download v1.0.18 to access cloud-stored data
+
+---
+
 ## 🧭 NAVIGATION PANE REDESIGN - LATEST IMPLEMENTATION
 **Date**: 2025-08-22
 **Status**: ✅ Implemented and tested
